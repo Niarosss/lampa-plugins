@@ -496,6 +496,11 @@
             });
           });
 
+          // Видаляємо дублікати елементів (однакові DOM-вузли могли бути знайдені кількома селекторами)
+          allButtons = allButtons.filter(function (el, idx) {
+            return allButtons.indexOf(el) === idx;
+          });
+
           if (allButtons.length === 0) {
             console.log("FancyFace: Не знайдено кнопок для організації");
             return;
@@ -641,6 +646,11 @@
               fullContainer.find(selector).each(function () {
                 allButtons.push(this);
               });
+            });
+
+            // Видаляємо дублікати елементів
+            allButtons = allButtons.filter(function (el, idx) {
+              return allButtons.indexOf(el) === idx;
             });
 
             if (allButtons.length === 0) {
