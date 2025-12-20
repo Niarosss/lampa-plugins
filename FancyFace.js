@@ -496,11 +496,6 @@
             });
           });
 
-          // Видаляємо дублікати елементів (однакові DOM-вузли могли бути знайдені кількома селекторами)
-          allButtons = allButtons.filter(function (el, idx) {
-            return allButtons.indexOf(el) === idx;
-          });
-
           if (allButtons.length === 0) {
             console.log("FancyFace: Не знайдено кнопок для організації");
             return;
@@ -516,28 +511,18 @@
             other: [],
           };
 
-          // Відстежуємо додані кнопки за унікальним ключем (текст + клас + data-subtitle)
-          var addedButtonKeys = {};
+          // Відстежуємо додані кнопки за текстом
+          var addedButtonTexts = {};
 
           // Сортуємо кнопки за категоріями
           $(allButtons).each(function () {
             var button = this;
             var buttonText = $(button).text().trim();
             var className = button.className || "";
-            var dataSubtitle =
-              $(button).attr("data-subtitle") ||
-              $(button).attr("data-id") ||
-              "";
 
-            // Унікальний ключ для кнопки
-            // Використовуємо data-subtitle як першу опору, якщо не підходить — fallback на outerHTML
-            var buttonKey = dataSubtitle
-              ? buttonText + "|" + className + "|" + dataSubtitle
-              : $(button).prop("outerHTML");
-
-            // Пропускаємо дублікати повного ключа
-            if (!buttonText || addedButtonKeys[buttonKey]) return;
-            addedButtonKeys[buttonKey] = true;
+            // Пропускаємо дублікати
+            if (!buttonText || addedButtonTexts[buttonText]) return;
+            addedButtonTexts[buttonText] = true;
 
             // Визначаємо категорію кнопки
             if (className.includes("online")) {
@@ -648,11 +633,6 @@
               });
             });
 
-            // Видаляємо дублікати елементів
-            allButtons = allButtons.filter(function (el, idx) {
-              return allButtons.indexOf(el) === idx;
-            });
-
             if (allButtons.length === 0) {
               console.log(
                 "FancyFace: Не знайдено кнопок для організації (слухач)"
@@ -672,22 +652,15 @@
               other: [],
             };
 
-            var addedButtonKeys = {};
+            var addedButtonTexts = {};
 
             $(allButtons).each(function () {
               var button = this;
               var buttonText = $(button).text().trim();
               var className = button.className || "";
-              var dataSubtitle =
-                $(button).attr("data-subtitle") ||
-                $(button).attr("data-id") ||
-                "";
-              var buttonKey = dataSubtitle
-                ? buttonText + "|" + className + "|" + dataSubtitle
-                : $(button).prop("outerHTML");
 
-              if (!buttonText || addedButtonKeys[buttonKey]) return;
-              addedButtonKeys[buttonKey] = true;
+              if (!buttonText || addedButtonTexts[buttonText]) return;
+              addedButtonTexts[buttonText] = true;
 
               if (className.includes("online")) {
                 categories.online.push(button);
