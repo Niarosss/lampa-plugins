@@ -435,30 +435,6 @@
                 flex-wrap: wrap !important;
                 gap: 10px !important;
             }
-        /* FancyFace online popup button */
-        .ff-online-popup-holder{ position: relative; display: inline-block; }
-        .ff-online-popup-button{
-          background: rgba(0,0,0,0.35);
-          color: #fff;
-          border-radius: 0.3em;
-          padding: 0.4em 0.8em;
-          cursor: pointer;
-          border: 0;
-          font-size: 0.9em;
-        }
-        .ff-online-popup{
-          display: none;
-          position: absolute;
-          top: 100%;
-          left: 0;
-          background: rgba(20,20,20,0.95);
-          padding: 0.5em;
-          border-radius: 0.4em;
-          box-shadow: 0 6px 18px rgba(0,0,0,0.5);
-          z-index: 9999;
-          min-width: 12em;
-        }
-        .ff-online-popup .full-start__button, .ff-online-popup .button{ display: block; margin: 4px 0; }
         `;
     document.head.appendChild(buttonStyle);
 
@@ -535,7 +511,7 @@
             other: [],
           };
 
-          // Відстежуємо додані кнопки за унікальним ключем (текст + клас + data-атрибут)
+          // Відстежуємо додані кнопки за унікальним ключем (текст + клас + data-subtitle)
           var addedButtonKeys = {};
 
           // Сортуємо кнопки за категоріями
@@ -543,10 +519,18 @@
             var button = this;
             var buttonText = $(button).text().trim();
             var className = button.className || "";
-            var dataAttr = $(button).attr("data-unique") || ""; // Додатковий атрибут
-            var buttonKey = buttonText + "_" + className + "_" + dataAttr; // Унікальний ключ
+            var dataSubtitle =
+              $(button).attr("data-subtitle") ||
+              $(button).attr("data-id") ||
+              "";
 
-            // Пропускаємо дублікати лише за повним ключем
+            // Унікальний ключ для кнопки
+            // Використовуємо data-subtitle як першу опору, якщо не підходить — fallback на outerHTML
+            var buttonKey = dataSubtitle
+              ? buttonText + "|" + className + "|" + dataSubtitle
+              : $(button).prop("outerHTML");
+
+            // Пропускаємо дублікати повного ключа
             if (!buttonText || addedButtonKeys[buttonKey]) return;
             addedButtonKeys[buttonKey] = true;
 
@@ -561,12 +545,7 @@
               categories.other.push(button);
             }
 
-            console.log(
-              "FancyFace: Оброблено кнопку:",
-              buttonText,
-              className,
-              dataAttr
-            );
+            console.log("FancyFace: Оброблено кнопку:", buttonText, className);
           });
 
           // Порядок кнопок
@@ -587,44 +566,7 @@
           });
 
           // Додаємо кнопки в порядку категорій
-          // Якщо є онлайн-кнопки, створюємо кнопку-обгортку з попапом
-          if (categories.online.length) {
-            var popupHolder = $("<div class='ff-online-popup-holder'></div>");
-            var popupBtn = $(
-              "<button class='ff-online-popup-button'>Онлайн ▾</button>"
-            );
-            var popup = $("<div class='ff-online-popup'></div>");
-
-            // Переміщаємо онлайн-кнопки в попап
-            categories.online.forEach(function (button) {
-              popup.append(button);
-            });
-
-            popupHolder.append(popupBtn).append(popup);
-            targetContainer.append(popupHolder);
-
-            // Обробник кліка для відкриття/закриття попапа
-            popupBtn.on("click", function (e) {
-              e.stopPropagation();
-              $(".ff-online-popup").not(popup).hide();
-              popup.toggle();
-            });
-
-            // Закриваємо попап при кліку поза ним
-            $(document)
-              .off("click.ff_online_popup")
-              .on("click.ff_online_popup", function () {
-                popup.hide();
-              });
-            // Не закривати при кліку всередині попапа
-            popup.on("click", function (e) {
-              e.stopPropagation();
-            });
-          }
-
-          // Додаємо інші категорії (без online, бо вони вже в попапі)
           buttonSortOrder.forEach(function (category) {
-            if (category === "online") return;
             categories[category].forEach(function (button) {
               targetContainer.append(button);
             });
@@ -720,15 +662,22 @@
               other: [],
             };
 
-            var addedButtonTexts = {};
+            var addedButtonKeys = {};
 
             $(allButtons).each(function () {
               var button = this;
               var buttonText = $(button).text().trim();
               var className = button.className || "";
+              var dataSubtitle =
+                $(button).attr("data-subtitle") ||
+                $(button).attr("data-id") ||
+                "";
+              var buttonKey = dataSubtitle
+                ? buttonText + "|" + className + "|" + dataSubtitle
+                : $(button).prop("outerHTML");
 
-              if (!buttonText || addedButtonTexts[buttonText]) return;
-              addedButtonTexts[buttonText] = true;
+              if (!buttonText || addedButtonKeys[buttonKey]) return;
+              addedButtonKeys[buttonKey] = true;
 
               if (className.includes("online")) {
                 categories.online.push(button);
@@ -748,41 +697,7 @@
 
             var originalElements = targetContainer.children().detach();
 
-            // Якщо є онлайн-кнопки, створюємо кнопку з попапом
-            if (categories.online.length) {
-              var popupHolder = $("<div class='ff-online-popup-holder'></div>");
-              var popupBtn = $(
-                "<button class='ff-online-popup-button'>Онлайн ▾</button>"
-              );
-              var popup = $("<div class='ff-online-popup'></div>");
-
-              categories.online.forEach(function (button) {
-                popup.append(button);
-              });
-
-              popupHolder.append(popupBtn).append(popup);
-              targetContainer.append(popupHolder);
-
-              popupBtn.on("click", function (e) {
-                e.stopPropagation();
-                $(".ff-online-popup").not(popup).hide();
-                popup.toggle();
-              });
-
-              $(document)
-                .off("click.ff_online_popup")
-                .on("click.ff_online_popup", function () {
-                  popup.hide();
-                });
-
-              popup.on("click", function (e) {
-                e.stopPropagation();
-              });
-            }
-
-            // Додаємо інші категорії (без online)
             buttonSortOrder.forEach(function (category) {
-              if (category === "online") return;
               categories[category].forEach(function (button) {
                 targetContainer.append(button);
               });
