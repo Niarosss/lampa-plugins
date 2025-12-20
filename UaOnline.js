@@ -2411,7 +2411,7 @@
       );
     }
     var button =
-      '<div class="full-start__button selector view--torrent lampac--button" data-subtitle="'
+      '<div class="full-start__button1 selector view--torrent lampac--button" data-subtitle="'
         .concat(manifst.name, " ")
         .concat(
           manifst.version,
