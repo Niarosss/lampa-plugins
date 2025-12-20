@@ -12,14 +12,12 @@
     // Налаштування за замовчуванням
     settings: {
       enabled: true,
-      buttons_mode: "default", // 'default', 'main_buttons', 'all_buttons'
       show_movie_type: true,
       theme: "default",
       colored_ratings: true,
       seasons_info_mode: "aired",
       show_episodes_on_main: false,
       label_position: "top-right", // 'top-right', 'top-left', 'bottom-right', 'bottom-left'
-      show_buttons: true,
       colored_elements: true, // Об'єднана настройка для статусів і вікових обмежень
     },
   };
@@ -423,320 +421,6 @@
       }
     });
   }
-
-  // Функція для відображення всіх кнопок у картці
-  function showAllButtons() {
-    // Додаємо стилі для кнопок за допомогою CSS
-    var buttonStyle = document.createElement("style");
-    buttonStyle.id = "fancyface_mod_buttons_style";
-    buttonStyle.innerHTML = `
-            .full-start-new__buttons, .full-start__buttons {
-                display: flex !important;
-                flex-wrap: wrap !important;
-                gap: 10px !important;
-            }
-        `;
-    document.head.appendChild(buttonStyle);
-
-    // Використовуємо Lampa.FullCard для розширення функціональності карток
-    var originFullCard;
-
-    // Перевіряємо, чи існує об'єкт Lampa.FullCard
-    if (Lampa.FullCard) {
-      // Зберігаємо оригінальний метод build
-      originFullCard = Lampa.FullCard.build;
-
-      // Перевизначаємо метод build для модифікації кнопок
-      Lampa.FullCard.build = function (data) {
-        // Викликаємо оригінальний метод build
-        var card = originFullCard(data);
-
-        // Додаємо функцію організації кнопок у картку
-        card.organizeButtons = function () {
-          // Знаходимо активність картки
-          var activity = card.activity;
-          if (!activity) return;
-
-          // Отримуємо елемент активності
-          var element = activity.render();
-          if (!element) return;
-
-          // Знаходимо контейнери для кнопок (підтримка різних версій Lampa)
-          var targetContainer = element.find(".full-start-new__buttons");
-          if (!targetContainer.length) {
-            targetContainer = element.find(".full-start__buttons");
-          }
-          if (!targetContainer.length) {
-            // Розширений пошук контейнерів кнопок
-            targetContainer = element.find(".buttons-container");
-          }
-          if (!targetContainer.length) return;
-
-          console.log(
-            "FancyFace: Знайдено контейнер для кнопок",
-            targetContainer
-          );
-
-          // Знаходимо всі кнопки з різних контейнерів
-          var allButtons = [];
-
-          // Пошук кнопок у різних контейнерах (підтримка різних версій Lampa)
-          var buttonSelectors = [
-            ".buttons--container .full-start__button",
-            ".full-start-new__buttons .full-start__button",
-            ".full-start__buttons .full-start__button",
-            ".buttons-container .button",
-            ".full-start-new__buttons .button",
-            ".full-start__buttons .button",
-          ];
-
-          buttonSelectors.forEach(function (selector) {
-            element.find(selector).each(function () {
-              allButtons.push(this);
-            });
-          });
-
-          if (allButtons.length === 0) {
-            console.log("FancyFace: Не знайдено кнопок для організації");
-            return;
-          }
-
-          console.log("FancyFace: Знайдено кнопок:", allButtons.length);
-
-          // Категорії кнопок
-          var categories = {
-            online: [],
-            torrent: [],
-            trailer: [],
-            other: [],
-          };
-
-          // Відстежуємо додані кнопки за текстом
-          var addedButtonTexts = {};
-
-          // Сортуємо кнопки за категоріями
-          $(allButtons).each(function () {
-            var button = this;
-            var buttonText = $(button).text().trim();
-            var className = button.className || "";
-
-            // Пропускаємо дублікати
-            if (!buttonText || addedButtonTexts[buttonText]) return;
-            addedButtonTexts[buttonText] = true;
-
-            // Визначаємо категорію кнопки
-            if (className.includes("online")) {
-              categories.online.push(button);
-            } else if (className.includes("torrent")) {
-              categories.torrent.push(button);
-            } else if (className.includes("trailer")) {
-              categories.trailer.push(button);
-            } else {
-              categories.other.push(button);
-            }
-
-            console.log("FancyFace: Оброблено кнопку:", buttonText, className);
-          });
-
-          // Порядок кнопок
-          var buttonSortOrder = ["online", "torrent", "trailer", "other"];
-
-          // Тимчасово вимикаємо оновлення контролера
-          var needToggle = Lampa.Controller.enabled().name === "full_start";
-          if (needToggle) Lampa.Controller.toggle("settings_component");
-
-          // Зберігаємо оригінальні елементи з подіями
-          var originalElements = targetContainer.children().detach();
-
-          // Застосовуємо стилі для контейнера
-          targetContainer.css({
-            display: "flex",
-            flexWrap: "wrap",
-            gap: "10px",
-          });
-
-          // Додаємо кнопки в порядку категорій
-          buttonSortOrder.forEach(function (category) {
-            categories[category].forEach(function (button) {
-              targetContainer.append(button);
-            });
-          });
-
-          // Вмикаємо контролер назад
-          if (needToggle) {
-            setTimeout(function () {
-              Lampa.Controller.toggle("full_start");
-            }, 100);
-          }
-        };
-
-        // Викликаємо організацію кнопок при готовності картки
-        card.onCreate = function () {
-          // Перевіряємо, чи увімкнена опція показу кнопок
-          if (FancyFace.settings.show_buttons) {
-            setTimeout(function () {
-              card.organizeButtons();
-            }, 300); // Збільшуємо таймаут для кращої сумісності
-          }
-        };
-
-        return card;
-      };
-    }
-
-    // Для сумісності, також перехоплюємо подію створення картки
-    Lampa.Listener.follow("full", function (e) {
-      if (e.type === "complite" && e.object && e.object.activity) {
-        // Перевіряємо, чи увімкнена опція показу кнопок
-        if (FancyFace.settings.show_buttons && !Lampa.FullCard) {
-          setTimeout(function () {
-            var fullContainer = e.object.activity.render();
-            var targetContainer = fullContainer.find(
-              ".full-start-new__buttons"
-            );
-            if (!targetContainer.length) {
-              targetContainer = fullContainer.find(".full-start__buttons");
-            }
-            if (!targetContainer.length) {
-              targetContainer = fullContainer.find(".buttons-container");
-            }
-            if (!targetContainer.length) return;
-
-            console.log(
-              "FancyFace: Знайдено контейнер для кнопок (слухач)",
-              targetContainer
-            );
-
-            // Застосовуємо стилі для контейнера
-            targetContainer.css({
-              display: "flex",
-              flexWrap: "wrap",
-              gap: "10px",
-            });
-
-            // Решта коду аналогічна тому, що був вище
-            var allButtons = [];
-
-            // Розширений пошук кнопок
-            var buttonSelectors = [
-              ".buttons--container .full-start__button",
-              ".full-start-new__buttons .full-start__button",
-              ".full-start__buttons .full-start__button",
-              ".buttons-container .button",
-              ".full-start-new__buttons .button",
-              ".full-start__buttons .button",
-            ];
-
-            buttonSelectors.forEach(function (selector) {
-              fullContainer.find(selector).each(function () {
-                allButtons.push(this);
-              });
-            });
-
-            if (allButtons.length === 0) {
-              console.log(
-                "FancyFace: Не знайдено кнопок для організації (слухач)"
-              );
-              return;
-            }
-
-            console.log(
-              "FancyFace: Знайдено кнопок (слухач):",
-              allButtons.length
-            );
-
-            var categories = {
-              online: [],
-              torrent: [],
-              trailer: [],
-              other: [],
-            };
-
-            var addedButtonTexts = {};
-
-            $(allButtons).each(function () {
-              var button = this;
-              var buttonText = $(button).text().trim();
-              var className = button.className || "";
-
-              if (!buttonText || addedButtonTexts[buttonText]) return;
-              addedButtonTexts[buttonText] = true;
-
-              if (className.includes("online")) {
-                categories.online.push(button);
-              } else if (className.includes("torrent")) {
-                categories.torrent.push(button);
-              } else if (className.includes("trailer")) {
-                categories.trailer.push(button);
-              } else {
-                categories.other.push(button);
-              }
-            });
-
-            var buttonSortOrder = ["online", "torrent", "trailer", "other"];
-
-            var needToggle = Lampa.Controller.enabled().name === "full_start";
-            if (needToggle) Lampa.Controller.toggle("settings_component");
-
-            var originalElements = targetContainer.children().detach();
-
-            buttonSortOrder.forEach(function (category) {
-              categories[category].forEach(function (button) {
-                targetContainer.append(button);
-              });
-            });
-
-            if (needToggle) {
-              setTimeout(function () {
-                Lampa.Controller.toggle("full_start");
-              }, 100);
-            }
-          }, 300); // Збільшуємо таймаут
-        }
-      }
-    });
-
-    // Додаємо MutationObserver для відстеження динамічно доданих кнопок
-    var buttonObserver = new MutationObserver(function (mutations) {
-      if (!FancyFace.settings.show_buttons) return;
-
-      let needReorganize = false;
-
-      mutations.forEach(function (mutation) {
-        if (
-          mutation.type === "childList" &&
-          (mutation.target.classList.contains("full-start-new__buttons") ||
-            mutation.target.classList.contains("full-start__buttons") ||
-            mutation.target.classList.contains("buttons-container"))
-        ) {
-          needReorganize = true;
-        }
-      });
-
-      if (needReorganize) {
-        setTimeout(function () {
-          if (
-            Lampa.FullCard &&
-            Lampa.Activity.active() &&
-            Lampa.Activity.active().activity.card
-          ) {
-            if (
-              typeof Lampa.Activity.active().activity.card.organizeButtons ===
-              "function"
-            ) {
-              Lampa.Activity.active().activity.card.organizeButtons();
-            }
-          }
-        }, 100);
-      }
-    });
-
-    buttonObserver.observe(document.body, {
-      childList: true,
-      subtree: true,
-    });
-  }
-
   // Функція для зміни міток ТВ та додавання мітки ФІЛЬМ
   function changeMovieTypeLabels() {
     // Додаємо CSS стилі для зміни міток
@@ -1827,27 +1511,6 @@
         );
       },
     });
-
-    Lampa.SettingsApi.addParam({
-      component: "season_info",
-      param: {
-        name: "show_buttons",
-        type: "trigger",
-        default: true,
-      },
-      field: {
-        name: "Показувати всі кнопки",
-        description: "Відображати всі кнопки дій у картці",
-      },
-      onChange: function (value) {
-        FancyFace.settings.show_buttons = value;
-        Lampa.Settings.update();
-        console.log(
-          "FancyFace: Відображення кнопок " + (value ? "увімкнено" : "вимкнено")
-        );
-      },
-    });
-
     Lampa.SettingsApi.addParam({
       component: "season_info",
       param: {
@@ -1973,8 +1636,6 @@
       },
     });
 
-    // Застосовуємо налаштування
-    FancyFace.settings.show_buttons = Lampa.Storage.get("show_buttons", true);
     FancyFace.settings.show_movie_type = Lampa.Storage.get(
       "season_info_show_movie_type",
       true
@@ -2011,10 +1672,6 @@
     if (FancyFace.settings.enabled) {
       addSeasonInfo();
     }
-
-    // Запускаємо функцію відображення кнопок у будь-якому випадку
-    showAllButtons();
-
     // Змінюємо мітки типу контенту
     changeMovieTypeLabels();
 
@@ -2071,7 +1728,7 @@
       </div>
 
       <div class="about-plugin__description">
-        <div style="color:#fff;margin-bottom:10px">Версія 1.0.0</div>
+        <div style="color:#fff;margin-bottom:10px">Версія 1.0.2</div>
         <ul>
           <li>✦ Попередній випуск</li>
         </ul>
@@ -2119,7 +1776,7 @@
   // Реєстрація плагіна в маніфесті
   Lampa.Manifest.plugins = {
     name: "FancyFace",
-    version: "1.0.0",
+    version: "1.0.2",
     description: "Покращений інтерфейс для додатка Lampa",
   };
 
