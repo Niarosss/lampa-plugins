@@ -2411,7 +2411,7 @@
       );
     }
     var button =
-      '<div class="full-start__button1 selector view--torrent lampac--button" data-subtitle="'
+      '<div class="full-start__button selector view--uaonline lampac--button" data-subtitle="'
         .concat(manifst.name, " ")
         .concat(
           manifst.version,
@@ -2421,7 +2421,7 @@
     resetTemplates();
 
     function addButton(e) {
-      if (e.render.find(".lampac--button").length) return;
+      if (e.render.find(".view--uaonline").length) return;
       var btn = $(Lampa.Lang.translate(button));
       // //console.log(btn.clone().removeClass('focus').prop('outerHTML'))
       btn.on("hover:enter", function () {
