@@ -511,18 +511,19 @@
             other: [],
           };
 
-          // Відстежуємо додані кнопки за текстом
-          var addedButtonTexts = {};
+          // Відстежуємо додані кнопки за комбінацією тексту та класу
+          var addedButtonKeys = {};
 
           // Сортуємо кнопки за категоріями
           $(allButtons).each(function () {
             var button = this;
             var buttonText = $(button).text().trim();
             var className = button.className || "";
+            var buttonKey = buttonText + "_" + className; // Комбінований ключ
 
             // Пропускаємо дублікати
-            if (!buttonText || addedButtonTexts[buttonText]) return;
-            addedButtonTexts[buttonText] = true;
+            if (!buttonText || addedButtonKeys[buttonKey]) return;
+            addedButtonKeys[buttonKey] = true;
 
             // Визначаємо категорію кнопки
             if (className.includes("online")) {
