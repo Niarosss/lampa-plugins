@@ -511,7 +511,7 @@
             other: [],
           };
 
-          // Відстежуємо додані кнопки за комбінацією тексту та класу
+          // Відстежуємо додані кнопки за унікальним ключем (текст + клас + data-атрибут)
           var addedButtonKeys = {};
 
           // Сортуємо кнопки за категоріями
@@ -519,9 +519,10 @@
             var button = this;
             var buttonText = $(button).text().trim();
             var className = button.className || "";
-            var buttonKey = buttonText + "_" + className; // Комбінований ключ
+            var dataAttr = $(button).attr("data-unique") || ""; // Додатковий атрибут
+            var buttonKey = buttonText + "_" + className + "_" + dataAttr; // Унікальний ключ
 
-            // Пропускаємо дублікати
+            // Пропускаємо дублікати лише за повним ключем
             if (!buttonText || addedButtonKeys[buttonKey]) return;
             addedButtonKeys[buttonKey] = true;
 
@@ -536,7 +537,12 @@
               categories.other.push(button);
             }
 
-            console.log("FancyFace: Оброблено кнопку:", buttonText, className);
+            console.log(
+              "FancyFace: Оброблено кнопку:",
+              buttonText,
+              className,
+              dataAttr
+            );
           });
 
           // Порядок кнопок
