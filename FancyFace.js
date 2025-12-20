@@ -2055,9 +2055,9 @@
     // стилі
     const style = $('<style id="about-plugin-styles"></style>').html(`
     .about-plugin {
-      background: rgba(9,2,39,.95);
-      border-radius: 15px;
-      padding: 10px;
+      background: rgba(24, 16, 54, 0.3);
+      border-radius: 16px;
+      padding: 12px;
     }
   `);
 
@@ -2067,7 +2067,7 @@
     const html = `
     <div class="about-plugin">
       <div class="about-plugin__title active">
-        <h1>Інтерфейс MOD v${FancyFace.version}</h1>
+        <h1>FancyFace v${FancyFace.version}</h1>
       </div>
 
       <div class="about-plugin__description">
