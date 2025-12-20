@@ -3,7 +3,7 @@
 
   var Defined = {
     api: "lampac",
-    localhost: "https://look--UaOnline--h7ynqrkjrc6c.code.run/",
+    localhost: "https://look--banderaonline--h7ynqrkjrc6c.code.run/",
     apn: "",
   };
 
@@ -28,7 +28,7 @@
     }
   }
 
-  var hostkey = "https://look--UaOnline--h7ynqrkjrc6c.code.run"
+  var hostkey = "https://look--banderaonline--h7ynqrkjrc6c.code.run"
     .replace("http://", "")
     .replace("https://", "");
 
@@ -65,7 +65,7 @@
       else {
         var net = new Lampa.Reguest();
         net.silent(
-          "https://look--UaOnline--h7ynqrkjrc6c.code.run".indexOf(
+          "https://look--banderaonline--h7ynqrkjrc6c.code.run".indexOf(
             location.host
           ) >= 0
             ? "https://github.com/"
@@ -90,7 +90,7 @@
     startConnection
   ) {
     window.rch_nws[hostkey].typeInvoke(
-      "https://look--UaOnline--h7ynqrkjrc6c.code.run",
+      "https://look--banderaonline--h7ynqrkjrc6c.code.run",
       function () {
         client.invoke(
           "RchRegistry",
@@ -155,7 +155,7 @@
                     } else {
                       $.ajax({
                         url:
-                          "https://look--UaOnline--h7ynqrkjrc6c.code.run/rch/gzresult?id=" +
+                          "https://look--banderaonline--h7ynqrkjrc6c.code.run/rch/gzresult?id=" +
                           rchId,
                         type: "POST",
                         data: compressedArray,
@@ -221,7 +221,7 @@
     );
   };
   window.rch_nws[hostkey].typeInvoke(
-    "https://look--UaOnline--h7ynqrkjrc6c.code.run",
+    "https://look--banderaonline--h7ynqrkjrc6c.code.run",
     function () {}
   );
 
@@ -252,7 +252,7 @@
     if (typeof NativeWsClient == "undefined") {
       Lampa.Utils.putScript(
         [
-          "https://look--UaOnline--h7ynqrkjrc6c.code.run/js/nws-client-es5.js?v18112025",
+          "https://look--banderaonline--h7ynqrkjrc6c.code.run/js/nws-client-es5.js?v18112025",
         ],
         function () {},
         false,
@@ -341,7 +341,7 @@
       network.timeout(10000);
       network.silent(
         account(
-          "https://look--UaOnline--h7ynqrkjrc6c.code.run/lite/withsearch"
+          "https://look--banderaonline--h7ynqrkjrc6c.code.run/lite/withsearch"
         ),
         function (json) {
           balansers_with_search = json;
@@ -1028,7 +1028,7 @@
                           time: 3000,
                         });
                         $.get(
-                          "https://look--UaOnline--h7ynqrkjrc6c.code.run/player-inner/" +
+                          "https://look--banderaonline--h7ynqrkjrc6c.code.run/player-inner/" +
                             element.url
                         );
                         return;
@@ -2213,7 +2213,7 @@
         Lampa.Activity.push({
           url: params.element.url,
           title: "Lampac - " + params.element.title,
-          component: "UaOnline",
+          component: "BanderaOnline",
           movie: params.element,
           page: 1,
           search: params.element.title,
@@ -2228,13 +2228,13 @@
   }
 
   function startPlugin() {
-    window.UaOnline_plugin = true;
+    window.BanderaOnline_plugin = true;
     var manifst = {
       type: "video",
       version: "",
       name: "UaOnline",
       description: "Українські джерела",
-      component: "UaOnline",
+      component: "BanderaOnline",
       onContextMenu: function onContextMenu(object) {
         return {
           name: Lampa.Lang.translate("lampac_watch"),
@@ -2243,7 +2243,7 @@
       },
       onContextLauch: function onContextLauch(object) {
         resetTemplates();
-        Lampa.Component.add("UaOnline", component);
+        Lampa.Component.add("BanderaOnline", component);
 
         var id = Lampa.Utils.hash(
           object.number_of_seasons
@@ -2255,7 +2255,7 @@
         Lampa.Activity.push({
           url: "",
           title: Lampa.Lang.translate("title_online"),
-          component: "UaOnline",
+          component: "BanderaOnline",
           search: all[id] ? all[id] : object.title,
           search_one: object.title,
           search_two: object.original_title,
@@ -2311,7 +2311,7 @@
       title_online: {
         //
         ru: "Онлайн",
-        uk: "Перегляд",
+        uk: "Онлайн",
         en: "Online",
         zh: "在线的",
       },
@@ -2411,13 +2411,13 @@
       );
     }
     var button =
-      '<div class="full-start__button selector view--online lampac--button" data-subtitle="'
+      '<div class="full-start__button selector view--torrent lampac--button" data-subtitle="'
         .concat(manifst.name, " ")
         .concat(
           manifst.version,
           '">\n        <svg viewBox="0 0 36 36" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" class="iconify iconify--twemoji" preserveAspectRatio="xMidYMid meet" fill="#000000"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"><path fill="#005BBB" d="M32 5H4a4 4 0 0 0-4 4v9h36V9a4 4 0 0 0-4-4z"></path><path fill="#FFD500" d="M36 27a4 4 0 0 1-4 4H4a4 4 0 0 1-4-4v-9h36v9z"></path></g></svg>\n\n        <span>#{title_online}</span>\n    </div>'
         ); // нужна заглушка, а то при страте лампы говорит пусто
-    Lampa.Component.add("UaOnline", component); //то же самое
+    Lampa.Component.add("BanderaOnline", component); //то же самое
     resetTemplates();
 
     function addButton(e) {
@@ -2426,7 +2426,7 @@
       // //console.log(btn.clone().removeClass('focus').prop('outerHTML'))
       btn.on("hover:enter", function () {
         resetTemplates();
-        Lampa.Component.add("UaOnline", component);
+        Lampa.Component.add("BanderaOnline", component);
 
         var id = Lampa.Utils.hash(
           e.movie.number_of_seasons
@@ -2438,7 +2438,7 @@
         Lampa.Activity.push({
           url: "",
           title: Lampa.Lang.translate("title_online"),
-          component: "UaOnline",
+          component: "BanderaOnline",
           search: all[id] ? all[id] : e.movie.title,
           search_one: e.movie.title,
           search_two: e.movie.original_title,
@@ -2529,5 +2529,5 @@
       Lampa.Storage.sync("online_watched_last", "object_object");
     }
   }
-  if (!window.UaOnline_plugin) startPlugin();
+  if (!window.BanderaOnline_plugin) startPlugin();
 })();
