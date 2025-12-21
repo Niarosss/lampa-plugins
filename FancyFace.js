@@ -1674,7 +1674,7 @@
     Lampa.SettingsApi.addParam({
       component: "season_info",
       param: {
-        name: "season_info_show_original_names",
+        name: "show_original_names",
         type: "trigger",
         default: true,
       },
