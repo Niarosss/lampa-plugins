@@ -1742,7 +1742,7 @@
       "show_original_names",
       true
     );
-    FancyFace.settings.show_original_names = Lampa.Storage.get(
+    FancyFace.settings.hide_trailers = Lampa.Storage.get(
       "hide_trailers",
       false
     );
