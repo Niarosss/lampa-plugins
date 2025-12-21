@@ -225,7 +225,9 @@
         for (var i = 0; i < classes.length; i++) {
           if (
             classes[i].indexOf("open--") === 0 ||
-            classes[i] === "full-screen"
+            classes[i] === "full--screen" ||
+            classes[i] === "notice--icon" ||
+            classes[i] === "head__time"
           ) {
             idParts.push(classes[i]);
           }
@@ -748,9 +750,6 @@
 
               // Функция переключения состояния
               function toggleItem() {
-                // Не позволяем скрыть настройки
-                if (id.includes("open--settings")) return;
-
                 var hiddenItems = Lampa.Storage.get("head_hidden_items", []);
                 var index = hiddenItems.indexOf(id);
 
