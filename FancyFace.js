@@ -1688,8 +1688,7 @@
       },
       field: {
         name: "Показувати оригінальні назви",
-        description:
-          'Відображення оригінальної назви фільму/серіалу в картці."',
+        description: "Відображення оригінальної назви фільму/серіалу в картці",
       },
       onChange: function (value) {
         FancyFace.settings.show_original_names = value;
@@ -1700,16 +1699,16 @@
     Lampa.SettingsApi.addParam({
       component: "season_info",
       param: {
-        name: "show_trailers",
+        name: "hide_trailers",
         type: "trigger",
         default: false,
       },
       field: {
         name: "Приховати трейлери",
-        description: 'Перемикання відображення трейлерів"',
+        description: "Перемикання відображення трейлерів",
       },
       onChange: function (value) {
-        FancyFace.settings.show_trailers = value;
+        FancyFace.settings.hide_trailers = value;
         Lampa.Settings.update();
       },
     });
@@ -1744,7 +1743,7 @@
       true
     );
     FancyFace.settings.show_original_names = Lampa.Storage.get(
-      "show_trailers",
+      "hide_trailers",
       false
     );
 
@@ -1759,7 +1758,7 @@
       addSeasonInfo();
     }
 
-    if (FancyFace.settings.show_trailers) {
+    if (FancyFace.settings.hide_trailers) {
       hideTrailers();
     }
     // Змінюємо мітки типу контенту
