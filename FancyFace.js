@@ -1313,7 +1313,7 @@
 
     // Додаємо розмітку одним блоком
     $(".full-start-new__title", render).after(
-      `<div class="original_title" style="margin: 1em 0; text-align: left;">
+      `<div class="original_title" style="margin-bottom: 1em; text-align: left;">
             <div style="font-size: 1.2em; opacity: 0.8;">Оригінальна назва: ${orig}</div>
         </div>`
     );
