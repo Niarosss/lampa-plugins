@@ -6,7 +6,7 @@
     // Назва плагіна
     name: "FancyFace",
     // Версія плагіна
-    version: "1.0.0",
+    version: "1.0.3", // Виправлено версію
     // Увімкнути налагодження
     debug: false,
     // Налаштування за замовчуванням
@@ -20,7 +20,7 @@
       label_position: "top-right", // 'top-right', 'top-left', 'bottom-right', 'bottom-left'
       colored_elements: true, // Об'єднана настройка для статусів і вікових обмежень
       show_original_names: true, // Показ оригінальної назви фільму або серіалу
-      hide_trailers: false,
+      hide_trailers: false, // Приховування трейлерів
     },
   };
 
@@ -1301,10 +1301,8 @@
   }
 
   // Функція для відображення оригінальної назви фільму
-
   function showTitles(card, render) {
     if (!FancyFace.settings.show_original_names) return;
-
     const orig = card.original_title || card.original_name;
     if (!orig) return;
 
@@ -1321,17 +1319,15 @@
 
   if (!window.title_plugin) {
     window.title_plugin = true;
-
     Lampa.Listener.follow("full", (e) => {
       // Чекаємо саме завершення рендеру картки
       if (e.type !== "complite" || !e.data.movie) return;
-
       const render = e.object.activity.render();
-
       // Викликаємо функцію, передаючи дані та готовий render
       showTitles(e.data.movie, render);
     });
   }
+
   // Функція приховування трейлерів
   function hideTrailers() {
     Lampa.Listener.follow("full", function (e) {
@@ -1796,9 +1792,7 @@
   }
 
   function showAbout() {
-    $("#about-plugin-styles").remove();
-
-    // стилі
+    $("#about-plugin-styles").remove(); // стилі
     const style = $('<style id="about-plugin-styles"></style>').html(`
     .about-plugin {
       background: rgba(24, 16, 54, 0.3);
@@ -1817,7 +1811,7 @@
       </div>
 
       <div class="about-plugin__description">
-        <div style="color:#fff;margin-bottom:10px">Версія 1.0.2</div>
+        <div style="color:#fff;margin-bottom:10px">Версія ${FancyFace.version}</div> // Актуальна версія
         <ul>
           <li>✦ Попередній випуск</li>
         </ul>
@@ -1865,7 +1859,7 @@
   // Реєстрація плагіна в маніфесті
   Lampa.Manifest.plugins = {
     name: "FancyFace",
-    version: "1.0.2",
+    version: FancyFace.version,
     description: "Покращений інтерфейс для додатка Lampa",
   };
 
