@@ -1,13 +1,9 @@
 (function () {
   "use strict";
 
-  // Основний об'єкт плагіна
   var FancyFace = {
-    // Назва плагіна
     name: "FancyFace",
-    // Версія плагіна
-    version: "1.0.3", // Виправлено версію
-    // Увімкнути налагодження
+    version: "1.0.3",
     debug: false,
     // Налаштування за замовчуванням
     settings: {
@@ -1792,12 +1788,12 @@
   }
 
   function showAbout() {
-    $("#about-plugin-styles").remove(); // стилі
+    $("#about-plugin-styles").remove();
     const style = $('<style id="about-plugin-styles"></style>').html(`
     .about-plugin {
-      background: rgba(24, 16, 54, 0.3);
+      background: rgba(35, 32, 45, 0.23);
       border-radius: 16px;
-      padding: 12px;
+      padding: 18px;
     }
   `);
 
@@ -1811,9 +1807,10 @@
       </div>
 
       <div class="about-plugin__description">
-        <div style="color:#fff;margin-bottom:10px">Версія ${FancyFace.version}</div> // Актуальна версія
+        <div style="color:#fff;margin-bottom:10px">Версія ${FancyFace.version}</div>
         <ul>
-          <li>✦ Попередній випуск</li>
+          <li>✦ 1.0.0 Попередній випуск.</li>
+          <li>✦ 1.0.2 Додано функцію приховавання трейлерів та функцію відображення оригінальної назви фільму або серіалу.</li>
         </ul>
       </div>
 
@@ -1832,7 +1829,6 @@
 
     const content = $("<div></div>").html(html);
 
-    // модалка
     Lampa.Modal.open({
       title: "",
       html: content,
