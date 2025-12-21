@@ -20,6 +20,7 @@
       label_position: "top-right", // 'top-right', 'top-left', 'bottom-right', 'bottom-left'
       colored_elements: true, // Об'єднана настройка для статусів і вікових обмежень
       show_original_names: true, // Показ оригінальної назви фільму або серіалу
+      hide_trailers: false,
     },
   };
 
@@ -1302,7 +1303,6 @@
   // Функція для відображення оригінальної назви фільму
 
   function showTitles(card, render) {
-    // Перевірка вашого налаштування
     if (!FancyFace.settings.show_original_names) return;
 
     const orig = card.original_title || card.original_name;
@@ -1330,6 +1330,14 @@
 
       // Викликаємо функцію, передаючи дані та готовий render
       showTitles(e.data.movie, render);
+    });
+  }
+  // Функція приховування трейлерів
+  function hideTrailers() {
+    Lampa.Listener.follow("full", function (e) {
+      if (e.type == "complite") {
+        e.object.activity.render().find(".view--trailer").remove();
+      }
     });
   }
 
@@ -1689,6 +1697,23 @@
       },
     });
 
+    Lampa.SettingsApi.addParam({
+      component: "season_info",
+      param: {
+        name: "show_trailers",
+        type: "trigger",
+        default: false,
+      },
+      field: {
+        name: "Приховати трейлери",
+        description: 'Перемикання відображення трейлерів"',
+      },
+      onChange: function (value) {
+        FancyFace.settings.show_trailers = value;
+        Lampa.Settings.update();
+      },
+    });
+
     FancyFace.settings.show_movie_type = Lampa.Storage.get(
       "season_info_show_movie_type",
       true
@@ -1718,6 +1743,10 @@
       "show_original_names",
       true
     );
+    FancyFace.settings.show_original_names = Lampa.Storage.get(
+      "show_trailers",
+      false
+    );
 
     // Встановлюємо enabled на основі seasons_info_mode
     FancyFace.settings.enabled =
@@ -1728,6 +1757,10 @@
     // Запускаємо функції плагіна залежно від налаштувань
     if (FancyFace.settings.enabled) {
       addSeasonInfo();
+    }
+
+    if (FancyFace.settings.show_trailers) {
+      hideTrailers();
     }
     // Змінюємо мітки типу контенту
     changeMovieTypeLabels();
