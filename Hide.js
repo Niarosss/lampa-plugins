@@ -1,12 +1,12 @@
 (function () {
-  "use strict";
+  ("use strict");
 
-  // Добавляем стиль для скрытия элементов и оформления
+  // Додаємо стилі для приховування елементів та оформлення
   $(
     "<style>\
     .hidden { display: none !important; }\
     .menu-hide-item .settings-param { \
-        padding: 16px 40px !important; /* Увеличенный отступ */ \
+        padding: 16px 40px !important; /* Збільшений відступ */ \
         min-height: 54px !important; \
         display: flex !important; \
         align-items: center !important; \
@@ -28,7 +28,7 @@
         align-items: center !important; \
         justify-content: center !important; \
         margin-right: 16px !important; \
-        margin-left: 10px !important; /* Добавлен отступ слева */ \
+        margin-left: 10px !important; /* Додано відступ зліва */ \
     }\
     .menu-hide-text { \
         font-size: 18px !important; \
@@ -57,15 +57,15 @@
         background: rgba(255,255,255,0.1) !important; \
         margin: 25px 0 !important; \
     }\
-    /* Стиль для неактивной кнопки */ \
+    /* Стиль для неактивної кнопки */ \
     .settings-param.disable-hide { \
         opacity: 0.6 !important; \
         pointer-events: none !important; \
     }\
-    /* Стиль для благодарности */ \
+    /* Стиль для подяки */ \
     .credits-text { \
         text-align: center; \
-        color: #b0b0b0 !important; /* Серый цвет с пониженной яркостью */ \
+        color: #b0b0b0 !important; /* Сірий колір зі зниженою яскравістю */ \
         font-size: 14px !important; \
         padding: 15px 20px 5px !important; \
         margin-top: 5px !important; \
@@ -74,123 +74,96 @@
 </style>"
   ).appendTo("head");
 
-  // Мультиязыковая поддержка
+  // Мультимовна підтримка
   Lampa.Lang.add({
     menu_items_hide: {
-      ru: "Настройка видимости элементов интерфейса",
       en: "Setting the visibility of interface elements",
       uk: "Налаштування видимості елементів інтерфейсу",
     },
-    head_items_hide: {
-      ru: "Настройка верхнего меню",
-      en: "Top menu settings",
-      uk: "Налаштування верхнього меню",
-    },
-    settings_items_hide: {
-      ru: "Настройка правого меню",
-      en: "Right menu settings",
-      uk: "Налаштування правого меню",
-    },
     left_menu_title: {
-      ru: "Левое меню",
       en: "Left menu",
       uk: "Ліве меню",
     },
     head_title: {
-      ru: "Верхнее меню",
       en: "Head menu",
       uk: "Верхнє меню",
     },
     settings_title: {
-      ru: "Настройки",
       en: "Settings menu",
       uk: "Праве меню",
     },
     plugin_description: {
-      ru: "Плагин для сокрытия элементов интерфейса",
       en: "Plugin for hiding interface elements",
       uk: "Плагін для приховання елементів інтерфейсу",
     },
     hidden: {
-      ru: "Скрыто",
       en: "Hidden",
       uk: "Приховано",
     },
     shown: {
-      ru: "Отображено",
       en: "Shown",
       uk: "Відображається",
     },
     no_name: {
-      ru: "Элемент без названия",
       en: "Unnamed element",
       uk: "Елемент без назви",
     },
     head_action_search: {
-      ru: "Поиск",
       en: "Search",
       uk: "Пошук",
     },
     head_action_settings: {
-      ru: "Настройки",
       en: "Settings",
       uk: "Налаштування",
     },
     head_action_feed: {
-      ru: "Лента",
       en: "Feed",
       uk: "Стрічка",
     },
     head_action_notice: {
-      ru: "Уведомления",
       en: "Notifications",
       uk: "Сповіщення",
     },
     head_action_profile: {
-      ru: "Профиль",
       en: "Profile",
       uk: "Профіль",
     },
     head_action_fullscreen: {
-      ru: "Полный экран",
       en: "Fullscreen",
       uk: "Повноекранний режим",
     },
     head_action_broadcast: {
-      ru: "Трансляция",
       en: "Broadcast",
       uk: "Трансляція",
     },
     credits_text: {
-      ru: "Нагло слизано у dikomillo (спасибо за первоначальную разработку). Переписано под свои нужды, исправлены ошибки. Автор - @Niaros",
-      en: "Brazenly licked in dikomillo (thanks for the initial development). Rewritten for own needs, bugs fixed. Author - @Niaros",
-      uk: "Нахабно злизано у dikomillo (дякую за початкову розробку). Переписано під власні потреби, виправлено баги. Автор - @Niaros",
+      en: "Brazenly licked in free access and rewritten for own needs, bugs fixed. Author - @Niaros",
+      uk: "Нахабно злизано у вільному доступі та переписано під власні потреби, виправлено баги. Автор - @Niaros",
     },
     reset_all_hidden: {
-      ru: "Показать все",
       en: "Show all",
       uk: "Показати все",
     },
     head_time: {
       ru: "Время",
       en: "Time",
-      uk: "Годинник",
+      uk: "Час і дата",
     },
   });
 
-  // Иконка глаза для настроек
+  // Іконка ока для налаштувань
   var eyeIcon =
     '<svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>';
 
-  // Иконка для кнопки "Показать все"
+  // Іконка для кнопки "Показати все"
   var resetIcon =
     '<svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg>';
 
-  // Иконка часов
+  // Іконка годинника
   var timeIcon =
     '<svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>';
 
-  // Инициализируем плагины
+  // Ініціалізуємо плагіни
   function startPlugin() {
     var manifest = {
       type: "other",
@@ -201,7 +174,7 @@
     };
     Lampa.Manifest.plugins.push(manifest);
 
-    // Функции для скрытия/показа пунктов меню
+    // Функції для приховування/показу пунктів меню
     function updateMenuVisibility() {
       var hiddenItems = Lampa.Storage.get("menu_hide", []);
 
@@ -225,10 +198,10 @@
 
       $(".head__action, .head__time").each(function () {
         var $item = $(this);
-        // Пропускаем системные элементы
+        // Пропускаємо системні елементи
         if ($item.hasClass("processing")) return;
 
-        // Генерируем ID на основе классов
+        // Генеруємо ID на основі класів
         var classes = $item.attr("class").split(" ");
         var idParts = [];
         for (var i = 0; i < classes.length; i++) {
@@ -261,7 +234,7 @@
         var component = $item.data("component");
         if (!component) return;
 
-        // Не скрываем настройки нашего плагина
+        // Не приховуємо налаштування нашого плагіна
         if (component === "menu_filter") return;
 
         if (hiddenItems.indexOf(component) !== -1) {
@@ -278,17 +251,17 @@
       updateSettingsVisibility();
     }
 
-    // Функция сброса всех скрытых элементов
+    // Функція скидання всіх прихованих елементів
     function resetAllHiddenItems() {
-      // Очищаем все хранилища скрытых элементов
+      // Очищаємо всі сховища прихованих елементів
       Lampa.Storage.set("menu_hide", []);
       Lampa.Storage.set("head_hidden_items", []);
       Lampa.Storage.set("settings_hidden_items", []);
 
-      // Обновляем видимость элементов
+      // Оновлюємо видимість елементів
       updateAllVisibility();
 
-      // Обновляем статусы кнопок в текущем экране
+      // Оновлюємо статуси кнопок на поточному екрані
       $(".menu-hide-item").each(function () {
         var $item = $(this);
         var $value = $item.find(".settings-param__value");
@@ -299,7 +272,7 @@
       });
     }
 
-    // Добавляем компонент настроек
+    // Додаємо компонент налаштувань
     Lampa.SettingsApi.addComponent({
       component: "menu_filter",
       name: Lampa.Lang.translate("menu_items_hide"),
@@ -307,7 +280,7 @@
       icon: eyeIcon,
     });
 
-    // Главное окно настроек
+    // Головне вікно налаштувань
     Lampa.SettingsApi.addParam({
       component: "interface",
       param: {
@@ -325,37 +298,17 @@
         });
       },
     });
-
-    // Кнопка для управления правым меню (Настройки)
-    Lampa.SettingsApi.addParam({
-      component: "interface",
-      param: {
-        type: "button",
-      },
-      field: {
-        name: Lampa.Lang.translate("settings_items_hide"),
-        description: Lampa.Lang.translate("plugin_description"),
-      },
-      onChange: function () {
-        Lampa.Settings.create("menu_filter", {
-          onBack: function () {
-            Lampa.Settings.create("interface");
-          },
-        });
-      },
-    });
-
-    // Переменные для отслеживания создания настроек
+    // Змінні для відстеження створення налаштувань
     var leftSettingsCreated = false;
     var headSettingsCreated = false;
     var settingsSettingsCreated = false;
-    var resetButtonAdded = false; // Флаг для кнопки "Показать все"
+    var resetButtonAdded = false; // Прапорець для кнопки "Показати все"
 
-    // Создаем настройки для меню с TV-поддержкой
+    // Створюємо налаштування для меню з підтримкою TV
     function createMenuSettings() {
-      // Добавляем благодарность и кнопку сброса только один раз
+      // Додаємо подяку та кнопку скидання лише один раз
       if (!resetButtonAdded) {
-        // Добавляем благодарность в самом верху
+        // Додаємо подяку в самому верху
         Lampa.SettingsApi.addParam({
           component: "menu_filter",
           param: {
@@ -372,7 +325,7 @@
           },
         });
 
-        // Добавляем кнопку "Показать все" в самом верху
+        // Додаємо кнопку "Показати все" в самому верху
         Lampa.SettingsApi.addParam({
           component: "menu_filter",
           param: {
@@ -423,26 +376,15 @@
                 "</span>"
             );
             $name.find("svg").after($text);
-
-            // Добавляем значок сброса справа
-            var $resetIcon = $(resetIcon).css({
-              width: "20px",
-              height: "20px",
-              "min-width": "20px",
-              "min-height": "20px",
-              "margin-right": "10px",
-            });
-
-            $name.append($resetIcon);
           },
         });
 
         resetButtonAdded = true;
       }
 
-      // Защита от дублирования левого меню
+      // Захист від дублювання лівого меню
       if (!leftSettingsCreated) {
-        // Добавляем заголовок для левого меню
+        // Додаємо заголовок для лівого меню
         Lampa.SettingsApi.addParam({
           component: "menu_filter",
           param: {
@@ -456,7 +398,7 @@
           },
         });
 
-        // Настройки для левого меню
+        // Налаштування для лівого меню
         var menuHiddenItems = Lampa.Storage.get("menu_hide", []);
 
         $(".menu__item").each(function () {
@@ -480,16 +422,16 @@
             onRender: function (item) {
               item.addClass("menu-hide-item");
 
-              // Удаляем описание
+              // Видаляємо опис
               item.find(".settings-param__descr").remove();
 
-              // Настройки для контейнера
+              // Налаштування для контейнера
               item.css({
                 padding: "0",
                 margin: "0",
               });
 
-              // Настройки для параметра
+              // Налаштування для параметра
               item.find(".settings-param").css({
                 padding: "0 15px",
                 display: "flex",
@@ -497,7 +439,7 @@
                 "justify-content": "space-between",
               });
 
-              // Настройки для имени параметра
+              // Налаштування для імені параметра
               var $name = item.find(".settings-param__name");
               $name.css({
                 padding: "0",
@@ -509,7 +451,7 @@
                 width: "100%",
               });
 
-              // Размер иконки
+              // Розмір іконки
               $name
                 .find("svg, img")
                 .css({
@@ -525,7 +467,7 @@
                 ? Lampa.Lang.translate("hidden")
                 : Lampa.Lang.translate("shown");
 
-              // Создаем элемент значения
+              // Створюємо елемент значення
               var $value = $('<div class="settings-param__value"/>')
                 .text(status)
                 .addClass(isHidden ? "menu-hide-hidden" : "menu-hide-shown")
@@ -534,7 +476,7 @@
                   "padding-right": "10px",
                 });
 
-              // Добавляем текст элемента рядом с иконкой
+              // Додаємо текст елемента поруч з іконкою
               var $text = $("<span/>")
                 .text(text)
                 .addClass("menu-hide-text")
@@ -546,7 +488,7 @@
               $name.find("svg, img").after($text);
               $name.append($value);
 
-              // Функция переключения состояния
+              // Функція переключення стану
               function toggleItem() {
                 var hiddenItems = Lampa.Storage.get("menu_hide", []);
                 var index = hiddenItems.indexOf(text);
@@ -572,7 +514,7 @@
                   .toggleClass("menu-hide-shown", !isNowHidden);
               }
 
-              // Универсальный обработчик для всех платформ
+              // Універсальний обробник для всіх платформ
               item.off("hover:enter").on("hover:enter", function () {
                 toggleItem();
               });
@@ -583,7 +525,7 @@
         leftSettingsCreated = true;
       }
 
-      // Добавляем разделитель
+      // Додаємо роздільник
       Lampa.SettingsApi.addParam({
         component: "menu_filter",
         param: {
@@ -595,9 +537,9 @@
         },
       });
 
-      // Защита от дублирования верхнего меню
+      // Захист від дублювання верхнього меню
       if (!headSettingsCreated) {
-        // Добавляем заголовок для верхнего меню
+        // Додаємо заголовок для верхнього меню
         Lampa.SettingsApi.addParam({
           component: "menu_filter",
           param: {
@@ -611,16 +553,16 @@
           },
         });
 
-        // Настройки для верхнего меню
+        // Налаштування для верхнього меню
         var headHiddenItems = Lampa.Storage.get("head_hidden_items", []);
         var headAddedItems = {};
 
         $(".head__action, .head__time").each(function () {
           var $item = $(this);
-          // Пропускаем системные элементы
+          // Пропускаємо системні елементи
           if ($item.hasClass("processing")) return;
 
-          // Генерируем ID на основе классов
+          // Генеруємо ID на основі класів
           var classes = $item.attr("class").split(" ");
           var idParts = [];
           for (var i = 0; i < classes.length; i++) {
@@ -639,7 +581,7 @@
           if (headAddedItems[id]) return;
           headAddedItems[id] = true;
 
-          // Получаем иконку элемента
+          // Отримуємо іконку елемента
           var icon = "";
           if (id.includes("head__time")) {
             icon = timeIcon;
@@ -654,7 +596,7 @@
             icon = "•";
           }
 
-          // Определяем название элемента по классам
+          // Визначаємо назву елемента за класами
           var titleKey = "";
           var title = "";
           if (id.includes("open--search")) {
@@ -690,16 +632,16 @@
             onRender: function (item) {
               item.addClass("menu-hide-item");
 
-              // Удаляем описание
+              // Видаляємо опис
               item.find(".settings-param__descr").remove();
 
-              // Настройки для контейнера
+              // Налаштування для контейнера
               item.css({
                 padding: "0",
                 margin: "0",
               });
 
-              // Настройки для параметра
+              // Налаштування для параметра
               item.find(".settings-param").css({
                 padding: "0 15px",
                 display: "flex",
@@ -707,7 +649,7 @@
                 "justify-content": "space-between",
               });
 
-              // Настройки для имени параметра
+              // Налаштування для імені параметра
               var $name = item.find(".settings-param__name");
               $name.css({
                 padding: "0",
@@ -719,7 +661,7 @@
                 width: "100%",
               });
 
-              // Размер иконки
+              // Розмір іконки
               $name
                 .find("svg, img")
                 .css({
@@ -735,7 +677,7 @@
                 ? Lampa.Lang.translate("hidden")
                 : Lampa.Lang.translate("shown");
 
-              // Создаем элемент значения
+              // Создаем элемент значення
               var $value = $('<div class="settings-param__value"/>')
                 .text(status)
                 .addClass(isHidden ? "menu-hide-hidden" : "menu-hide-shown")
@@ -756,7 +698,7 @@
               $name.find("svg, img").after($text);
               $name.append($value);
 
-              // Функция переключения состояния
+              // Функція переключення стану
               function toggleItem() {
                 var hiddenItems = Lampa.Storage.get("head_hidden_items", []);
                 var index = hiddenItems.indexOf(id);
@@ -782,7 +724,7 @@
                   .toggleClass("menu-hide-shown", !isNowHidden);
               }
 
-              // Универсальный обработчик для всех платформ
+              // Універсальний обробник для всіх платформ
               item.off("hover:enter").on("hover:enter", function () {
                 toggleItem();
               });
@@ -793,7 +735,7 @@
         headSettingsCreated = true;
       }
 
-      // Добавляем разделитель
+      // Додаємо роздільник
       Lampa.SettingsApi.addParam({
         component: "menu_filter",
         param: {
@@ -805,9 +747,9 @@
         },
       });
 
-      // Защита от дублирования правого меню
+      // Захист від дублювання правого меню
       if (!settingsSettingsCreated) {
-        // Добавляем заголовок для правого меню (Настройки)
+        // Додаємо заголовок для правого меню (Налаштування)
         Lampa.SettingsApi.addParam({
           component: "menu_filter",
           param: {
@@ -821,7 +763,7 @@
           },
         });
 
-        // Настройки для правого меню (Настройки)
+        // Налаштування для правого меню (Налаштування)
         var settingsHiddenItems = Lampa.Storage.get(
           "settings_hidden_items",
           []
@@ -863,16 +805,16 @@
               onRender: function (item) {
                 item.addClass("menu-hide-item");
 
-                // Удаляем описание
+                // Видаляємо опис
                 item.find(".settings-param__descr").remove();
 
-                // Настройки для контейнера
+                // Налаштування для контейнера
                 item.css({
                   padding: "0",
                   margin: "0",
                 });
 
-                // Настройки для параметра
+                // Налаштування для параметра
                 item.find(".settings-param").css({
                   padding: "0 15px",
                   display: "flex",
@@ -880,12 +822,12 @@
                   "justify-content": "space-between",
                 });
 
-                // Делаем кнопку "Скрытие элементов интерфейса" неактивной
+                // Деактивуємо кнопку "Приховати елементи інтерфейсу"
                 if (component === "menu_filter") {
                   item.find(".settings-param").addClass("disable-hide");
                 }
 
-                // Настройки для имени параметра
+                // Налаштування для імені параметра
                 var $name = item.find(".settings-param__name");
                 $name.css({
                   padding: "0",
@@ -897,7 +839,7 @@
                   width: "100%",
                 });
 
-                // Размер иконки
+                // Розмір іконки
                 $name
                   .find("svg, img")
                   .css({
@@ -913,7 +855,7 @@
                   ? Lampa.Lang.translate("hidden")
                   : Lampa.Lang.translate("shown");
 
-                // Создаем элемент значения
+                // Создаем элемент значення
                 var $value = $('<div class="settings-param__value"/>')
                   .text(status)
                   .addClass(isHidden ? "menu-hide-hidden" : "menu-hide-shown")
@@ -922,7 +864,7 @@
                     "padding-right": "10px",
                   });
 
-                // Добавляем текст элемента рядом с иконкой
+                // Додавання тексту елемента поруч із значком
                 var $text = $("<span/>")
                   .text(name)
                   .addClass("menu-hide-text")
@@ -934,9 +876,9 @@
                 $name.find("svg, img").after($text);
                 $name.append($value);
 
-                // Функция переключения состояния
+                // Функція перемикання стану
                 function toggleItem() {
-                  // Не позволяем скрыть настройки плагина
+                  // Ми не дозволяємо приховувати налаштування плагіна
                   if (component === "menu_filter") return;
 
                   var hiddenItems = Lampa.Storage.get(
@@ -966,7 +908,7 @@
                     .toggleClass("menu-hide-shown", !isNowHidden);
                 }
 
-                // Универсальный обработчик для всех платформ
+                // Універсальний обробник для всіх платформ
                 item.off("hover:enter").on("hover:enter", function () {
                   toggleItem();
                 });
@@ -975,19 +917,19 @@
           });
         }
 
-        // Запускаем обработку
+        // Запускаємо обробку
         processSettingsMenu();
 
         settingsSettingsCreated = true;
       }
     }
 
-    // Обработчик для обновления меню
+    // Обробник для оновлення меню
     function handleMenuChanges() {
-      // Применяем настройки при загрузке
+      // Застосовуємо налаштування під час завантаження
       updateAllVisibility();
 
-      // Обновляем при изменении хранилища
+      // Оновлюємо при зміні сховища
       Lampa.Storage.listener.follow("change", function (e) {
         if (
           e.name === "menu_hide" ||
@@ -998,7 +940,7 @@
         }
       });
 
-      // Обновляем при изменении DOM
+      // Оновлюємо при зміні DOM
       var observer = new MutationObserver(function () {
         if ($(".menu__list, .head__actions, .settings__body").length) {
           createMenuSettings();
@@ -1012,9 +954,9 @@
       });
     }
 
-    // Запускаем при загрузке
+    // Запускаємо під час завантаження
     function initPlugin() {
-      // Ждем пока появится меню
+      // Чекаємо, доки з'явиться меню
       var waitForMenu = setInterval(function () {
         if ($(".menu__list, .head__actions, .settings__body").length) {
           clearInterval(waitForMenu);
@@ -1024,7 +966,7 @@
       }, 500);
     }
 
-    // Подключение плагина
+    // Підключення плагіна
     if (window.appready) {
       initPlugin();
     } else {
@@ -1036,7 +978,7 @@
     }
   }
 
-  // Подключение плагина
+  // Підключення плагіна
   if (window.appready) {
     startPlugin();
   } else {
