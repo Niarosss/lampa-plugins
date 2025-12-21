@@ -77,8 +77,8 @@
   // Мультимовна підтримка
   Lampa.Lang.add({
     menu_items_hide: {
-      en: "Setting the visibility of interface elements",
-      uk: "Налаштування видимості елементів інтерфейсу",
+      en: "Setting the visibility of elements",
+      uk: "Налаштування видимості елементів",
     },
     left_menu_title: {
       en: "Left menu",
