@@ -219,7 +219,7 @@
     function updateHeadVisibility() {
       var hiddenItems = Lampa.Storage.get("head_hidden_items", []);
 
-      $(".head__action").each(function () {
+      $(".head__action, .head__time").each(function () {
         var $item = $(this);
         // Пропускаем системные элементы
         if ($item.hasClass("processing")) return;
@@ -611,7 +611,7 @@
         var headHiddenItems = Lampa.Storage.get("head_hidden_items", []);
         var headAddedItems = {};
 
-        $(".head__action").each(function () {
+        $(".head__action, .head__time").each(function () {
           var $item = $(this);
           // Пропускаем системные элементы
           if ($item.hasClass("processing")) return;
