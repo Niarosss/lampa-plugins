@@ -19,6 +19,7 @@
       show_episodes_on_main: false,
       label_position: "top-right", // 'top-right', 'top-left', 'bottom-right', 'bottom-left'
       colored_elements: true, // Об'єднана настройка для статусів і вікових обмежень
+      show_original_names: true, // Показ оригінальної назви фільму або серіалу
     },
   };
 
@@ -1298,6 +1299,40 @@
     });
   }
 
+  // Функція для відображення оригінальної назви фільму
+
+  function showTitles(card, render) {
+    // Перевірка вашого налаштування
+    if (!FancyFace.settings.show_original_names) return;
+
+    const orig = card.original_title || card.original_name;
+    if (!orig) return;
+
+    // Видаляємо старе перед додаванням (на випадок ре-рендерингу)
+    $(".original_title", render).remove();
+
+    // Додаємо розмітку одним блоком
+    $(".full-start-new__title", render).after(
+      `<div class="original_title" style="margin: 1em 0; text-align: left;">
+            <div style="font-size: 1.2em; opacity: 0.8;">Оригінальна назва: ${orig}</div>
+        </div>`
+    );
+  }
+
+  if (!window.title_plugin) {
+    window.title_plugin = true;
+
+    Lampa.Listener.follow("full", (e) => {
+      // Чекаємо саме завершення рендеру картки
+      if (e.type !== "complite" || !e.data.movie) return;
+
+      const render = e.object.activity.render();
+
+      // Викликаємо функцію, передаючи дані та готовий render
+      showTitles(e.data.movie, render);
+    });
+  }
+
   // Функція для зміни кольору вікових обмежень
   function colorizeAgeRating() {
     if (!FancyFace.settings.colored_elements) return;
@@ -1636,6 +1671,24 @@
       },
     });
 
+    Lampa.SettingsApi.addParam({
+      component: "season_info",
+      param: {
+        name: "season_info_show_original_names",
+        type: "trigger",
+        default: true,
+      },
+      field: {
+        name: "Показувати оригінальні назви",
+        description:
+          'Відображення оригінальної назви фільму/серіалу в картці."',
+      },
+      onChange: function (value) {
+        FancyFace.settings.show_original_names = value;
+        Lampa.Settings.update();
+      },
+    });
+
     FancyFace.settings.show_movie_type = Lampa.Storage.get(
       "season_info_show_movie_type",
       true
@@ -1660,6 +1713,10 @@
     FancyFace.settings.label_position = Lampa.Storage.get(
       "label_position",
       "top-right"
+    );
+    FancyFace.settings.show_original_names = Lampa.Storage.get(
+      "show_original_names",
+      true
     );
 
     // Встановлюємо enabled на основі seasons_info_mode
