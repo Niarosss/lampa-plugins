@@ -5,7 +5,7 @@
     if (!render) return;
 
     $(".full-start-new__title", render).after(
-      `<div class="original_title" style="margin:1.5em 0;text-align:left;">
+      `<div class="original_title" style="margin:1em 0;text-align:left;">
          <div>
            <div style='font-size:1em;'>Оригінальна назва: ${orig}</div>
          </div>
