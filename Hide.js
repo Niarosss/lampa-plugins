@@ -156,6 +156,11 @@
       en: "Fullscreen",
       uk: "Повноекранний режим",
     },
+    head_action_broadcast: {
+      ru: "Трансляция",
+      en: "Broadcast",
+      uk: "Трансляція",
+    },
     credits_text: {
       ru: "Нагло слизано у dikomillo (спасибо за первоначальную разработку). Переписано под свои нужды, исправлены ошибки. Автор - @Niaros",
       en: "Brazenly licked in dikomillo (thanks for the initial development). Rewritten for own needs, bugs fixed. Author - @Niaros",
@@ -647,6 +652,8 @@
           var titleKey = "";
           if (id.includes("open--search")) {
             titleKey = "head_action_search";
+          } else if (id.includes("open--broadcast")) {
+            titleKey = "head_action_broadcast";
           } else if (id.includes("open--settings")) {
             titleKey = "head_action_settings";
           } else if (id.includes("open--feed")) {
@@ -693,11 +700,6 @@
                 "align-items": "center",
                 "justify-content": "space-between",
               });
-
-              // Делаем кнопку "Настройки" неактивной
-              if (id.includes("open--settings")) {
-                item.find(".settings-param").addClass("disable-hide");
-              }
 
               // Настройки для имени параметра
               var $name = item.find(".settings-param__name");
