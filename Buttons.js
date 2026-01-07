@@ -770,27 +770,11 @@
       }
     });
 
-    items.push({
-      title: "Перейменувати",
-      rename: true,
-    });
-
-    items.push({
-      title: "Змінити порядок",
-      edit: true,
-    });
-
     Lampa.Select.show({
       title: folder.name,
       items: items,
       onSelect: function (item) {
-        if (item.rename) {
-          openRenameFolderDialog(folder);
-        } else if (item.edit) {
-          openFolderEditDialog(folder);
-        } else {
-          item.button.trigger("hover:enter");
-        }
+        item.button.trigger("hover:enter");
       },
       onBack: function () {
         Lampa.Controller.toggle("full_start");
@@ -883,8 +867,7 @@
       scroll_to_center: true,
       onBack: function () {
         Lampa.Modal.close();
-        updateFolderIcon(folder);
-        openFolderMenu(folder);
+        openEditDialog();
       },
     });
   }
@@ -1169,6 +1152,9 @@
           '<path d="M2 2L11 11L20 2" stroke="currentColor" stroke-width="4" stroke-linecap="round"/>' +
           "</svg>" +
           "</div>" +
+          '<div class="menu-edit-list__rename selector">' +
+          '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>' +
+          "</div>" +
           '<div class="menu-edit-list__delete selector">' +
           '<svg width="26" height="26" viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg">' +
           '<rect x="1.89111" y="1.78369" width="21.793" height="21.793" rx="3.5" stroke="currentColor" stroke-width="3"/>' +
@@ -1180,6 +1166,13 @@
 
       item.data("folderId", folder.id);
       item.data("itemType", "folder");
+
+      item.on("hover:enter", function () {
+        Lampa.Modal.close();
+        setTimeout(function () {
+          openFolderEditDialog(folder);
+        }, 100);
+      });
 
       item.find(".move-up").on("hover:enter", function () {
         var prev = item.prev();
@@ -1201,6 +1194,35 @@
           item.insertAfter(next);
           saveItemOrder();
         }
+      });
+
+      item.find(".menu-edit-list__rename").on("hover:enter", function () {
+        Lampa.Modal.close();
+        setTimeout(function () {
+          Lampa.Input.edit(
+            {
+              title: "Перейменувати папку",
+              value: folder.name,
+              free: true,
+              nosave: true,
+              nomic: true,
+            },
+            function (newName) {
+              if (newName && newName.trim()) {
+                var folders = getFolders();
+                var targetFolder = folders.find(function (f) {
+                  return f.id === folder.id;
+                });
+                if (targetFolder) {
+                  targetFolder.name = newName.trim();
+                  setFolders(folders);
+                  Lampa.Noty.show("Папку перейменовано");
+                }
+              }
+              openEditDialog();
+            }
+          );
+        }, 100);
       });
 
       item.find(".menu-edit-list__delete").on("hover:enter", function () {
@@ -1594,7 +1616,7 @@
     var resetBtn = $(
       '<div class="menu-edit-list__item folder-reset-button selector">' +
         '<div class="menu-edit-list__icon">' +
-        '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>' +
+        '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"></polyline><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path></svg>' +
         "</div>" +
         '<div class="menu-edit-list__title">Скинути</div>' +
         "</div>"
@@ -1895,7 +1917,7 @@
         ".folder-create-confirm { background: rgba(100,200,100,0.3); margin-top: 1em; border-radius: 0.3em; }" +
         ".folder-create-confirm.focus { border: 3px solid rgba(255,255,255,0.8); }" +
         ".bottom-controls { display: flex; gap: 0.5em; margin-top: 1em; }" +
-        ".bottom-controls > .menu-edit-list__item { flex: 1; justify-content: center; }" +
+        ".bottom-controls > .menu-edit-list__item { width: calc(50% - 0.25em); margin-bottom: 0; justify-content: center; }" +
         ".folder-reset-button { background: rgba(200,100,100,0.3); border: 3px solid transparent; }" +
         ".folder-reset-button.focus { background: rgba(200,100,100,0.4); border-color: rgba(255,255,255,0.8); }" +
         ".menu-edit-list__toggle.focus { border: 2px solid rgba(255,255,255,0.8); border-radius: 0.3em; }" +
