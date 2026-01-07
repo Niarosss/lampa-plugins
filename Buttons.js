@@ -90,7 +90,7 @@
     Lampa.Storage.set("button_renamed", renamed);
   }
 
-  function getButtonId(button) {
+  function generateButtonId(button) {
     var classes = button.attr("class") || "";
     var text = button.find("span").text().trim().replace(/\s+/g, "_");
     var subtitle = button.attr("data-subtitle") || "";
@@ -125,6 +125,26 @@
     }
 
     return id;
+  }
+
+  function getButtonId(button) {
+    var stableId = button.attr("data-stable-id");
+    if (stableId) {
+      return stableId;
+    }
+    var newId = generateButtonId(button);
+    button.attr("data-stable-id", newId);
+    return newId;
+  }
+
+  function applyRenamedButtons(buttons) {
+    var renamed = getRenamedButtons();
+    buttons.forEach(function (btn) {
+      var id = getButtonId(btn);
+      if (renamed[id]) {
+        btn.find("span").text(renamed[id]);
+      }
+    });
   }
 
   function getButtonType(button) {
@@ -599,6 +619,11 @@
       });
     }
 
+    applyRenamedButtons(
+      visibleButtons.filter(function (b) {
+        return !b.hasClass("button--folder");
+      })
+    );
     applyButtonAnimation(visibleButtons);
 
     var editBtn = targetContainer.find(".button--edit-order");
@@ -1789,6 +1814,11 @@
     targetContainer.append(editButton);
     visibleButtons.push(editButton);
 
+    applyRenamedButtons(
+      visibleButtons.filter(function (b) {
+        return !b.hasClass("button--folder");
+      })
+    );
     applyButtonAnimation(visibleButtons);
 
     setTimeout(function () {
@@ -1839,8 +1869,8 @@
         "gap: 0.5em !important; " +
         "}" +
         ".full-start-new__buttons.buttons-loading .full-start__button { visibility: hidden !important; }" +
-        ".menu-edit-list__create-folder { background: rgba(100,200,100,0.2); }" +
-        ".menu-edit-list__create-folder.focus { background: rgba(100,200,100,0.3); border: 3px solid rgba(255,255,255,0.8); }" +
+        ".menu-edit-list__create-folder { background: rgba(100,200,100,0.2); border: 3px solid transparent; }" +
+        ".menu-edit-list__create-folder.focus { background: rgba(100,200,100,0.3); border-color: rgba(255,255,255,0.8); }" +
         ".menu-edit-list__delete { width: 2.4em; height: 2.4em; display: flex; align-items: center; justify-content: center; cursor: pointer; }" +
         ".menu-edit-list__delete svg { width: 1.2em !important; height: 1.2em !important; }" +
         ".menu-edit-list__delete.focus { border: 2px solid rgba(255,255,255,0.8); border-radius: 0.3em; }" +
