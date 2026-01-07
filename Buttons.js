@@ -27,7 +27,7 @@
   var allButtonsOriginal = [];
   var currentContainer = null;
 
-  // Вспомогательная функция для поиска кнопки
+  // Допоміжна функція для пошуку кнопки
   function findButton(btnId) {
     var btn = allButtonsOriginal.find(function (b) {
       return getButtonId(b) === btnId;
@@ -40,7 +40,7 @@
     return btn;
   }
 
-  // Вспомогательная функция для получения всех ID кнопок в папках
+  // Допоміжна функція для отримання всіх ID кнопок у папках
   function getButtonsInFolders() {
     var folders = getFolders();
     var buttonsInFolders = [];
@@ -290,7 +290,7 @@
       openEditDialog();
     });
 
-    // Проверяем настройку и скрываем кнопку если редактор выключен
+    // Перевіряємо налаштування та приховуємо кнопку, якщо редактор вимкнено
     if (Lampa.Storage.get("buttons_editor_enabled") === false) {
       btn.hide();
     }
@@ -743,7 +743,7 @@
     });
 
     items.push({
-      title: "Изменить порядок",
+      title: "Змінити порядок",
       edit: true,
     });
 
@@ -816,7 +816,7 @@
     });
 
     Lampa.Modal.open({
-      title: "Порядок кнопок в папке",
+      title: "Порядок кнопок у папці",
       html: list,
       size: "small",
       scroll_to_center: true,
@@ -899,14 +899,14 @@
     Lampa.Input.edit(
       {
         free: true,
-        title: "Название папки",
+        title: "Назва папки",
         nosave: true,
         value: "",
         nomic: true,
       },
       function (folderName) {
         if (!folderName || !folderName.trim()) {
-          Lampa.Noty.show("Введите название папки");
+          Lampa.Noty.show("Введіть назву папки");
           openEditDialog();
           return;
         }
@@ -966,7 +966,7 @@
 
     var createBtn = $(
       '<div class="selector folder-create-confirm">' +
-        '<div style="text-align: center; padding: 1em;">Создать папку "' +
+        '<div style="text-align: center; padding: 1em;">Створити папку "' +
         folderName +
         '"</div>' +
         "</div>"
@@ -974,7 +974,7 @@
 
     createBtn.on("hover:enter", function () {
       if (selectedButtons.length < 2) {
-        Lampa.Noty.show("Выберите минимум 2 кнопки");
+        Lampa.Noty.show("Виберіть мінімум 2 кнопки");
         return;
       }
 
@@ -1030,7 +1030,7 @@
       setItemOrder(itemOrder);
 
       Lampa.Modal.close();
-      Lampa.Noty.show('Папка "' + folderName + '" создана');
+      Lampa.Noty.show('Папку "' + folderName + '" створено');
 
       if (currentContainer) {
         currentContainer.data("buttons-processed", false);
@@ -1042,7 +1042,7 @@
     list.append(createBtn);
 
     Lampa.Modal.open({
-      title: "Выберите кнопки для папки",
+      title: "Виберіть кнопки для папки",
       html: list,
       size: "medium",
       scroll_to_center: true,
@@ -1094,7 +1094,7 @@
         '<line x1="9" y1="14" x2="15" y2="14"></line>' +
         "</svg>" +
         "</div>" +
-        '<div class="menu-edit-list__title">Создать папку</div>' +
+        '<div class="menu-edit-list__title">Створити папку</div>' +
         "</div>"
     );
 
@@ -1209,7 +1209,7 @@
         setCustomOrder(newCustomOrder);
 
         item.remove();
-        Lampa.Noty.show("Папка удалена");
+        Lampa.Noty.show("Папку видалено");
 
         setTimeout(function () {
           if (currentContainer) {
@@ -1440,25 +1440,29 @@
           /<[^>]*>/g,
           ""
         );
-        Lampa.Input.edit(
-          {
-            free: true,
-            title: "Новое название кнопки",
-            nosave: true,
-            value: currentName,
-            nomic: true,
-          },
-          function (newName) {
-            if (newName && newName.trim()) {
-              var renamedButtons = getRenamedButtons();
-              renamedButtons[btnId] = newName.trim();
-              setRenamedButtons(renamedButtons);
-              item.find(".menu-edit-list__title").html(newName.trim());
-              btn.find("span").text(newName.trim());
-              Lampa.Noty.show("Кнопка переименована");
+        Lampa.Modal.close();
+        setTimeout(function () {
+          Lampa.Input.edit(
+            {
+              free: true,
+              title: "Нова назва кнопки",
+              nosave: true,
+              value: currentName,
+              nomic: true,
+            },
+            function (newName) {
+              if (newName && newName.trim()) {
+                var renamedButtons = getRenamedButtons();
+                renamedButtons[btnId] = newName.trim();
+                setRenamedButtons(renamedButtons);
+                item.find(".menu-edit-list__title").html(newName.trim());
+                btn.find("span").text(newName.trim());
+                Lampa.Noty.show("Кнопку перейменовано");
+              }
+              openEditDialog();
             }
-          }
-        );
+          );
+        }, 100);
       });
 
       item.find(".toggle").on("hover:enter", function () {
@@ -1530,7 +1534,7 @@
 
     var resetBtn = $(
       '<div class="selector folder-reset-button">' +
-        '<div style="text-align: center; padding: 1em;">Сбросить по умолчанию</div>' +
+        '<div style="text-align: center; padding: 1em;">Скинути за замовчуванням</div>' +
         "</div>"
     );
 
@@ -1542,7 +1546,7 @@
       Lampa.Storage.set("button_folders", []);
       Lampa.Storage.set("button_item_order", []);
       Lampa.Modal.close();
-      Lampa.Noty.show("Настройки сброшены");
+      Lampa.Noty.show("Налаштування скинуто");
 
       setTimeout(function () {
         if (currentContainer) {
@@ -1796,7 +1800,7 @@
 
   function setupButtonNavigation(container) {
     // Lampa автоматически обрабатывает навигацию для flex-wrap: wrap
-    // Просто убедимся что контроллер обновлен
+    // Просто переконаємося, що контролер оновлено
     if (Lampa.Controller && typeof Lampa.Controller.toggle === "function") {
       try {
         Lampa.Controller.toggle("full_start");
@@ -1882,7 +1886,7 @@
     });
   }
 
-  // Добавляем настройку в раздел "Интерфейс"
+  // Додаємо налаштування до розділу "Інтерфейс"
   if (Lampa.SettingsApi) {
     Lampa.SettingsApi.addParam({
       component: "interface",
@@ -1899,10 +1903,10 @@
           var currentValue = Lampa.Storage.get("buttons_editor_enabled", true);
           if (currentValue) {
             $(".button--edit-order").show();
-            Lampa.Noty.show("Редактор кнопок включен");
+            Lampa.Noty.show("Редактор кнопок увімкнено");
           } else {
             $(".button--edit-order").hide();
-            Lampa.Noty.show("Редактор кнопок выключен");
+            Lampa.Noty.show("Редактор кнопок вимкнено");
           }
         }, 100);
       },
