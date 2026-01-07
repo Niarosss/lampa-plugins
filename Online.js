@@ -106,10 +106,12 @@
     this.startSource = function (json) {
       var _this = this;
       return new Promise(function (resolve, reject) {
+        var a_sources = {};
+        var a_filter = [];
         json.forEach(function (j) {
           var name = (j.balanser || j.name.split(" ")[0]).toLowerCase();
           if (filter_sources.indexOf(name) > -1) {
-            sources[name] = {
+            a_sources[name] = {
               url: j.url,
               name: j.name,
               show: typeof j.show == "undefined" ? true : j.show,
@@ -117,7 +119,11 @@
           }
         });
 
-        if (filter_sources.length) {
+        a_filter = Object.keys(a_sources);
+
+        if (a_filter.length) {
+          sources = a_sources;
+          filter_sources = a_filter;
           balanser = Lampa.Storage.get("online_balanser", filter_sources[0]);
           if (!sources[balanser]) balanser = filter_sources[0];
           source = sources[balanser].url;
