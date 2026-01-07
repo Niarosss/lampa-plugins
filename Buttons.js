@@ -771,6 +771,11 @@
     });
 
     items.push({
+      title: "Перейменувати",
+      rename: true,
+    });
+
+    items.push({
       title: "Змінити порядок",
       edit: true,
     });
@@ -779,7 +784,9 @@
       title: folder.name,
       items: items,
       onSelect: function (item) {
-        if (item.edit) {
+        if (item.rename) {
+          openRenameFolderDialog(folder);
+        } else if (item.edit) {
           openFolderEditDialog(folder);
         } else {
           item.button.trigger("hover:enter");
@@ -789,6 +796,32 @@
         Lampa.Controller.toggle("full_start");
       },
     });
+  }
+
+  function openRenameFolderDialog(folder) {
+    Lampa.Input.edit(
+      {
+        title: "Перейменувати папку",
+        value: folder.name,
+        free: true,
+        nosave: true,
+        nomic: true,
+      },
+      function (newName) {
+        if (newName) {
+          var folders = getFolders();
+          var targetFolder = folders.find(function (f) {
+            return f.id === folder.id;
+          });
+          if (targetFolder) {
+            targetFolder.name = newName;
+            setFolders(folders);
+            Lampa.Noty.show("Папку перейменовано");
+            applyChanges();
+          }
+        }
+      }
+    );
   }
 
   function openFolderEditDialog(folder) {
@@ -1598,7 +1631,7 @@
     list.append(resetBtn);
 
     Lampa.Modal.open({
-      title: "Порядок кнопок",
+      title: "Налаштування кнопок",
       html: list,
       size: "small",
       scroll_to_center: true,
@@ -1861,6 +1894,8 @@
         ".folder-item .menu-edit-list__move { margin-right: 0; }" +
         ".folder-create-confirm { background: rgba(100,200,100,0.3); margin-top: 1em; border-radius: 0.3em; }" +
         ".folder-create-confirm.focus { border: 3px solid rgba(255,255,255,0.8); }" +
+        ".bottom-controls { display: flex; gap: 0.5em; margin-top: 1em; }" +
+        ".bottom-controls > .menu-edit-list__item { flex: 1; justify-content: center; }" +
         ".folder-reset-button { background: rgba(200,100,100,0.3); border: 3px solid transparent; }" +
         ".folder-reset-button.focus { background: rgba(200,100,100,0.4); border-color: rgba(255,255,255,0.8); }" +
         ".menu-edit-list__toggle.focus { border: 2px solid rgba(255,255,255,0.8); border-radius: 0.3em; }" +
