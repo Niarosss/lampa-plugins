@@ -1167,13 +1167,18 @@
       item.data("folderId", folder.id);
       item.data("itemType", "folder");
 
-      item.on("hover:enter", function () {
-        Lampa.Modal.close();
-        setTimeout(function () {
-          openFolderEditDialog(folder);
-        }, 100);
+      item.on("hover:enter", function (e) {
+        if (
+          !$(e.target).closest(
+            ".menu-edit-list__move, .menu-edit-list__rename, .menu-edit-list__delete"
+          ).length
+        ) {
+          Lampa.Modal.close();
+          setTimeout(function () {
+            openFolderEditDialog(folder);
+          }, 100);
+        }
       });
-
       item.find(".move-up").on("hover:enter", function () {
         var prev = item.prev();
         while (prev.length && prev.hasClass("menu-edit-list__create-folder")) {
