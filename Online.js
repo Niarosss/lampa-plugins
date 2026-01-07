@@ -345,30 +345,27 @@
       version: "1.0.0",
       name: "Online View with Sources",
       component: "online_view_ws",
-      onLauch: function (object) {
-        Lampa.Component.add("online_view_ws", component);
-        Lampa.Activity.push({
-          url: "",
-          title: "Перегляд онлайн",
-          component: "online_view_ws",
-          movie: object,
-        });
-      },
     };
 
-    Lampa.Manifest.plugins.push(manifest);
+    Lampa.Manifest.plugins = manifest;
 
     var button =
       '<div class="full-start__button selector view--online"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="24" height="24"><path d="M8 5v14l11-7z"/></svg><span>#{online_watch_plugin}</span></div>';
 
     function addButton(e) {
-      var render = e.activity || e.object.activity;
-      if (render.render().find(".view--online").length) return;
+      var render = e.object.activity.render();
+      if (render.find(".view--online").length) return;
       var btn = $(Lampa.Lang.translate(button));
       btn.on("hover:enter", function () {
-        manifest.onLauch(e.data.movie);
+        Lampa.Component.add("online_view_ws", component);
+        Lampa.Activity.push({
+          url: "",
+          title: "Перегляд онлайн",
+          component: "online_view_ws",
+          movie: e.data.movie,
+        });
       });
-      render.render().find(".view--torrent").after(btn);
+      render.find(".view--torrent").after(btn);
     }
 
     Lampa.Listener.follow("full", function (e) {
