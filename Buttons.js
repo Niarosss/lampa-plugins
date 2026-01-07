@@ -604,18 +604,18 @@
         }
       });
     } else {
+      folders.forEach(function (folder) {
+        var folderBtn = createFolderButton(folder);
+        targetContainer.append(folderBtn);
+        visibleButtons.push(folderBtn);
+      });
+
       currentButtons.forEach(function (btn) {
         var btnId = getButtonId(btn);
         if (!btn.hasClass("hidden") && buttonsInFolders.indexOf(btnId) === -1) {
           targetContainer.append(btn);
           visibleButtons.push(btn);
         }
-      });
-
-      folders.forEach(function (folder) {
-        var folderBtn = createFolderButton(folder);
-        targetContainer.append(folderBtn);
-        visibleButtons.push(folderBtn);
       });
     }
 
@@ -1131,7 +1131,7 @@
 
     function createFolderItem(folder) {
       var item = $(
-        '<div class="menu-edit-list__item folder-item">' +
+        '<div class="menu-edit-list__item folder-item selector">' +
           '<div class="menu-edit-list__icon">' +
           '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">' +
           '<path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>' +
@@ -1654,8 +1654,10 @@
       }, 100);
     });
 
-    list.append(createFolderBtn);
-    list.append(resetBtn);
+    var bottomControls = $('<div class="bottom-controls"></div>');
+    bottomControls.append(createFolderBtn);
+    bottomControls.append(resetBtn);
+    list.append(bottomControls);
 
     Lampa.Modal.open({
       title: "Налаштування кнопок",
