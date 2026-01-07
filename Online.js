@@ -314,6 +314,10 @@
       scroll.destroy();
       clearInterval(balanser_timer);
     };
+
+    this.create = function () {
+      return this.render();
+    };
   }
 
   function startPlugin() {
