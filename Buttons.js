@@ -671,6 +671,9 @@
       } else {
         text = "Кнопка";
       }
+      if (btn.hasClass("button--options")) {
+        text = "Ще";
+      }
       return text;
     }
 
@@ -1110,26 +1113,6 @@
     var folders = getFolders();
     var itemOrder = getItemOrder();
 
-    var createFolderBtn = $(
-      '<div class="menu-edit-list__item menu-edit-list__create-folder selector">' +
-        '<div class="menu-edit-list__icon">' +
-        '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">' +
-        '<path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>' +
-        '<line x1="12" y1="11" x2="12" y2="17"></line>' +
-        '<line x1="9" y1="14" x2="15" y2="14"></line>' +
-        "</svg>" +
-        "</div>" +
-        '<div class="menu-edit-list__title">Створити папку</div>' +
-        "</div>"
-    );
-
-    createFolderBtn.on("hover:enter", function () {
-      Lampa.Modal.close();
-      openCreateFolderDialog();
-    });
-
-    list.append(createFolderBtn);
-
     function createFolderItem(folder) {
       var item = $(
         '<div class="menu-edit-list__item folder-item">' +
@@ -1557,15 +1540,35 @@
       });
     }
 
+    var createFolderBtn = $(
+      '<div class="menu-edit-list__item menu-edit-list__create-folder selector">' +
+        '<div class="menu-edit-list__icon">' +
+        '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">' +
+        '<path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>' +
+        '<line x1="12" y1="11" x2="12" y2="17"></line>' +
+        '<line x1="9" y1="14" x2="15" y2="14"></line>' +
+        "</svg>" +
+        "</div>" +
+        '<div class="menu-edit-list__title">Створити папку</div>' +
+        "</div>"
+    );
+
+    createFolderBtn.on("hover:enter", function () {
+      Lampa.Modal.close();
+      openCreateFolderDialog();
+    });
+
     var resetBtn = $(
-      '<div class="selector folder-reset-button">' +
-        '<div style="text-align: center; padding: 1em;">Скинути за замовчуванням</div>' +
+      '<div class="menu-edit-list__item folder-reset-button selector">' +
+        '<div class="menu-edit-list__icon">' +
+        '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>' +
+        "</div>" +
+        '<div class="menu-edit-list__title">Скинути</div>' +
         "</div>"
     );
 
     resetBtn.on("hover:enter", function () {
-      var folders = getFolders();
-
+      Lampa.Storage.set("button_renamed", {});
       Lampa.Storage.set("button_custom_order", []);
       Lampa.Storage.set("button_hidden", []);
       Lampa.Storage.set("button_folders", []);
@@ -1576,44 +1579,22 @@
       setTimeout(function () {
         if (currentContainer) {
           currentContainer
-            .find(".button--play, .button--edit-order, .button--folder")
-            .remove();
-          currentContainer.data("buttons-processed", false);
-
-          var targetContainer = currentContainer.find(
-            ".full-start-new__buttons"
-          );
-          var existingButtons = targetContainer
             .find(".full-start__button")
-            .toArray();
-
-          allButtonsOriginal.forEach(function (originalBtn) {
-            var btnId = getButtonId(originalBtn);
-            var exists = false;
-
-            for (var i = 0; i < existingButtons.length; i++) {
-              if (getButtonId($(existingButtons[i])) === btnId) {
-                exists = true;
-                break;
-              }
-            }
-
-            if (!exists) {
-              var clonedBtn = originalBtn.clone(true, true);
-              clonedBtn.css({
-                opacity: "1",
-                animation: "none",
-              });
-              targetContainer.append(clonedBtn);
-            }
+            .not(".button--edit-order")
+            .remove();
+          allButtonsOriginal.forEach(function (btn) {
+            currentContainer
+              .find(".button--edit-order")
+              .before(btn.clone(true, true));
           });
-
+          currentContainer.data("buttons-processed", false);
           reorderButtons(currentContainer);
           refreshController();
         }
       }, 100);
     });
 
+    list.append(createFolderBtn);
     list.append(resetBtn);
 
     Lampa.Modal.open({
@@ -1880,8 +1861,8 @@
         ".folder-item .menu-edit-list__move { margin-right: 0; }" +
         ".folder-create-confirm { background: rgba(100,200,100,0.3); margin-top: 1em; border-radius: 0.3em; }" +
         ".folder-create-confirm.focus { border: 3px solid rgba(255,255,255,0.8); }" +
-        ".folder-reset-button { background: rgba(200,100,100,0.3); margin-top: 1em; border-radius: 0.3em; }" +
-        ".folder-reset-button.focus { border: 3px solid rgba(255,255,255,0.8); }" +
+        ".folder-reset-button { background: rgba(200,100,100,0.3); border: 3px solid transparent; }" +
+        ".folder-reset-button.focus { background: rgba(200,100,100,0.4); border-color: rgba(255,255,255,0.8); }" +
         ".menu-edit-list__toggle.focus { border: 2px solid rgba(255,255,255,0.8); border-radius: 0.3em; }" +
         "</style>"
     );
