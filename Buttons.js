@@ -1013,7 +1013,12 @@
   }
 
   function buildEditorUI(html) {
-    if (!allButtonsCache.length && !allButtonsOriginal.length) {
+    let container = Lampa.Activity.active()
+      .render()
+      .find(".full-start__content");
+    if (!container.length) container = $(".full-start__content");
+
+    if (!container.length) {
       Lampa.Noty.show(
         "Спочатку відкрийте головний екран, щоб завантажити список кнопок."
       );
@@ -1021,6 +1026,35 @@
         .empty()
         .append(
           '<div style="padding: 2em; text-align: center;">Для налаштування кнопок, будь ласка, спочатку зайдіть на головний екран Lampa.</div>'
+        );
+      return;
+    }
+
+    let categories = categorizeButtons(container);
+    let allButtons = [].concat(
+      categories.online,
+      categories.torrent,
+      categories.trailer,
+      categories.book,
+      categories.reaction,
+      categories.other
+    );
+    allButtonsCache = sortByCustomOrder(allButtons);
+
+    if (allButtonsOriginal.length === 0 && allButtonsCache.length > 0) {
+      allButtonsCache.forEach(function (btn) {
+        allButtonsOriginal.push(btn.clone(true, true));
+      });
+    }
+
+    if (!allButtonsCache.length) {
+      Lampa.Noty.show(
+        "На головному екрані не знайдено кнопок для редагування."
+      );
+      html
+        .empty()
+        .append(
+          '<div style="padding: 2em; text-align: center;">На головному екрані не знайдено кнопок для редагування.</div>'
         );
       return;
     }
@@ -1529,12 +1563,10 @@
           "buttons_editor",
           {},
           function () {
-            //onSave
             applyChanges();
             Lampa.Settings.create("interface");
           },
           function () {
-            //onBack
             applyChanges();
             Lampa.Settings.create("interface");
           }
