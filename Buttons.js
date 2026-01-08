@@ -504,10 +504,13 @@
       }
     }
 
+    const hasName = folder.name && folder.name.trim();
     const btn = $(`
-      <div class="full-start__button selector button--folder" data-folder-id="${folder.id}">
+      <div class="full-start__button selector button--folder${
+        !hasName ? " folder--no-name" : ""
+      }" data-folder-id="${folder.id}">
         ${icon}
-        <span>${folder.name}</span>
+        ${hasName ? `<span>${folder.name}</span>` : ""}
       </div>
     `);
 
@@ -796,9 +799,14 @@
       list.append(item);
     });
 
+    const confirmText =
+      folderName && folderName.trim()
+        ? `Створити папку "${folderName}"`
+        : "Створити папку без назви";
+
     const createBtn = $(`
       <div class="selector folder-create-confirm">
-        <div style="text-align: center; padding: 1em;">Створити папку "${folderName}"</div>
+        <div style="text-align: center; padding: 1em;">${confirmText}</div>
       </div>
     `);
 
