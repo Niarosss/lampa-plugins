@@ -1756,9 +1756,9 @@
   let manifest = {
     name: "FancyFace",
     version: FancyFace.version,
-    description: "Покращений інтерфейс для застосунку Lampa",
+    desc: "Покращений інтерфейс для застосунку Lampa",
     author: "@Niaros",
-    url: "https://niarosss.github.io/lampa-plugins/Hide.js",
+    url: "https://niarosss.github.io/lampa-plugins/FancyFace.js",
     type: "other",
     component: "menu_filter",
   };

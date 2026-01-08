@@ -1328,6 +1328,17 @@
   }
 
   function startPlugin() {
+    let manifest = {
+      name: "Button",
+      version: "1.0.1",
+      desc: "Налаштування кнопок в картці фільму чи серіалу",
+      author: "@Niaros",
+      url: "https://niarosss.github.io/lampa-plugins/Button.js",
+      type: "other",
+      component: "menu_filter",
+    };
+    Lampa.Manifest.plugins = manifest;
+
     const style = $(
       `<style>
         @keyframes button-fade-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
