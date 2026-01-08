@@ -78,7 +78,7 @@
   Lampa.Lang.add({
     menu_items_hide: {
       en: "Setting the visibility of elements",
-      uk: "Налаштування видимості елементів",
+      uk: "Перемикання видимості елементів",
     },
     left_menu_title: {
       en: "Left menu",
@@ -152,36 +152,29 @@
   });
 
   // Іконка ока для налаштувань
-  var eyeIcon =
-    '<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">' +
-    '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>' +
-    '<circle cx="12" cy="12" r="3" stroke="white" stroke-width="2"/>' +
-    "</svg>";
+  const eyeIcon = `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="12" cy="12" r="3" stroke="white" stroke-width="2"/>
+    </svg>`;
 
   // Іконка для кнопки "Показати все"
-  var resetIcon =
-    '<svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg>';
+  const resetIcon = `<svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg>`;
 
   // Іконка годинника
-  var timeIcon =
-    '<svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>';
+  const timeIcon = `<svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>`;
 
-  function renderVisibilityIcon(isHidden) {
-    return (
-      '<svg width="26" height="26" viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg">' +
-      '<rect x="1.89111" y="1.78369" width="21.793" height="21.793" rx="3.5" stroke="currentColor" stroke-width="3"/>' +
-      '<path d="M7.44873 12.9658L10.8179 16.3349L18.1269 9.02588" ' +
-      'stroke="currentColor" stroke-width="3" stroke-linecap="round" ' +
-      'opacity="' +
-      (isHidden ? "0" : "1") +
-      '"/>' +
-      "</svg>"
-    );
-  }
+  const renderVisibilityIcon = (isHidden) => {
+    return `<svg width="26" height="26" viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect x="1.89111" y="1.78369" width="21.793" height="21.793" rx="3.5" stroke="currentColor" stroke-width="3"/>
+<path d="M7.44873 12.9658L10.8179 16.3349L18.1269 9.02588" stroke="currentColor" stroke-width="3" stroke-linecap="round" opacity="${
+      isHidden ? "0" : "1"
+    }"/>
+</svg>`;
+  };
 
   // Ініціалізуємо плагіни
   function startPlugin() {
-    var manifest = {
+    const manifest = {
       type: "other",
       version: "1.0.1",
       name: Lampa.Lang.translate("menu_items_hide"),
@@ -192,16 +185,16 @@
 
     // Функції для приховування/показу пунктів меню
     function updateMenuVisibility() {
-      var hiddenItems = Lampa.Storage.get("menu_hide", []);
+      const hiddenItems = Lampa.Storage.get("menu_hide", []);
 
       $(".menu__item").each(function () {
-        var $item = $(this);
-        var textElement = $item.find(".menu__text");
+        const $item = $(this);
+        const textElement = $item.find(".menu__text");
         if (textElement.length === 0) return;
 
-        var text = textElement.text().trim();
+        const text = textElement.text().trim();
 
-        if (hiddenItems.indexOf(text) !== -1) {
+        if (hiddenItems.includes(text)) {
           $item.addClass("hidden");
         } else {
           $item.removeClass("hidden");
@@ -210,17 +203,17 @@
     }
 
     function updateHeadVisibility() {
-      var hiddenItems = Lampa.Storage.get("head_hidden_items", []);
+      const hiddenItems = Lampa.Storage.get("head_hidden_items", []);
 
       $(".head__action, .head__time").each(function () {
-        var $item = $(this);
+        const $item = $(this);
         // Пропускаємо системні елементи
         if ($item.hasClass("processing")) return;
 
         // Генеруємо ID на основі класів
-        var classes = $item.attr("class").split(" ");
-        var idParts = [];
-        for (var i = 0; i < classes.length; i++) {
+        const classes = $item.attr("class").split(" ");
+        let idParts = [];
+        for (let i = 0; i < classes.length; i++) {
           if (
             classes[i].indexOf("open--") === 0 ||
             classes[i] === "full--screen" ||
@@ -230,11 +223,11 @@
             idParts.push(classes[i]);
           }
         }
-        var id = idParts.join("_");
+        const id = idParts.join("_");
 
         if (!id) return;
 
-        if (hiddenItems.indexOf(id) !== -1) {
+        if (hiddenItems.includes(id)) {
           $item.addClass("hidden");
         } else {
           $item.removeClass("hidden");
@@ -243,17 +236,17 @@
     }
 
     function updateSettingsVisibility() {
-      var hiddenItems = Lampa.Storage.get("settings_hidden_items", []);
+      const hiddenItems = Lampa.Storage.get("settings_hidden_items", []);
 
       $(".settings-folder").each(function () {
-        var $item = $(this);
-        var component = $item.data("component");
+        const $item = $(this);
+        const component = $item.data("component");
         if (!component) return;
 
         // Не приховуємо налаштування нашого плагіна
         if (component === "menu_filter") return;
 
-        if (hiddenItems.indexOf(component) !== -1) {
+        if (hiddenItems.includes(component)) {
           $item.addClass("hidden");
         } else {
           $item.removeClass("hidden");
@@ -315,10 +308,10 @@
       },
     });
     // Змінні для відстеження створення налаштувань
-    var leftSettingsCreated = false;
-    var headSettingsCreated = false;
-    var settingsSettingsCreated = false;
-    var resetButtonAdded = false; // Прапорець для кнопки "Показати все"
+    let leftSettingsCreated = false;
+    let headSettingsCreated = false;
+    let settingsSettingsCreated = false;
+    let resetButtonAdded = false; // Прапорець для кнопки "Показати все"
 
     // Створюємо налаштування для меню з підтримкою TV
     function createMenuSettings() {
@@ -414,16 +407,16 @@
         });
 
         // Налаштування для лівого меню
-        var menuHiddenItems = Lampa.Storage.get("menu_hide", []);
+        const menuHiddenItems = Lampa.Storage.get("menu_hide", []);
 
         $(".menu__item").each(function () {
-          var $item = $(this);
-          var textElement = $item.find(".menu__text");
+          const $item = $(this);
+          const textElement = $item.find(".menu__text");
           if (textElement.length === 0) return;
 
-          var text = textElement.text().trim();
-          var iconElement = $item.find(".menu__ico");
-          var icon = iconElement.length ? iconElement.html() : "•";
+          const text = textElement.text().trim();
+          const iconElement = $item.find(".menu__ico");
+          const icon = iconElement.length ? iconElement.html() : "•";
 
           Lampa.SettingsApi.addParam({
             component: "menu_filter",
@@ -476,7 +469,7 @@
                 })
                 .addClass("menu-hide-icon");
 
-              var isHidden = menuHiddenItems.indexOf(text) !== -1;
+              const isHidden = menuHiddenItems.includes(text);
               var $value = $('<div class="settings-param__value"/>').html(
                 renderVisibilityIcon(isHidden)
               );
@@ -495,8 +488,8 @@
 
               // Функція переключення стану
               function toggleItem() {
-                var hiddenItems = Lampa.Storage.get("menu_hide", []);
-                var index = hiddenItems.indexOf(text);
+                const hiddenItems = Lampa.Storage.get("menu_hide", []);
+                const index = hiddenItems.indexOf(text);
 
                 if (index !== -1) {
                   hiddenItems.splice(index, 1);
@@ -506,7 +499,7 @@
 
                 Lampa.Storage.set("menu_hide", hiddenItems);
                 updateMenuVisibility();
-                var isNowHidden = hiddenItems.indexOf(text) !== -1;
+                const isNowHidden = hiddenItems.includes(text);
                 $value.html(renderVisibilityIcon(isNowHidden));
               }
 
@@ -550,18 +543,18 @@
         });
 
         // Налаштування для верхнього меню
-        var headHiddenItems = Lampa.Storage.get("head_hidden_items", []);
-        var headAddedItems = {};
+        const headHiddenItems = Lampa.Storage.get("head_hidden_items", []);
+        const headAddedItems = {};
 
         $(".head__action, .head__time").each(function () {
-          var $item = $(this);
+          const $item = $(this);
           // Пропускаємо системні елементи
           if ($item.hasClass("processing")) return;
 
           // Генеруємо ID на основі класів
-          var classes = $item.attr("class").split(" ");
-          var idParts = [];
-          for (var i = 0; i < classes.length; i++) {
+          const classes = $item.attr("class").split(" ");
+          let idParts = [];
+          for (let i = 0; i < classes.length; i++) {
             if (
               classes[i].indexOf("open--") === 0 ||
               classes[i] === "full--screen" ||
@@ -571,30 +564,29 @@
               idParts.push(classes[i]);
             }
           }
-          var id = idParts.join("_");
+          const id = idParts.join("_");
 
           if (!id) return;
           if (headAddedItems[id]) return;
           headAddedItems[id] = true;
 
           // Отримуємо іконку елемента
-          var icon = "";
+          let icon = "";
           if (id.includes("head__time")) {
             icon = timeIcon;
           } else if ($item.find("svg").length) {
             icon = $item.html();
           } else if ($item.find("img").length) {
-            icon =
-              '<img src="' +
-              $item.find("img").attr("src") +
-              '" width="30" height="30" style="display:block;">';
+            icon = `<img src="${$item
+              .find("img")
+              .attr("src")}" width="30" height="30" style="display:block;">`;
           } else {
             icon = "•";
           }
 
           // Визначаємо назву елемента за класами
-          var titleKey = "";
-          var title = "";
+          let titleKey = "";
+          let title = "";
           if (id.includes("open--search")) {
             titleKey = "head_action_search";
           } else if (id.includes("open--broadcast")) {
@@ -667,7 +659,7 @@
                 })
                 .addClass("menu-hide-icon");
 
-              var isHidden = headHiddenItems.indexOf(id) !== -1;
+              const isHidden = headHiddenItems.includes(id);
               var $value = $('<div class="settings-param__value"/>').html(
                 renderVisibilityIcon(isHidden)
               );
@@ -686,8 +678,8 @@
 
               // Функція переключення стану
               function toggleItem() {
-                var hiddenItems = Lampa.Storage.get("head_hidden_items", []);
-                var index = hiddenItems.indexOf(id);
+                const hiddenItems = Lampa.Storage.get("head_hidden_items", []);
+                const index = hiddenItems.indexOf(id);
 
                 if (index !== -1) {
                   hiddenItems.splice(index, 1);
@@ -698,7 +690,7 @@
                 Lampa.Storage.set("head_hidden_items", hiddenItems);
                 updateHeadVisibility();
 
-                var isNowHidden = hiddenItems.indexOf(id) !== -1;
+                const isNowHidden = hiddenItems.includes(id);
                 $value.html(renderVisibilityIcon(isNowHidden));
               }
 
@@ -742,30 +734,30 @@
         });
 
         // Налаштування для правого меню (Налаштування)
-        var settingsHiddenItems = Lampa.Storage.get(
+        const settingsHiddenItems = Lampa.Storage.get(
           "settings_hidden_items",
           []
         );
-        var settingsAddedItems = {};
+        const settingsAddedItems = {};
 
         function processSettingsMenu() {
-          var folders = $(".settings-folder");
+          const folders = $(".settings-folder");
           if (folders.length === 0) {
             setTimeout(processSettingsMenu, 300);
             return;
           }
 
           folders.each(function () {
-            var $item = $(this);
-            var component = $item.data("component");
+            const $item = $(this);
+            const component = $item.data("component");
             if (!component) return;
             if (settingsAddedItems[component]) return;
             settingsAddedItems[component] = true;
 
-            var nameElement = $item.find(".settings-folder__name");
-            var name = nameElement.length ? nameElement.text().trim() : "";
-            var iconElement = $item.find(".settings-folder__icon");
-            var icon = iconElement.length ? iconElement.html() : "•";
+            const nameElement = $item.find(".settings-folder__name");
+            let name = nameElement.length ? nameElement.text().trim() : "";
+            const iconElement = $item.find(".settings-folder__icon");
+            const icon = iconElement.length ? iconElement.html() : "•";
 
             if (!name) {
               name = Lampa.Lang.translate("no_name");
@@ -827,7 +819,7 @@
                   })
                   .addClass("menu-hide-icon");
 
-                var isHidden = settingsHiddenItems.indexOf(component) !== -1;
+                const isHidden = settingsHiddenItems.includes(component);
                 var $value = $('<div class="settings-param__value"/>').html(
                   renderVisibilityIcon(isHidden)
                 );
@@ -849,11 +841,11 @@
                   // Ми не дозволяємо приховувати налаштування плагіна
                   if (component === "menu_filter") return;
 
-                  var hiddenItems = Lampa.Storage.get(
+                  const hiddenItems = Lampa.Storage.get(
                     "settings_hidden_items",
                     []
                   );
-                  var index = hiddenItems.indexOf(component);
+                  const index = hiddenItems.indexOf(component);
 
                   if (index !== -1) {
                     hiddenItems.splice(index, 1);
@@ -864,7 +856,7 @@
                   Lampa.Storage.set("settings_hidden_items", hiddenItems);
                   updateSettingsVisibility();
 
-                  var isNowHidden = hiddenItems.indexOf(component) !== -1;
+                  const isNowHidden = hiddenItems.includes(component);
                   $value.html(renderVisibilityIcon(isNowHidden));
                 }
 
@@ -901,7 +893,7 @@
       });
 
       // Оновлюємо при зміні DOM
-      var observer = new MutationObserver(function () {
+      const observer = new MutationObserver(function () {
         if ($(".menu__list, .head__actions, .settings__body").length) {
           createMenuSettings();
           updateAllVisibility();
@@ -917,7 +909,7 @@
     // Запускаємо під час завантаження
     function initPlugin() {
       // Чекаємо, доки з'явиться меню
-      var waitForMenu = setInterval(function () {
+      const waitForMenu = setInterval(function () {
         if ($(".menu__list, .head__actions, .settings__body").length) {
           clearInterval(waitForMenu);
           createMenuSettings();
