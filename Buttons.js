@@ -600,6 +600,9 @@
             <div class="menu-edit-list__move move-down selector">
               <svg width="22" height="14" viewBox="0 0 22 14" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2 2L11 11L20 2" stroke="currentColor" stroke-width="4" stroke-linecap="round"/></svg>
             </div>
+            <div class="menu-edit-list__rename selector">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+            </div>
           </div>
         `);
 
@@ -620,6 +623,32 @@
             item.insertAfter(next);
             saveFolderButtonOrder(folder, list);
           }
+        });
+
+        item.find(".menu-edit-list__rename").on("hover:enter", () => {
+          const currentName = getButtonDisplayName(
+            btn,
+            allButtonsOriginal
+          ).replace(/<[^>]*>/g, "");
+          Lampa.Input.edit(
+            {
+              free: true,
+              title: "Нова назва кнопки",
+              nosave: true,
+              value: currentName,
+              nomic: true,
+            },
+            (newName) => {
+              Lampa.Modal.close();
+              if (newName && newName.trim()) {
+                const renamedButtons = getRenamedButtons();
+                renamedButtons[btnId] = newName.trim();
+                setRenamedButtons(renamedButtons);
+                Lampa.Noty.show("Кнопку перейменовано");
+              }
+              setTimeout(() => openFolderEditDialog(folder), 50);
+            }
+          );
         });
 
         list.append(item);
@@ -910,30 +939,28 @@
       });
 
       item.find(".menu-edit-list__rename").on("hover:enter", () => {
-        Lampa.Modal.close();
-        setTimeout(() => {
-          Lampa.Input.edit(
-            {
-              title: "Перейменувати папку",
-              value: folder.name,
-              free: true,
-              nosave: true,
-              nomic: true,
-            },
-            (newName) => {
-              if (newName && newName.trim()) {
-                const folders = getFolders();
-                const targetFolder = folders.find((f) => f.id === folder.id);
-                if (targetFolder) {
-                  targetFolder.name = newName.trim();
-                  setFolders(folders);
-                  Lampa.Noty.show("Папку перейменовано");
-                }
+        Lampa.Input.edit(
+          {
+            title: "Перейменувати папку",
+            value: folder.name,
+            free: true,
+            nosave: true,
+            nomic: true,
+          },
+          (newName) => {
+            Lampa.Modal.close();
+            if (newName && newName.trim()) {
+              const folders = getFolders();
+              const targetFolder = folders.find((f) => f.id === folder.id);
+              if (targetFolder) {
+                targetFolder.name = newName.trim();
+                setFolders(folders);
+                Lampa.Noty.show("Папку перейменовано");
               }
-              openEditDialog();
             }
-          );
-        }, 100);
+            setTimeout(openEditDialog, 50);
+          }
+        );
       });
 
       item.find(".menu-edit-list__delete").on("hover:enter", () => {
@@ -1028,29 +1055,26 @@
           /<[^>]*>/g,
           ""
         );
-        Lampa.Modal.close();
-        setTimeout(() => {
-          Lampa.Input.edit(
-            {
-              free: true,
-              title: "Нова назва кнопки",
-              nosave: true,
-              value: currentName,
-              nomic: true,
-            },
-            (newName) => {
-              if (newName && newName.trim()) {
-                const renamedButtons = getRenamedButtons();
-                renamedButtons[btnId] = newName.trim();
-                setRenamedButtons(renamedButtons);
-                item.find(".menu-edit-list__title").html(newName.trim());
-                btn.find("span").text(newName.trim());
-                Lampa.Noty.show("Кнопку перейменовано");
-              }
-              openEditDialog();
+        Lampa.Input.edit(
+          {
+            free: true,
+            title: "Нова назва кнопки",
+            nosave: true,
+            value: currentName,
+            nomic: true,
+          },
+          (newName) => {
+            Lampa.Modal.close();
+            if (newName && newName.trim()) {
+              const renamedButtons = getRenamedButtons();
+              renamedButtons[btnId] = newName.trim();
+              setRenamedButtons(renamedButtons);
+              btn.find("span").text(newName.trim());
+              Lampa.Noty.show("Кнопку перейменовано");
             }
-          );
-        }, 100);
+            setTimeout(openEditDialog, 50);
+          }
+        );
       });
 
       item.find(".toggle").on("hover:enter", () => {
