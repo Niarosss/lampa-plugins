@@ -2,9 +2,7 @@
   "use strict";
 
   const playIcon =
-    '<svg viewBox="0 0 12 12" xmlns="http://www.w3.org/2000/svg">' +
-    '<path d="M9.074 7.733L3.308 11.631C1.903 12.581 0 11.583 0 9.898V2.101C0 .415 1.903-.582 3.308.368L9.074 4.266C10.351 5.125 10.351 6.874 9.074 7.733Z" fill="currentColor"/>' +
-    "</svg>";
+    '<svg viewBox="0 0 12 12" xmlns="http://www.w3.org/2000/svg"><path d="M 10.234 7.733 L 4.468 11.631 C 3.063 12.581 1.16 11.583 1.16 9.898 L 1.16 2.101 C 1.16 0.415 3.063 -0.582 4.468 0.368 L 10.234 4.266 C 11.511 5.125 11.511 6.874 10.234 7.733 Z" fill="currentColor"></path></svg>';
 
   const EXCLUDED_CLASSES = [
     "button--play",
@@ -853,7 +851,11 @@
       );
 
       Lampa.Modal.close();
-      Lampa.Noty.show(`Папку "${folderName}" створено`);
+      const notifyText =
+        folderName && folderName.trim()
+          ? `Папку "${folderName}" створено`
+          : "Папку без назви створено";
+      Lampa.Noty.show(notifyText);
 
       if (currentContainer) {
         currentContainer.data("buttons-processed", false);
