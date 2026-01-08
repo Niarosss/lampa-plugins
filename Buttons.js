@@ -1017,299 +1017,308 @@
       Lampa.Noty.show(
         "Спочатку відкрийте головний екран, щоб завантажити список кнопок."
       );
-      Lampa.Settings.create("interface");
       return;
     }
 
-    if (currentContainer) {
-      var categories = categorizeButtons(currentContainer);
-      var allButtons = []
-        .concat(categories.online)
-        .concat(categories.torrent)
-        .concat(categories.trailer)
-        .concat(categories.book)
-        .concat(categories.reaction)
-        .concat(categories.other);
-
-      allButtons = sortByCustomOrder(allButtons);
-      allButtonsCache = allButtons;
-
-      var folders = getFolders();
-      var buttonsInFolders = getButtonsInFolders();
-
-      var filteredButtons = allButtons.filter(function (btn) {
-        return buttonsInFolders.indexOf(getButtonId(btn)) === -1;
-      });
-
-      currentButtons = filteredButtons;
-    }
-
-    var scroll = new Lampa.Scroll({
-      mask: true,
-      over: true,
-    });
-    var body = scroll.render();
-    var items = [];
-
-    function updateList() {
-      body.empty();
-      items.forEach(function (item) {
-        body.append(item);
-      });
-      Lampa.Utils.trigger(body, "update");
-    }
-
-    function createSortable() {
-      Lampa.Utils.sortable(
-        body,
-        ".menu-edit-list__item:not(.bottom-controls .menu-edit-list__item)",
-        "[data-item-id]",
-        {
-          onUpdate: function onUpdate(startIndex, newIndex) {
-            saveItemOrder();
-          },
-        }
-      );
-    }
-
-    function createFolderEditItem(folder, allItems) {
-      var item = $(
-        '<div class="menu-edit-list__item folder-item selector" data-item-id="' +
-          folder.id +
-          '">' +
-          '<div class="menu-edit-list__icon">' +
-          '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">' +
-          '<path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>' +
-          "</svg>" +
-          "</div>" +
-          '<div class="menu-edit-list__title">' +
-          folder.name +
-          ' <span style="opacity:0.5">(' +
-          folder.buttons.length +
-          ")</span></div>" +
-          '<div class="menu-edit-list__rename selector">' +
-          '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>' +
-          "</div>" +
-          '<div class="menu-edit-list__delete selector">' +
-          '<svg width="26" height="26" viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg">' +
-          '<rect x="1.89111" y="1.78369" width="21.793" height="21.793" rx="3.5" stroke="currentColor" stroke-width="3"/>' +
-          '<path d="M9.5 9.5L16.5 16.5M16.5 9.5L9.5 16.5" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>' +
-          "</svg>" +
-          "</div>" +
-          "</div>"
-      );
-
-      item.data("folderId", folder.id);
-      item.data("itemType", "folder");
-
-      item.on("hover:enter", function (e) {
-        if (
-          !$(e.target).closest(
-            ".menu-edit-list__rename, .menu-edit-list__delete"
-          ).length
-        ) {
-          openFolderEditDialog(folder);
-        }
-      });
-
-      item.find(".menu-edit-list__rename").on("hover:enter", function () {
-        openRenameFolderDialog(folder, renderList);
-      });
-
-      item.find(".menu-edit-list__delete").on("hover:enter", function () {
-        deleteFolder(folder.id);
-        renderList();
-      });
-
-      return item;
-    }
-
-    function createButtonEditItem(btn, hidden, allItems) {
-      var displayName = getButtonDisplayName(btn, allButtonsOriginal);
-      var icon = btn.find("svg").clone();
-      var btnId = getButtonId(btn);
-      var isHidden = hidden.indexOf(btnId) !== -1;
-
-      var item = $(
-        '<div class="menu-edit-list__item" data-item-id="' +
-          btnId +
-          '">' +
-          '<div class="menu-edit-list__icon"></div>' +
-          '<div class="menu-edit-list__title">' +
-          displayName +
-          "</div>" +
-          '<div class="menu-edit-list__rename selector">' +
-          '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>' +
-          "</div>" +
-          '<div class="menu-edit-list__toggle toggle selector">' +
-          '<svg width="26" height="26" viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg">' +
-          '<rect x="1.89111" y="1.78369" width="21.793" height="21.793" rx="3.5" stroke="currentColor" stroke-width="3"/>' +
-          '<path d="M7.44873 12.9658L10.8179 16.3349L18.1269 9.02588" stroke="currentColor" stroke-width="3" class="dot" opacity="' +
-          (isHidden ? "0" : "1") +
-          '" stroke-linecap="round"/>' +
-          "</svg>" +
-          "</div>" +
-          "</div>"
-      );
-
-      item.find(".menu-edit-list__icon").append(icon);
-      item.data("buttonId", btnId);
-      item.data("itemType", "button");
-
-      item.find(".menu-edit-list__rename").on("hover:enter", function () {
-        var currentName = getButtonDisplayName(btn, allButtonsOriginal).replace(
-          /<[^>]*>/g,
-          ""
-        );
-        Lampa.Input.edit(
-          {
-            free: true,
-            title: "Нова назва кнопки",
-            nosave: true,
-            value: currentName,
-            nomic: true,
-          },
-          function (newName) {
-            if (newName && newName.trim()) {
-              var renamedButtons = getRenamedButtons();
-              renamedButtons[btnId] = newName.trim();
-              setRenamedButtons(renamedButtons);
-              item.find(".menu-edit-list__title").html(newName.trim());
-              btn.find("span").text(newName.trim());
-              Lampa.Noty.show("Кнопку перейменовано");
-            }
-          }
-        );
-      });
-
-      item.find(".toggle").on("hover:enter", function () {
-        var hidden = getHiddenButtons();
-        var index = hidden.indexOf(btnId);
-
-        if (index !== -1) {
-          hidden.splice(index, 1);
-          item.find(".dot").attr("opacity", "1");
-        } else {
-          hidden.push(btnId);
-          item.find(".dot").attr("opacity", "0");
-        }
-
-        setHiddenButtons(hidden);
-      });
-
-      return item;
-    }
-
-    function renderList() {
-      items = [];
-      var folders = getFolders();
-      var hidden = getHiddenButtons();
-      var buttonsInFolders = getButtonsInFolders();
-      var itemOrder = getItemOrder();
-      var allItems = [];
-
-      allButtonsCache.forEach(function (btn) {
-        var btnId = getButtonId(btn);
-        if (buttonsInFolders.indexOf(btnId) === -1) {
-          allItems.push({
-            type: "button",
-            id: btnId,
-            element: btn,
-          });
-        }
-      });
-
-      folders.forEach(function (folder) {
-        allItems.push({
-          type: "folder",
-          id: folder.id,
-          data: folder,
-        });
-      });
-
-      var sortedItems = [];
-      var remainingItems = allItems.slice();
-
-      if (itemOrder.length > 0) {
-        itemOrder.forEach(function (orderedItem) {
-          var foundIndex = remainingItems.findIndex(function (item) {
-            return item.type === orderedItem.type && item.id === orderedItem.id;
-          });
-          if (foundIndex !== -1) {
-            sortedItems.push(remainingItems[foundIndex]);
-            remainingItems.splice(foundIndex, 1);
-          }
-        });
-        sortedItems = sortedItems.concat(remainingItems);
-      } else {
-        sortedItems = allItems;
-      }
-
-      sortedItems.forEach(function (item) {
-        if (item.type === "button") {
-          items.push(createButtonEditItem(item.element, hidden, allItems));
-        } else if (item.type === "folder") {
-          items.push(createFolderEditItem(item.data, allItems));
-        }
-      });
-
-      var createFolderItem = $(
-        '<div class="menu-edit-list__item menu-edit-list__create-folder selector">' +
-          '<div class="menu-edit-list__icon">' +
-          '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">' +
-          '<path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>' +
-          '<line x1="12" y1="11" x2="12" y2="17"></line>' +
-          '<line x1="9" y1="14" x2="15" y2="14"></line>' +
-          "</svg>" +
-          "</div>" +
-          '<div class="menu-edit-list__title">Створити папку</div>' +
-          "</div>"
-      );
-
-      createFolderItem.on("hover:enter", function () {
-        openCreateFolderDialog(renderList);
-      });
-
-      var resetBtn = $(
-        '<div class="menu-edit-list__item folder-reset-button selector">' +
-          '<div class="menu-edit-list__icon">' +
-          '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"></polyline><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path></svg>' +
-          "</div>" +
-          '<div class="menu-edit-list__title">Скинути</div>' +
-          "</div>"
-      );
-
-      resetBtn.on("hover:enter", function () {
-        Lampa.Storage.set("button_renamed", {});
-        Lampa.Storage.set("button_custom_order", []);
-        Lampa.Storage.set("button_hidden", []);
-        Lampa.Storage.set("button_folders", []);
-        Lampa.Storage.set("button_item_order", []);
-        Lampa.Noty.show("Налаштування скинуто");
-        renderList();
-      });
-
-      var bottomControls = $('<div class="bottom-controls"></div>');
-      bottomControls.append(createFolderItem);
-      bottomControls.append(resetBtn);
-
-      items.push(bottomControls);
-      updateList();
-    }
-
     Lampa.Settings.create(
-      "buttons_editor",
+      false,
       {},
       function (data) {
         saveItemOrder();
         applyChanges();
+
+        Lampa.Controller.toggle("settings");
+        Lampa.Controller.toggle("settings_component");
+
         Lampa.Settings.create("interface");
       },
       function () {
         applyChanges();
+
+        Lampa.Controller.toggle("settings");
+        Lampa.Controller.toggle("settings_component");
+
         Lampa.Settings.create("interface");
       },
       function (html) {
+        if (currentContainer) {
+          var categories = categorizeButtons(currentContainer);
+          var allButtons = []
+            .concat(categories.online)
+            .concat(categories.torrent)
+            .concat(categories.trailer)
+            .concat(categories.book)
+            .concat(categories.reaction)
+            .concat(categories.other);
+
+          allButtons = sortByCustomOrder(allButtons);
+          allButtonsCache = allButtons;
+
+          var folders = getFolders();
+          var buttonsInFolders = getButtonsInFolders();
+
+          var filteredButtons = allButtons.filter(function (btn) {
+            return buttonsInFolders.indexOf(getButtonId(btn)) === -1;
+          });
+
+          currentButtons = filteredButtons;
+        }
+
+        var scroll = new Lampa.Scroll({
+          mask: true,
+          over: true,
+        });
+        var body = scroll.render();
+        var items = [];
+
+        function updateList() {
+          body.empty();
+          items.forEach(function (item) {
+            body.append(item);
+          });
+          Lampa.Utils.trigger(body, "update");
+        }
+
+        function createSortable() {
+          Lampa.Utils.sortable(
+            body,
+            ".menu-edit-list__item:not(.bottom-controls .menu-edit-list__item)",
+            "[data-item-id]",
+            {
+              onUpdate: function onUpdate(startIndex, newIndex) {
+                saveItemOrder();
+              },
+            }
+          );
+        }
+
+        function createFolderEditItem(folder, allItems) {
+          var item = $(
+            '<div class="menu-edit-list__item folder-item selector" data-item-id="' +
+              folder.id +
+              '">' +
+              '<div class="menu-edit-list__icon">' +
+              '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">' +
+              '<path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>' +
+              "</svg>" +
+              "</div>" +
+              '<div class="menu-edit-list__title">' +
+              folder.name +
+              ' <span style="opacity:0.5">(' +
+              folder.buttons.length +
+              ")</span></div>" +
+              '<div class="menu-edit-list__rename selector">' +
+              '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>' +
+              "</div>" +
+              '<div class="menu-edit-list__delete selector">' +
+              '<svg width="26" height="26" viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg">' +
+              '<rect x="1.89111" y="1.78369" width="21.793" height="21.793" rx="3.5" stroke="currentColor" stroke-width="3"/>' +
+              '<path d="M9.5 9.5L16.5 16.5M16.5 9.5L9.5 16.5" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>' +
+              "</svg>" +
+              "</div>" +
+              "</div>"
+          );
+
+          item.data("folderId", folder.id);
+          item.data("itemType", "folder");
+
+          item.on("hover:enter", function (e) {
+            if (
+              !$(e.target).closest(
+                ".menu-edit-list__rename, .menu-edit-list__delete"
+              ).length
+            ) {
+              openFolderEditDialog(folder);
+            }
+          });
+
+          item.find(".menu-edit-list__rename").on("hover:enter", function () {
+            openRenameFolderDialog(folder, renderList);
+          });
+
+          item.find(".menu-edit-list__delete").on("hover:enter", function () {
+            deleteFolder(folder.id);
+            renderList();
+          });
+
+          return item;
+        }
+
+        function createButtonEditItem(btn, hidden, allItems) {
+          var displayName = getButtonDisplayName(btn, allButtonsOriginal);
+          var icon = btn.find("svg").clone();
+          var btnId = getButtonId(btn);
+          var isHidden = hidden.indexOf(btnId) !== -1;
+
+          var item = $(
+            '<div class="menu-edit-list__item" data-item-id="' +
+              btnId +
+              '">' +
+              '<div class="menu-edit-list__icon"></div>' +
+              '<div class="menu-edit-list__title">' +
+              displayName +
+              "</div>" +
+              '<div class="menu-edit-list__rename selector">' +
+              '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>' +
+              "</div>" +
+              '<div class="menu-edit-list__toggle toggle selector">' +
+              '<svg width="26" height="26" viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg">' +
+              '<rect x="1.89111" y="1.78369" width="21.793" height="21.793" rx="3.5" stroke="currentColor" stroke-width="3"/>' +
+              '<path d="M7.44873 12.9658L10.8179 16.3349L18.1269 9.02588" stroke="currentColor" stroke-width="3" class="dot" opacity="' +
+              (isHidden ? "0" : "1") +
+              '" stroke-linecap="round"/>' +
+              "</svg>" +
+              "</div>" +
+              "</div>"
+          );
+
+          item.find(".menu-edit-list__icon").append(icon);
+          item.data("buttonId", btnId);
+          item.data("itemType", "button");
+
+          item.find(".menu-edit-list__rename").on("hover:enter", function () {
+            var currentName = getButtonDisplayName(
+              btn,
+              allButtonsOriginal
+            ).replace(/<[^>]*>/g, "");
+            Lampa.Input.edit(
+              {
+                free: true,
+                title: "Нова назва кнопки",
+                nosave: true,
+                value: currentName,
+                nomic: true,
+              },
+              function (newName) {
+                if (newName && newName.trim()) {
+                  var renamedButtons = getRenamedButtons();
+                  renamedButtons[btnId] = newName.trim();
+                  setRenamedButtons(renamedButtons);
+                  item.find(".menu-edit-list__title").html(newName.trim());
+                  btn.find("span").text(newName.trim());
+                  Lampa.Noty.show("Кнопку перейменовано");
+                }
+              }
+            );
+          });
+
+          item.find(".toggle").on("hover:enter", function () {
+            var hidden = getHiddenButtons();
+            var index = hidden.indexOf(btnId);
+
+            if (index !== -1) {
+              hidden.splice(index, 1);
+              item.find(".dot").attr("opacity", "1");
+            } else {
+              hidden.push(btnId);
+              item.find(".dot").attr("opacity", "0");
+            }
+
+            setHiddenButtons(hidden);
+          });
+
+          return item;
+        }
+
+        function renderList() {
+          items = [];
+          var folders = getFolders();
+          var hidden = getHiddenButtons();
+          var buttonsInFolders = getButtonsInFolders();
+          var itemOrder = getItemOrder();
+          var allItems = [];
+
+          allButtonsCache.forEach(function (btn) {
+            var btnId = getButtonId(btn);
+            if (buttonsInFolders.indexOf(btnId) === -1) {
+              allItems.push({
+                type: "button",
+                id: btnId,
+                element: btn,
+              });
+            }
+          });
+
+          folders.forEach(function (folder) {
+            allItems.push({
+              type: "folder",
+              id: folder.id,
+              data: folder,
+            });
+          });
+
+          var sortedItems = [];
+          var remainingItems = allItems.slice();
+
+          if (itemOrder.length > 0) {
+            itemOrder.forEach(function (orderedItem) {
+              var foundIndex = remainingItems.findIndex(function (item) {
+                return (
+                  item.type === orderedItem.type && item.id === orderedItem.id
+                );
+              });
+              if (foundIndex !== -1) {
+                sortedItems.push(remainingItems[foundIndex]);
+                remainingItems.splice(foundIndex, 1);
+              }
+            });
+            sortedItems = sortedItems.concat(remainingItems);
+          } else {
+            sortedItems = allItems;
+          }
+
+          sortedItems.forEach(function (item) {
+            if (item.type === "button") {
+              items.push(createButtonEditItem(item.element, hidden, allItems));
+            } else if (item.type === "folder") {
+              items.push(createFolderEditItem(item.data, allItems));
+            }
+          });
+
+          var createFolderItem = $(
+            '<div class="menu-edit-list__item menu-edit-list__create-folder selector">' +
+              '<div class="menu-edit-list__icon">' +
+              '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">' +
+              '<path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>' +
+              '<line x1="12" y1="11" x2="12" y2="17"></line>' +
+              '<line x1="9" y1="14" x2="15" y2="14"></line>' +
+              "</svg>" +
+              "</div>" +
+              '<div class="menu-edit-list__title">Створити папку</div>' +
+              "</div>"
+          );
+
+          createFolderItem.on("hover:enter", function () {
+            openCreateFolderDialog(renderList);
+          });
+
+          var resetBtn = $(
+            '<div class="menu-edit-list__item folder-reset-button selector">' +
+              '<div class="menu-edit-list__icon">' +
+              '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"></polyline><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path></svg>' +
+              "</div>" +
+              '<div class="menu-edit-list__title">Скинути</div>' +
+              "</div>"
+          );
+
+          resetBtn.on("hover:enter", function () {
+            Lampa.Storage.set("button_renamed", {});
+            Lampa.Storage.set("button_custom_order", []);
+            Lampa.Storage.set("button_hidden", []);
+            Lampa.Storage.set("button_folders", []);
+            Lampa.Storage.set("button_item_order", []);
+            Lampa.Noty.show("Налаштування скинуто");
+            renderList();
+          });
+
+          var bottomControls = $('<div class="bottom-controls"></div>');
+          bottomControls.append(createFolderItem);
+          bottomControls.append(resetBtn);
+
+          items.push(bottomControls);
+          updateList();
+        }
+
         html.empty();
         html.append(body);
         renderList();
@@ -1622,7 +1631,14 @@
       },
       onRender: function (item) {
         var parent = item.closest(".settings-param");
-        parent.find(".settings-param__name").prepend(editIcon);
+        var name = parent.find(".settings-param__name");
+        var icon = $(editIcon);
+        icon.css({
+          width: "24px",
+          height: "24px",
+          "margin-right": "15px",
+        });
+        name.prepend(icon);
         parent.find(".settings-param__value").remove();
 
         var target = $(
