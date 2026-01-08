@@ -290,7 +290,7 @@
       component: "menu_filter",
       name: Lampa.Lang.translate("menu_items_hide"),
       description: Lampa.Lang.translate("plugin_description"),
-      icon: eyeIcon,
+      icon: '<div class="menu__ico">' + eyeIcon + "</div>",
     });
 
     // Головне вікно налаштувань
