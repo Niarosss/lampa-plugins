@@ -426,7 +426,7 @@
 
               // Налаштування для контейнера
               item.css({
-                padding: "6px",
+                padding: "10px",
                 margin: "0",
               });
 
@@ -635,7 +635,7 @@
 
               // Налаштування для контейнера
               item.css({
-                padding: "6px",
+                padding: "10px",
                 margin: "0",
               });
 
@@ -807,7 +807,7 @@
 
                 // Налаштування для контейнера
                 item.css({
-                  padding: "6px",
+                  padding: "10px",
                   margin: "0",
                 });
 
