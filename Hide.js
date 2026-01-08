@@ -351,8 +351,6 @@
 
             var $name = item.find(".settings-param__name");
             $name.css({
-              padding: "0",
-              margin: "0",
               "font-size": "16px",
               display: "flex",
               "align-items": "center",

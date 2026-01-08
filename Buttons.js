@@ -1600,23 +1600,25 @@
       }, 400);
     });
 
-    setTimeout(function () {
-      Lampa.SettingsApi.addParam({
-        section: "interface",
-        param: {
-          name: "buttons_editor_btn_" + Date.now(), // Додаємо унікальний ідентифікатор
-          type: "button",
-        },
-        field: {
-          name: "Редактор кнопок",
-        },
-        onRender: function (item) {
-          item.on("hover:enter", function () {
-            openEditDialog();
-          });
-        },
-      });
-    }, 100);
+    Lampa.SettingsApi.addParam({
+      component: "interface",
+      param: {
+        name: "buttons_editor",
+        type: "button",
+      },
+      field: {
+        name: "Редактор кнопок",
+      },
+      onChange: function () {
+        openEditDialog();
+      },
+      onRender: function (item) {
+        item.find(".settings-param__name").css({
+          width: "100%",
+        });
+        item.find(".settings-param__value").remove();
+      },
+    });
 
     window.plugin_buttons_ready = true;
     Lampa.Listener.send("plugin_buttons_ready");
