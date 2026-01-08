@@ -1456,7 +1456,17 @@
 
   // Функція ініціалізації плагіна
   function startPlugin() {
-    // Реєструємо плагін у Lampa
+    let manifest = {
+      name: "FancyFace",
+      version: FancyFace.version,
+      description: "Покращений інтерфейс для застосунку Lampa",
+      author: "@Niaros",
+      url: "https://niarosss.github.io/lampa-plugins/FancyFace.js",
+      type: "other",
+      component: "menu_filter",
+    };
+    Lampa.Manifest.plugins = manifest;
+
     Lampa.SettingsApi.addComponent({
       component: "season_info",
       name: "Додаткові налаштування інтерфейсу",
@@ -1752,17 +1762,6 @@
       }
     });
   }
-
-  let manifest = {
-    name: "FancyFace",
-    version: FancyFace.version,
-    descr: "Покращений інтерфейс для застосунку Lampa",
-    author: "@Niaros",
-    url: "https://niarosss.github.io/lampa-plugins/FancyFace.js",
-    type: "other",
-    component: "menu_filter",
-  };
-  Lampa.Manifest.plugins = manifest;
 
   window.season_info = FancyFace;
 })();

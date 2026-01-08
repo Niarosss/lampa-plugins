@@ -177,7 +177,7 @@
     let manifest = {
       name: Lampa.Lang.translate("menu_items_hide"),
       author: "@Niaros",
-      descr: Lampa.Lang.translate("plugin_description"),
+      description: Lampa.Lang.translate("plugin_description"),
       url: "https://niarosss.github.io/lampa-plugins/Hide.js",
       version: "1.0.2",
       type: "other",
