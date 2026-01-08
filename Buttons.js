@@ -1,6 +1,94 @@
 (function () {
   "use strict";
 
+  Lampa.Lang.add({
+    buttons_settings_name: {
+      en: "Buttons editor",
+      uk: "Редактор кнопок",
+    },
+    buttons_settings_desc: {
+      en: "Customize the position and visibility of buttons",
+      uk: "Налаштування позиції та видимості кнопок",
+    },
+    buttons_editor_enabled: {
+      en: "Enable editor",
+      uk: "Увімкнути редактор",
+    },
+    folder_rename: {
+      en: "Rename folder",
+      uk: "Перейменувати папку",
+    },
+    folder_renamed: {
+      en: "Folder renamed",
+      uk: "Папку перейменовано",
+    },
+    folder_name: {
+      en: "Folder name",
+      uk: "Назва папки",
+    },
+    folder_enter_name: {
+      en: "Enter a folder name",
+      uk: "Введіть назву папки",
+    },
+    button_order_in_folder: {
+      en: "Button order in folder",
+      uk: "Порядок кнопок у папці",
+    },
+    button_unnamed: {
+      en: "Button",
+      uk: "Кнопка",
+    },
+    button_more: {
+      en: "More",
+      uk: "Ще",
+    },
+  });
+
+  var buttons_icon =
+    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 29" fill="none"><use xlink:href="#sprite-edit"></use></svg>';
+
+  function createButtonsSettings() {
+    Lampa.SettingsApi.addComponent({
+      component: "buttons_settings",
+      name: Lampa.Lang.translate("buttons_settings_name"),
+      description: Lampa.Lang.translate("buttons_settings_desc"),
+      icon: buttons_icon,
+    });
+
+    Lampa.SettingsApi.addParam({
+      component: "buttons_settings",
+      param: {
+        type: "toggle",
+        name: "buttons_editor_enabled",
+        default: true,
+      },
+      field: {
+        name: Lampa.Lang.translate("buttons_editor_enabled"),
+      },
+      onChange: function (value) {
+        Lampa.Storage.set("buttons_editor_enabled", value);
+      },
+    });
+
+    Lampa.SettingsApi.addParam({
+      component: "interface",
+      param: {
+        type: "button",
+      },
+      field: {
+        name: Lampa.Lang.translate("buttons_settings_name"),
+        description: Lampa.Lang.translate("buttons_settings_desc"),
+      },
+      onChange: function () {
+        Lampa.Settings.create("buttons_settings");
+      },
+    });
+  }
+
+  function startPlugin() {
+    createButtonsSettings();
+  }
+
   var LAMPAC_ICON =
     '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><path d="M20.331 14.644l-13.794-13.831 17.55 10.075zM2.938 0c-0.813 0.425-1.356 1.2-1.356 2.206v27.581c0 1.006 0.544 1.781 1.356 2.206l16.038-16zM29.512 14.1l-3.681-2.131-4.106 4.031 4.106 4.031 3.756-2.131c1.125-0.893 1.125-2.906-0.075-3.8zM6.538 31.188l17.55-10.075-3.756-3.756z" fill="currentColor"></path></svg>';
 
@@ -669,10 +757,10 @@
           .replace(/_/g, " ");
         text = capitalize(text);
       } else {
-        text = "Кнопка";
+        text = Lampa.Lang.translate("button_unnamed");
       }
       if (btn.hasClass("button--options")) {
-        text = "Ще";
+        text = Lampa.Lang.translate("button_more");
       }
       return text;
     }
@@ -785,7 +873,7 @@
   function openRenameFolderDialog(folder) {
     Lampa.Input.edit(
       {
-        title: "Перейменувати папку",
+        title: Lampa.Lang.translate("folder_rename"),
         value: folder.name,
         free: true,
         nosave: true,
@@ -800,7 +888,7 @@
           if (targetFolder) {
             targetFolder.name = newName;
             setFolders(folders);
-            Lampa.Noty.show("Папку перейменовано");
+            Lampa.Noty.show(Lampa.Lang.translate("folder_renamed"));
             applyChanges();
           }
         }
@@ -861,7 +949,7 @@
     });
 
     Lampa.Modal.open({
-      title: "Порядок кнопок у папці",
+      title: Lampa.Lang.translate("button_order_in_folder"),
       html: list,
       size: "small",
       scroll_to_center: true,
@@ -943,14 +1031,14 @@
     Lampa.Input.edit(
       {
         free: true,
-        title: "Назва папки",
+        title: Lampa.Lang.translate("folder_name"),
         nosave: true,
         value: "",
         nomic: true,
       },
       function (folderName) {
         if (!folderName || !folderName.trim()) {
-          Lampa.Noty.show("Введіть назву папки");
+          Lampa.Noty.show(Lampa.Lang.translate("folder_enter_name"));
           openEditDialog();
           return;
         }
@@ -1961,46 +2049,14 @@
     });
   }
 
-  // Додаємо налаштування до розділу "Інтерфейс"
-  if (Lampa.SettingsApi) {
-    Lampa.SettingsApi.addParam({
-      component: "interface",
-      param: {
-        name: "buttons_editor_enabled",
-        type: "trigger",
-        default: true,
-      },
-      field: {
-        name: "Редактор кнопок",
-      },
-      onChange: function (value) {
-        setTimeout(function () {
-          var currentValue = Lampa.Storage.get("buttons_editor_enabled", true);
-          if (currentValue) {
-            $(".button--edit-order").show();
-            Lampa.Noty.show("Редактор кнопок увімкнено");
-          } else {
-            $(".button--edit-order").hide();
-            Lampa.Noty.show("Редактор кнопок вимкнено");
-          }
-        }, 100);
-      },
-      onRender: function (element) {
-        setTimeout(function () {
-          var lastElement = $(
-            'div[data-component="interface"] .settings-param'
-          ).last();
-          if (lastElement.length) {
-            element.insertAfter(lastElement);
-          }
-        }, 0);
-      },
-    });
-  }
-
   init();
 
   if (typeof module !== "undefined" && module.exports) {
     module.exports = {};
   }
+  Lampa.Listener.follow("app", function (e) {
+    if (e.type == "ready") {
+      startPlugin();
+    }
+  });
 })();
