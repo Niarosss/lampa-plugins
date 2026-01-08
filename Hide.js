@@ -1,5 +1,79 @@
 (function () {
   ("use strict");
+
+  // Додаємо стилі для приховування елементів та оформлення
+  $(
+    "<style>\
+    .hidden { display: none !important; }\
+    .menu-hide-item .settings-param { \
+        padding: 16px 40px !important; \
+        min-height: 54px !important; \
+        display: flex !important; \
+        align-items: center !important; \
+        border-radius: 12px !important; \
+        margin-bottom: 12px !important; \
+        background: rgba(255,255,255,0.05) !important; \
+        transition: all 0.2s ease !important; \
+    }\
+    .menu-hide-item .settings-param:hover { \
+        background: rgba(255,255,255,0.1) !important; \
+        transform: translateY(-2px) !important; \
+    }\
+    .menu-hide-icon { \
+        width: 30px !important; \
+        height: 30px !important; \
+        min-width: 30px !important; \
+        min-height: 30px !important; \
+        display: flex !important; \
+        align-items: center !important; \
+        justify-content: center !important; \
+        margin-right: 16px !important; \
+        margin-left: 10px !important; \
+    }\
+    .menu-hide-text { \
+        font-size: 18px !important; \
+        flex-grow: 1 !important; \
+        font-weight: 500 !important; \
+        letter-spacing: 0.3px !important; \
+    }\
+    .menu-hide-hidden { \
+        color: #ff4e45 !important; \
+    }\
+    .menu-hide-shown { \
+        color: #4CAF50 !important; \
+    }\
+    .section-title .settings-param__name { \
+        font-size: 20px !important; \
+        font-weight: 600 !important; \
+        margin: 25px 0 15px 0 !important; \
+        padding-bottom: 8px !important; \
+        border-bottom: 2px solid rgba(255,255,255,0.1) !important; \
+        color: #fff !important; \
+    }\
+    .section-divider .settings-param { \
+        height: 1px !important; \
+        min-height: 1px !important; \
+        padding: 0 !important; \
+        background: rgba(255,255,255,0.1) !important; \
+        margin: 25px 0 !important; \
+    }\
+    /* Стиль для неактивної кнопки */ \
+    .settings-param.disable-hide { \
+        opacity: 0.6 !important; \
+        pointer-events: none !important; \
+    }\
+    /* Стиль для подяки */ \
+    .credits-text { \
+        text-align: center; \
+        color: #b0b0b0 !important; /* Сірий колір зі зниженою яскравістю */ \
+        font-size: 14px !important; \
+        padding: 15px 20px 5px !important; \
+        margin-top: 5px !important; \
+        line-height: 1.5; \
+    }\
+</style>"
+  ).appendTo("head");
+
   // Мультимовна підтримка
   Lampa.Lang.add({
     menu_items_hide: {
@@ -277,6 +351,8 @@
 
             var $name = item.find(".settings-param__name");
             $name.css({
+              padding: "0",
+              margin: "0",
               "font-size": "16px",
               display: "flex",
               "align-items": "center",
@@ -734,7 +810,6 @@
 
                 // Налаштування для контейнера
                 item.css({
-                  padding: "0",
                   margin: "0",
                 });
 
