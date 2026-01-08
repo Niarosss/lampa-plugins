@@ -1331,7 +1331,7 @@
     let manifest = {
       name: "Button",
       version: "1.0.1",
-      desc: "Налаштування кнопок в картці фільму чи серіалу",
+      descr: "Налаштування кнопок в картці фільму чи серіалу",
       author: "@Niaros",
       url: "https://niarosss.github.io/lampa-plugins/Button.js",
       type: "other",

@@ -94,7 +94,7 @@
     },
     plugin_description: {
       en: "Plugin for hiding interface elements",
-      uk: "Плагін для приховання елементів інтерфейсу",
+      uk: "Плагін для керування елементами нтерфейсу",
     },
     hidden: {
       en: "Hidden",
@@ -177,7 +177,7 @@
     let manifest = {
       name: Lampa.Lang.translate("menu_items_hide"),
       author: "@Niaros",
-      description: Lampa.Lang.translate("plugin_description"),
+      descr: Lampa.Lang.translate("plugin_description"),
       url: "https://niarosss.github.io/lampa-plugins/Hide.js",
       version: "1.0.2",
       type: "other",
