@@ -6,7 +6,7 @@
     "<style>\
     .hidden { display: none !important; }\
     .menu-hide-item .settings-param { \
-        padding: 16px 40px !important; \
+        padding: 16px 40px !important; /* Збільшений відступ */ \
         min-height: 54px !important; \
         display: flex !important; \
         align-items: center !important; \
@@ -28,7 +28,7 @@
         align-items: center !important; \
         justify-content: center !important; \
         margin-right: 16px !important; \
-        margin-left: 10px !important; \
+        margin-left: 10px !important; /* Додано відступ зліва */ \
     }\
     .menu-hide-text { \
         font-size: 18px !important; \
@@ -351,7 +351,6 @@
 
             var $name = item.find(".settings-param__name");
             $name.css({
-              padding: "10px",
               margin: "0",
               "font-size": "16px",
               display: "flex",
@@ -427,7 +426,7 @@
 
               // Налаштування для контейнера
               item.css({
-                padding: "0",
+                padding: "6px",
                 margin: "0",
               });
 
@@ -442,7 +441,6 @@
               // Налаштування для імені параметра
               var $name = item.find(".settings-param__name");
               $name.css({
-                padding: "0",
                 margin: "0",
                 "font-size": "16px",
                 display: "flex",
@@ -637,7 +635,7 @@
 
               // Налаштування для контейнера
               item.css({
-                padding: "0",
+                padding: "6px",
                 margin: "0",
               });
 
@@ -652,7 +650,6 @@
               // Налаштування для імені параметра
               var $name = item.find(".settings-param__name");
               $name.css({
-                padding: "0",
                 margin: "0",
                 "font-size": "16px",
                 display: "flex",
@@ -810,6 +807,7 @@
 
                 // Налаштування для контейнера
                 item.css({
+                  padding: "6px",
                   margin: "0",
                 });
 
@@ -829,7 +827,6 @@
                 // Налаштування для імені параметра
                 var $name = item.find(".settings-param__name");
                 $name.css({
-                  padding: "0",
                   margin: "0",
                   "font-size": "16px",
                   display: "flex",
