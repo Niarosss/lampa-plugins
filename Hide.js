@@ -6,7 +6,7 @@
     "<style>\
     .hidden { display: none !important; }\
     .menu-hide-item .settings-param { \
-        padding: 16px 40px !important; /* Збільшений відступ */ \
+        padding: 16px 60px !important; /* Збільшений відступ */ \
         min-height: 54px !important; \
         display: flex !important; \
         align-items: center !important; \

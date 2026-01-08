@@ -297,24 +297,6 @@
     });
   }
 
-  function createEditButton() {
-    var btn = $(
-      '<div class="full-start__button selector button--edit-order" style="order: 9999;">' +
-        '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 29" fill="none"><use xlink:href="#sprite-edit"></use></svg>' +
-        "</div>"
-    );
-
-    btn.on("hover:enter", function () {
-      openEditDialog();
-    });
-
-    if (Lampa.Storage.get("buttons_editor_enabled") === false) {
-      btn.hide();
-    }
-
-    return btn;
-  }
-
   function saveOrder() {
     var order = [];
     currentButtons.forEach(function (btn) {
@@ -1517,10 +1499,6 @@
       });
     }
 
-    var editButton = createEditButton();
-    targetContainer.append(editButton);
-    visibleButtons.push(editButton);
-
     applyRenamedButtons(
       visibleButtons.filter(function (b) {
         return !b.hasClass("button--folder");
@@ -1622,21 +1600,23 @@
       }, 400);
     });
 
-    Lampa.SettingsApi.addParam({
-      section: "interface",
-      param: {
-        name: "buttons_editor_btn",
-        type: "button",
-      },
-      field: {
-        name: "Редактор кнопок",
-      },
-      onRender: function (item) {
-        item.on("hover:enter", function () {
-          openEditDialog();
-        });
-      },
-    });
+    setTimeout(function () {
+      Lampa.SettingsApi.addParam({
+        section: "interface",
+        param: {
+          name: "buttons_editor_btn_" + Date.now(), // Додаємо унікальний ідентифікатор
+          type: "button",
+        },
+        field: {
+          name: "Редактор кнопок",
+        },
+        onRender: function (item) {
+          item.on("hover:enter", function () {
+            openEditDialog();
+          });
+        },
+      });
+    }, 100);
 
     window.plugin_buttons_ready = true;
     Lampa.Listener.send("plugin_buttons_ready");
