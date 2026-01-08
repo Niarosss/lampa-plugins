@@ -3,7 +3,7 @@
 
   const playIcon =
     '<svg viewBox="0 0 12 12" xmlns="http://www.w3.org/2000/svg">' +
-    '<path d="M9.074 7.733L3.308 11.631C1.903 12.581 0 11.583 0 9.898V2.101C0 .415 1.903-.582 3.308.368L9.074 4.266C10.351 5.125 10.351 6.874 9.074 7.733Z" fill="white"/>' +
+    '<path d="M9.074 7.733L3.308 11.631C1.903 12.581 0 11.583 0 9.898V2.101C0 .415 1.903-.582 3.308.368L9.074 4.266C10.351 5.125 10.351 6.874 9.074 7.733Z" fill="currentColor"/>' +
     "</svg>";
 
   const EXCLUDED_CLASSES = [
@@ -639,14 +639,16 @@
               nomic: true,
             },
             (newName) => {
-              Lampa.Modal.close();
               if (newName && newName.trim()) {
                 const renamedButtons = getRenamedButtons();
                 renamedButtons[btnId] = newName.trim();
                 setRenamedButtons(renamedButtons);
+                btn.find("span").text(newName.trim());
+                item
+                  .find(".menu-edit-list__title")
+                  .html(getButtonDisplayName(btn, allButtonsOriginal));
                 Lampa.Noty.show("Кнопку перейменовано");
               }
-              setTimeout(() => openFolderEditDialog(folder), 50);
             }
           );
         });
@@ -948,17 +950,22 @@
             nomic: true,
           },
           (newName) => {
-            Lampa.Modal.close();
             if (newName && newName.trim()) {
               const folders = getFolders();
               const targetFolder = folders.find((f) => f.id === folder.id);
               if (targetFolder) {
                 targetFolder.name = newName.trim();
                 setFolders(folders);
+                item
+                  .find(".menu-edit-list__title")
+                  .html(
+                    `${newName.trim()} <span style="opacity:0.5">(${
+                      targetFolder.buttons.length
+                    })</span>`
+                  );
                 Lampa.Noty.show("Папку перейменовано");
               }
             }
-            setTimeout(openEditDialog, 50);
           }
         );
       });
@@ -1064,15 +1071,16 @@
             nomic: true,
           },
           (newName) => {
-            Lampa.Modal.close();
             if (newName && newName.trim()) {
               const renamedButtons = getRenamedButtons();
               renamedButtons[btnId] = newName.trim();
               setRenamedButtons(renamedButtons);
               btn.find("span").text(newName.trim());
+              item
+                .find(".menu-edit-list__title")
+                .html(getButtonDisplayName(btn, currentButtons));
               Lampa.Noty.show("Кнопку перейменовано");
             }
-            setTimeout(openEditDialog, 50);
           }
         );
       });
