@@ -1,8 +1,8 @@
 (function () {
   "use strict";
 
-  const LAMPAC_ICON =
-    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="-1 0 12 12"><path fill-rule="evenodd" d="m9.074 7.733-5.766 3.898C1.903 12.581 0 11.583 0 9.898V2.101C0 .415 1.903-.582 3.308.368l5.766 3.898a2.088 2.088 0 0 1 0 3.467"/></svg>';
+  const playIcon =
+    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="-1 0 12 12"><path stroke="white" fill-rule="evenodd" d="m9.074 7.733-5.766 3.898C1.903 12.581 0 11.583 0 9.898V2.101C0 .415 1.903-.582 3.308.368l5.766 3.898a2.088 2.088 0 0 1 0 3.467"/></svg>';
 
   const EXCLUDED_CLASSES = [
     "button--play",
@@ -191,7 +191,7 @@
       ) {
         var svgElement = $btn.find("svg").first();
         if (svgElement.length && !svgElement.hasClass("modss-online-icon")) {
-          svgElement.replaceWith(LAMPAC_ICON);
+          svgElement.replaceWith(playIcon);
         }
       }
 

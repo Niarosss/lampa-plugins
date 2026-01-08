@@ -3,7 +3,7 @@
 
   var FancyFace = {
     name: "FancyFace",
-    version: "1.0.3",
+    version: "1.0.5",
     debug: false,
     // Налаштування за замовчуванням
     settings: {
@@ -1469,27 +1469,13 @@
     // Реєструємо плагін у Lampa
     Lampa.SettingsApi.addComponent({
       component: "season_info",
-      name: "Модифікація інтерфейсу",
+      name: "Додаткові налаштування інтерфейсу",
       icon:
         '<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">' +
         '<path d="M4 5C4 4.44772 4.44772 4 5 4H19C19.5523 4 20 4.44772 20 5V7C20 7.55228 19.5523 8 19 8H5C4.44772 8 4 7.55228 4 7V5Z" stroke="white" stroke-width="2"/>' +
         '<path d="M4 11C4 10.4477 4.44772 10 5 10H19C19.5523 10 20 10.4477 20 11V13C20 13.5523 19.5523 14 19 14H5C4.44772 14 4 13.5523 4 13V11Z" stroke="white" stroke-width="2"/>' +
         '<path d="M4 17C4 16.4477 4.44772 16 5 16H19C19.5523 16 20 16.4477 20 17V19C20 19.5523 19.5523 20 19 20H5C4.44772 20 4 19.5523 4 19V17Z" stroke="white" stroke-width="2"/>' +
         "</svg>",
-    });
-
-    // Додаємо налаштування плагіна
-    Lampa.SettingsApi.addParam({
-      component: "season_info",
-      param: {
-        type: "button",
-        component: "about",
-      },
-      field: {
-        name: "Про плагін",
-        description: "Інформація та підтримка",
-      },
-      onChange: showAbout,
     });
 
     Lampa.SettingsApi.addParam({
@@ -1792,61 +1778,6 @@
     });
   }
 
-  function showAbout() {
-    $("#about-plugin-styles").remove();
-    const style = $('<style id="about-plugin-styles"></style>').html(`
-    .about-plugin {
-      background: rgba(35, 32, 45, 0.23);
-      border-radius: 16px;
-      padding: 18px;
-    }
-  `);
-
-    $("head").append(style);
-
-    // HTML
-    const html = `
-    <div class="about-plugin">
-      <div class="about-plugin__title active">
-        <h1>FancyFace v${FancyFace.version}</h1>
-      </div>
-
-      <div class="about-plugin__description">
-        <div style="color:#fff;margin-bottom:10px">Версія ${FancyFace.version}</div>
-        <ul>
-          <li>✦ 1.0.0 Попередній випуск.</li>
-          <li>✦ 1.0.2 Додано функцію приховавання трейлерів та функцію відображення оригінальної назви фільму або серіалу.</li>
-        </ul>
-      </div>
-
-      <div class="credits-container">
-        <div class="credits-column">
-          <div class="credits-title">Розробник</div>
-          <div class="credits-list">
-            <div class="credits-item">
-              <div class="credits-name">Niaros</div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  `;
-
-    const content = $("<div></div>").html(html);
-
-    Lampa.Modal.open({
-      title: "",
-      html: content,
-      size: "full",
-      onBack() {
-        $("#about-plugin-styles").remove();
-        Lampa.Modal.close();
-        Lampa.Controller.toggle("settings");
-      },
-    });
-  }
-
-  // Чекаємо завантаження додатка та запускаємо плагін
   if (window.appready) {
     startPlugin();
   } else {
@@ -1857,13 +1788,11 @@
     });
   }
 
-  // Реєстрація плагіна в маніфесті
   Lampa.Manifest.plugins = {
     name: "FancyFace",
     version: FancyFace.version,
-    description: "Покращений інтерфейс для додатка Lampa",
+    description: "Покращений інтерфейс для застосунку Lampa",
   };
 
-  // Експортуємо об'єкт плагіна для зовнішнього доступу
   window.season_info = FancyFace;
 })();
