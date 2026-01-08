@@ -500,10 +500,16 @@
                 Lampa.Storage.set("menu_hide", hiddenItems);
                 updateMenuVisibility();
 
-                var newStatus =
-                  hiddenItems.indexOf(text) !== -1
-                    ? Lampa.Lang.translate("hidden")
-                    : Lampa.Lang.translate("shown");
+                var newStatus = $(
+                  '<div class="menu-edit-list__toggle toggle selector">' +
+                    '<svg width="26" height="26" viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg">' +
+                    '<rect x="1.89111" y="1.78369" width="21.793" height="21.793" rx="3.5" stroke="currentColor" stroke-width="3"/>' +
+                    '<path d="M7.44873 12.9658L10.8179 16.3349L18.1269 9.02588" stroke="currentColor" stroke-width="3" class="dot" opacity="' +
+                    (hiddenItems.indexOf(text) !== -1 ? "0" : "1") +
+                    '" stroke-linecap="round"/>' +
+                    "</svg>" +
+                    "</div>"
+                );
 
                 var isNowHidden = hiddenItems.indexOf(text) !== -1;
                 $value
