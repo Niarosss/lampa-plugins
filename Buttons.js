@@ -1303,11 +1303,11 @@
       function (data) {
         saveItemOrder();
         applyChanges();
-        Lampa.Controller.toggle("settings_component");
+        Lampa.Settings.create("interface");
       },
       function () {
         applyChanges();
-        Lampa.Controller.toggle("settings_component");
+        Lampa.Settings.create("interface");
       },
       function (html) {
         html.empty();
@@ -1600,19 +1600,31 @@
       }, 400);
     });
 
+    var editIcon =
+      '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 29" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use xlink:href="#sprite-edit"></use></svg>';
+
+    Lampa.SettingsApi.addComponent({
+      component: "buttons_editor",
+      name: "Редактор кнопок",
+    });
+
     Lampa.SettingsApi.addParam({
       component: "interface",
       param: {
-        name: "buttons_editor",
+        name: "buttons_editor_link",
         type: "button",
       },
       field: {
         name: "Редактор кнопок",
+        icon: editIcon,
       },
       onChange: function () {
-        openEditDialog();
+        Lampa.Settings.create("buttons_editor");
       },
       onRender: function (item) {
+        var a = item.find(".settings-param").parent();
+        $(".settings-folder > div").prepend(a);
+
         item.find(".settings-param__name").css({
           width: "100%",
         });
