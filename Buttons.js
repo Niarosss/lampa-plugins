@@ -2,7 +2,9 @@
   "use strict";
 
   const playIcon =
-    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="-1 0 12 12"><path stroke="white" fill-rule="evenodd" d="m9.074 7.733-5.766 3.898C1.903 12.581 0 11.583 0 9.898V2.101C0 .415 1.903-.582 3.308.368l5.766 3.898a2.088 2.088 0 0 1 0 3.467"/></svg>';
+    '<svg viewBox="0 0 12 12" xmlns="http://www.w3.org/2000/svg">' +
+    '<path d="M9.074 7.733L3.308 11.631C1.903 12.581 0 11.583 0 9.898V2.101C0 .415 1.903-.582 3.308.368L9.074 4.266C10.351 5.125 10.351 6.874 9.074 7.733Z" fill="white"/>' +
+    "</svg>";
 
   const EXCLUDED_CLASSES = [
     "button--play",
@@ -118,19 +120,18 @@
   }
 
   function getButtonId(button) {
-    var stableId = button.attr("data-stable-id");
-    if (stableId) {
-      return stableId;
+    let stableId = button.attr("data-stable-id");
+    if (!stableId) {
+      stableId = generateButtonId(button);
+      button.attr("data-stable-id", stableId);
     }
-    var newId = generateButtonId(button);
-    button.attr("data-stable-id", newId);
-    return newId;
+    return stableId;
   }
 
   function applyRenamedButtons(buttons) {
-    var renamed = getRenamedButtons();
-    buttons.forEach(function (btn) {
-      var id = getButtonId(btn);
+    const renamed = getRenamedButtons();
+    buttons.forEach((btn) => {
+      const id = getButtonId(btn);
       if (renamed[id]) {
         btn.find("span").text(renamed[id]);
       }
@@ -138,36 +139,28 @@
   }
 
   function getButtonType(button) {
-    var classes = button.attr("class") || "";
-
-    for (var i = 0; i < DEFAULT_GROUPS.length; i++) {
-      var group = DEFAULT_GROUPS[i];
-      for (var j = 0; j < group.patterns.length; j++) {
-        if (classes.indexOf(group.patterns[j]) !== -1) {
-          return group.name;
-        }
+    const classes = button.attr("class") || "";
+    for (const group of DEFAULT_GROUPS) {
+      if (group.patterns.some((pattern) => classes.includes(pattern))) {
+        return group.name;
       }
     }
-
     return "other";
   }
 
   function isExcluded(button) {
-    var classes = button.attr("class") || "";
-    for (var i = 0; i < EXCLUDED_CLASSES.length; i++) {
-      if (classes.indexOf(EXCLUDED_CLASSES[i]) !== -1) {
-        return true;
-      }
-    }
-    return false;
+    const classes = button.attr("class") || "";
+    return EXCLUDED_CLASSES.some((excludedClass) =>
+      classes.includes(excludedClass)
+    );
   }
 
   function categorizeButtons(container) {
-    var allButtons = container
+    const allButtons = container
       .find(".full-start__button")
       .not(".button--edit-order, .button--folder, .button--play");
 
-    var categories = {
+    const categories = {
       online: [],
       torrent: [],
       trailer: [],
@@ -177,11 +170,11 @@
     };
 
     allButtons.each(function () {
-      var $btn = $(this);
+      const $btn = $(this);
 
       if (isExcluded($btn)) return;
 
-      var type = getButtonType($btn);
+      const type = getButtonType($btn);
 
       if (
         type === "online" &&
@@ -189,30 +182,25 @@
         !$btn.hasClass("modss--button") &&
         !$btn.hasClass("showy--button")
       ) {
-        var svgElement = $btn.find("svg").first();
+        const svgElement = $btn.find("svg").first();
         if (svgElement.length && !svgElement.hasClass("modss-online-icon")) {
           svgElement.replaceWith(playIcon);
         }
       }
 
-      if (categories[type]) {
-        categories[type].push($btn);
-      } else {
-        categories.other.push($btn);
-      }
+      (categories[type] || categories.other).push($btn);
     });
 
     return categories;
   }
 
   function sortByCustomOrder(buttons) {
-    var customOrder = getCustomOrder();
+    const customOrder = getCustomOrder();
+    const priority = [];
+    const regular = [];
 
-    var priority = [];
-    var regular = [];
-
-    buttons.forEach(function (btn) {
-      var id = getButtonId(btn);
+    buttons.forEach((btn) => {
+      const id = getButtonId(btn);
       if (id === "modss_online_button" || id === "showy_online_button") {
         priority.push(btn);
       } else {
@@ -220,9 +208,9 @@
       }
     });
 
-    priority.sort(function (a, b) {
-      var idA = getButtonId(a);
-      var idB = getButtonId(b);
+    priority.sort((a, b) => {
+      const idA = getButtonId(a);
+      const idB = getButtonId(b);
       if (idA === "modss_online_button") return -1;
       if (idB === "modss_online_button") return 1;
       if (idA === "showy_online_button") return -1;
@@ -231,74 +219,65 @@
     });
 
     if (!customOrder.length) {
-      regular.sort(function (a, b) {
-        var typeOrder = [
-          "online",
-          "torrent",
-          "trailer",
-          "book",
-          "reaction",
-          "other",
-        ];
-        var typeA = getButtonType(a);
-        var typeB = getButtonType(b);
-        var indexA = typeOrder.indexOf(typeA);
-        var indexB = typeOrder.indexOf(typeB);
+      const typeOrder = [
+        "online",
+        "torrent",
+        "trailer",
+        "book",
+        "reaction",
+        "other",
+      ];
+      regular.sort((a, b) => {
+        let typeA = getButtonType(a);
+        let typeB = getButtonType(b);
+        let indexA = typeOrder.indexOf(typeA);
+        let indexB = typeOrder.indexOf(typeB);
         if (indexA === -1) indexA = 999;
         if (indexB === -1) indexB = 999;
         return indexA - indexB;
       });
-      return priority.concat(regular);
+      return [...priority, ...regular];
     }
 
-    var sorted = [];
-    var remaining = regular.slice();
+    const buttonMap = new Map(regular.map((btn) => [getButtonId(btn), btn]));
+    const sorted = [];
 
-    customOrder.forEach(function (id) {
-      for (var i = 0; i < remaining.length; i++) {
-        if (getButtonId(remaining[i]) === id) {
-          sorted.push(remaining[i]);
-          remaining.splice(i, 1);
-          break;
-        }
+    customOrder.forEach((id) => {
+      if (buttonMap.has(id)) {
+        sorted.push(buttonMap.get(id));
+        buttonMap.delete(id);
       }
     });
 
-    return priority.concat(sorted).concat(remaining);
+    return [...priority, ...sorted, ...Array.from(buttonMap.values())];
   }
 
   function applyHiddenButtons(buttons) {
-    var hidden = getHiddenButtons();
-    buttons.forEach(function (btn) {
-      var id = getButtonId(btn);
-      if (hidden.indexOf(id) !== -1) {
-        btn.addClass("hidden");
-      } else {
-        btn.removeClass("hidden");
-      }
+    const hidden = getHiddenButtons();
+    buttons.forEach((btn) => {
+      const id = getButtonId(btn);
+      btn.toggleClass("hidden", hidden.includes(id));
     });
   }
 
   function applyButtonAnimation(buttons) {
-    buttons.forEach(function (btn, index) {
+    buttons.forEach((btn, index) => {
       btn.css({
         opacity: "0",
         animation: "button-fade-in 0.4s ease forwards",
-        "animation-delay": index * 0.08 + "s",
+        "animation-delay": `${index * 0.08}s`,
       });
     });
   }
 
   function createEditButton() {
-    var btn = $(
-      '<div class="full-start__button selector button--edit-order" style="order: 9999;">' +
-        '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 29" fill="none"><use xlink:href="#sprite-edit"></use></svg>' +
-        "</div>"
+    const btn = $(
+      `<div class="full-start__button selector button--edit-order" style="order: 9999;">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 29" fill="none"><use xlink:href="#sprite-edit"></use></svg>
+      </div>`
     );
 
-    btn.on("hover:enter", function () {
-      openEditDialog();
-    });
+    btn.on("hover:enter", openEditDialog);
 
     // Перевіряємо налаштування та приховуємо кнопку, якщо редактор вимкнено
     if (Lampa.Storage.get("buttons_editor_enabled") === false) {
@@ -309,121 +288,69 @@
   }
 
   function saveOrder() {
-    var order = [];
-    currentButtons.forEach(function (btn) {
-      order.push(getButtonId(btn));
-    });
+    const order = currentButtons.map((btn) => getButtonId(btn));
     setCustomOrder(order);
   }
 
   function saveItemOrder() {
-    var order = [];
-    var items = $(".menu-edit-list .menu-edit-list__item").not(
+    const items = $(".menu-edit-list .menu-edit-list__item").not(
       ".menu-edit-list__create-folder"
     );
 
-    items.each(function () {
-      var $item = $(this);
-      var itemType = $item.data("itemType");
+    const order = items
+      .map(function () {
+        const $item = $(this);
+        const itemType = $item.data("itemType");
 
-      if (itemType === "folder") {
-        order.push({
-          type: "folder",
-          id: $item.data("folderId"),
-        });
-      } else if (itemType === "button") {
-        order.push({
-          type: "button",
-          id: $item.data("buttonId"),
-        });
-      }
-    });
+        if (itemType === "folder") {
+          return {
+            type: "folder",
+            id: $item.data("folderId"),
+          };
+        }
+        if (itemType === "button") {
+          return {
+            type: "button",
+            id: $item.data("buttonId"),
+          };
+        }
+        return null;
+      })
+      .get();
 
-    setItemOrder(order);
+    setItemOrder(order.filter(Boolean));
   }
 
   function applyChanges() {
     if (!currentContainer) return;
 
-    var categories = categorizeButtons(currentContainer);
-    var allButtons = []
-      .concat(categories.online)
-      .concat(categories.torrent)
-      .concat(categories.trailer)
-      .concat(categories.book)
-      .concat(categories.reaction)
-      .concat(categories.other);
+    const categories = categorizeButtons(currentContainer);
+    const allButtons = Object.values(categories).flat();
 
-    allButtons = sortByCustomOrder(allButtons);
-    allButtonsCache = allButtons;
+    allButtonsCache = sortByCustomOrder(allButtons);
 
-    var folders = getFolders();
-    var foldersUpdated = false;
+    const folders = getFolders();
+    let foldersUpdated = false;
 
-    folders.forEach(function (folder) {
-      var updatedButtons = [];
-      var usedButtons = [];
+    folders.forEach((folder) => {
+      const usedButtons = new Set();
+      const updatedButtons = folder.buttons
+        .map((oldBtnId) => {
+          let foundBtn = allButtonsCache.find((btn) => {
+            const newBtnId = getButtonId(btn);
+            return !usedButtons.has(newBtnId) && newBtnId === oldBtnId;
+          });
 
-      folder.buttons.forEach(function (oldBtnId) {
-        var found = false;
-
-        for (var i = 0; i < allButtons.length; i++) {
-          var btn = allButtons[i];
-          var newBtnId = getButtonId(btn);
-
-          if (usedButtons.indexOf(newBtnId) !== -1) continue;
-
-          if (newBtnId === oldBtnId) {
-            updatedButtons.push(newBtnId);
-            usedButtons.push(newBtnId);
-            found = true;
-            break;
+          if (foundBtn) {
+            const newBtnId = getButtonId(foundBtn);
+            usedButtons.add(newBtnId);
+            return newBtnId;
           }
-        }
-
-        if (!found) {
-          for (var i = 0; i < allButtons.length; i++) {
-            var btn = allButtons[i];
-            var newBtnId = getButtonId(btn);
-
-            if (usedButtons.indexOf(newBtnId) !== -1) continue;
-
-            var text = btn.find("span").text().trim();
-            var classes = btn.attr("class") || "";
-
-            if (
-              (oldBtnId.indexOf("modss") !== -1 ||
-                oldBtnId.indexOf("MODS") !== -1) &&
-              (classes.indexOf("modss") !== -1 || text.indexOf("MODS") !== -1)
-            ) {
-              updatedButtons.push(newBtnId);
-              usedButtons.push(newBtnId);
-              found = true;
-              break;
-            } else if (
-              (oldBtnId.indexOf("showy") !== -1 ||
-                oldBtnId.indexOf("Showy") !== -1) &&
-              (classes.indexOf("showy") !== -1 || text.indexOf("Showy") !== -1)
-            ) {
-              updatedButtons.push(newBtnId);
-              usedButtons.push(newBtnId);
-              found = true;
-              break;
-            }
-          }
-        }
-
-        if (!found) {
-          updatedButtons.push(oldBtnId);
-        }
-      });
-
-      if (
-        updatedButtons.length !== folder.buttons.length ||
-        updatedButtons.some(function (id, i) {
-          return id !== folder.buttons[i];
+          return oldBtnId; // Keep old ID if no match found
         })
-      ) {
+        .filter(Boolean);
+
+      if (updatedButtons.length !== folder.buttons.length) {
         folder.buttons = updatedButtons;
         foldersUpdated = true;
       }
@@ -433,19 +360,14 @@
       setFolders(folders);
     }
 
-    var buttonsInFolders = [];
-    folders.forEach(function (folder) {
-      buttonsInFolders = buttonsInFolders.concat(folder.buttons);
-    });
+    const buttonsInFolders = folders.flatMap((folder) => folder.buttons);
 
-    var filteredButtons = allButtons.filter(function (btn) {
-      return buttonsInFolders.indexOf(getButtonId(btn)) === -1;
-    });
+    currentButtons = allButtonsCache.filter(
+      (btn) => !buttonsInFolders.includes(getButtonId(btn))
+    );
+    applyHiddenButtons(currentButtons);
 
-    currentButtons = filteredButtons;
-    applyHiddenButtons(filteredButtons);
-
-    var targetContainer = currentContainer.find(".full-start-new__buttons");
+    const targetContainer = currentContainer.find(".full-start-new__buttons");
     if (!targetContainer.length) return;
 
     targetContainer
@@ -453,170 +375,58 @@
       .not(".button--edit-order")
       .detach();
 
-    var itemOrder = getItemOrder();
-    var visibleButtons = [];
-    var folders = getFolders();
-    var buttonsInFolders = [];
-    folders.forEach(function (folder) {
-      buttonsInFolders = buttonsInFolders.concat(folder.buttons);
-    });
+    const itemOrder = getItemOrder();
+    let visibleButtons = [];
+
+    const renderQueue = new Set();
 
     if (itemOrder.length > 0) {
-      var addedFolders = [];
-      var addedButtons = [];
-
-      itemOrder.forEach(function (item) {
+      itemOrder.forEach((item) => {
         if (item.type === "folder") {
-          var folder = folders.find(function (f) {
-            return f.id === item.id;
-          });
-          if (folder) {
-            var folderBtn = createFolderButton(folder);
+          const folder = folders.find((f) => f.id === item.id);
+          if (folder && !renderQueue.has(folder.id)) {
+            const folderBtn = createFolderButton(folder);
             targetContainer.append(folderBtn);
             visibleButtons.push(folderBtn);
-            addedFolders.push(folder.id);
+            renderQueue.add(folder.id);
           }
         } else if (item.type === "button") {
-          var btnId = item.id;
-          if (buttonsInFolders.indexOf(btnId) === -1) {
-            var btn = currentButtons.find(function (b) {
-              return getButtonId(b) === btnId;
-            });
-            if (btn && !btn.hasClass("hidden")) {
-              targetContainer.append(btn);
-              visibleButtons.push(btn);
-              addedButtons.push(btnId);
-            }
+          const btn = currentButtons.find(
+            (b) => getButtonId(b) === item.id && !b.hasClass("hidden")
+          );
+          if (btn && !renderQueue.has(item.id)) {
+            targetContainer.append(btn);
+            visibleButtons.push(btn);
+            renderQueue.add(item.id);
           }
-        }
-      });
-
-      currentButtons.forEach(function (btn) {
-        var btnId = getButtonId(btn);
-        if (
-          addedButtons.indexOf(btnId) === -1 &&
-          !btn.hasClass("hidden") &&
-          buttonsInFolders.indexOf(btnId) === -1
-        ) {
-          var insertBefore = null;
-          var btnType = getButtonType(btn);
-          var typeOrder = [
-            "online",
-            "torrent",
-            "trailer",
-            "book",
-            "reaction",
-            "other",
-          ];
-          var btnTypeIndex = typeOrder.indexOf(btnType);
-          if (btnTypeIndex === -1) btnTypeIndex = 999;
-
-          if (
-            btnId === "modss_online_button" ||
-            btnId === "showy_online_button"
-          ) {
-            var firstNonPriority = targetContainer
-              .find(".full-start__button")
-              .not(".button--edit-order, .button--folder")
-              .filter(function () {
-                var id = getButtonId($(this));
-                return (
-                  id !== "modss_online_button" && id !== "showy_online_button"
-                );
-              })
-              .first();
-
-            if (firstNonPriority.length) {
-              insertBefore = firstNonPriority;
-            }
-
-            if (btnId === "showy_online_button") {
-              var modsBtn = targetContainer
-                .find(".full-start__button")
-                .filter(function () {
-                  return getButtonId($(this)) === "modss_online_button";
-                });
-              if (modsBtn.length) {
-                insertBefore = modsBtn.next();
-                if (
-                  !insertBefore.length ||
-                  insertBefore.hasClass("button--edit-order")
-                ) {
-                  insertBefore = null;
-                }
-              }
-            }
-          } else {
-            targetContainer
-              .find(".full-start__button")
-              .not(".button--edit-order, .button--folder")
-              .each(function () {
-                var existingBtn = $(this);
-                var existingId = getButtonId(existingBtn);
-
-                if (
-                  existingId === "modss_online_button" ||
-                  existingId === "showy_online_button"
-                ) {
-                  return true;
-                }
-
-                var existingType = getButtonType(existingBtn);
-                var existingTypeIndex = typeOrder.indexOf(existingType);
-                if (existingTypeIndex === -1) existingTypeIndex = 999;
-
-                if (btnTypeIndex < existingTypeIndex) {
-                  insertBefore = existingBtn;
-                  return false;
-                }
-              });
-          }
-
-          if (insertBefore && insertBefore.length) {
-            btn.insertBefore(insertBefore);
-          } else {
-            var editBtn = targetContainer.find(".button--edit-order");
-            if (editBtn.length) {
-              btn.insertBefore(editBtn);
-            } else {
-              targetContainer.append(btn);
-            }
-          }
-          visibleButtons.push(btn);
-        }
-      });
-
-      folders.forEach(function (folder) {
-        if (addedFolders.indexOf(folder.id) === -1) {
-          var folderBtn = createFolderButton(folder);
-          targetContainer.append(folderBtn);
-          visibleButtons.push(folderBtn);
-        }
-      });
-    } else {
-      folders.forEach(function (folder) {
-        var folderBtn = createFolderButton(folder);
-        targetContainer.append(folderBtn);
-        visibleButtons.push(folderBtn);
-      });
-
-      currentButtons.forEach(function (btn) {
-        var btnId = getButtonId(btn);
-        if (!btn.hasClass("hidden") && buttonsInFolders.indexOf(btnId) === -1) {
-          targetContainer.append(btn);
-          visibleButtons.push(btn);
         }
       });
     }
 
+    folders.forEach((folder) => {
+      if (!renderQueue.has(folder.id)) {
+        const folderBtn = createFolderButton(folder);
+        targetContainer.append(folderBtn);
+        visibleButtons.push(folderBtn);
+        renderQueue.add(folder.id);
+      }
+    });
+
+    currentButtons.forEach((btn) => {
+      const btnId = getButtonId(btn);
+      if (!renderQueue.has(btnId) && !btn.hasClass("hidden")) {
+        targetContainer.append(btn);
+        visibleButtons.push(btn);
+        renderQueue.add(btnId);
+      }
+    });
+
     applyRenamedButtons(
-      visibleButtons.filter(function (b) {
-        return !b.hasClass("button--folder");
-      })
+      visibleButtons.filter((b) => !b.hasClass("button--folder"))
     );
     applyButtonAnimation(visibleButtons);
 
-    var editBtn = targetContainer.find(".button--edit-order");
+    const editBtn = targetContainer.find(".button--edit-order");
     if (editBtn.length) {
       editBtn.detach();
       targetContainer.append(editBtn);
@@ -624,7 +434,7 @@
 
     saveOrder();
 
-    setTimeout(function () {
+    setTimeout(() => {
       if (currentContainer) {
         setupButtonNavigation(currentContainer);
       }
@@ -637,60 +447,45 @@
   }
 
   function getButtonDisplayName(btn, allButtons) {
-    var btnId = getButtonId(btn);
-    var renamedButtons = getRenamedButtons();
+    const btnId = getButtonId(btn);
+    const renamedButtons = getRenamedButtons();
 
     if (renamedButtons[btnId]) {
       return renamedButtons[btnId];
     }
 
-    var text = btn.find("span").text().trim();
-    var classes = btn.attr("class") || "";
-    var subtitle = btn.attr("data-subtitle") || "";
+    let text = btn.find("span").text().trim();
+    const classes = btn.attr("class") || "";
+    const subtitle = btn.attr("data-subtitle") || "";
 
     if (!text) {
-      var viewClass = classes.split(" ").find(function (c) {
-        return c.indexOf("view--") === 0 || c.indexOf("button--") === 0;
-      });
-      if (viewClass) {
-        text = viewClass
-          .replace("view--", "")
-          .replace("button--", "")
-          .replace(/_/g, " ");
-        text = capitalize(text);
-      } else {
-        text = "Кнопка";
-      }
-      if (btn.hasClass("button--options")) {
-        text = "Ще";
-      }
-      return text;
+      const viewClass =
+        classes
+          .split(" ")
+          .find((c) => c.startsWith("view--") || c.startsWith("button--")) ||
+        "";
+      text = capitalize(viewClass.replace(/view--|button--|_/g, " "));
+      if (btn.hasClass("button--options")) text = "Ще";
+      return text || "Кнопка";
     }
 
-    var sameTextCount = 0;
-    allButtons.forEach(function (otherBtn) {
-      if (otherBtn.find("span").text().trim() === text) {
-        sameTextCount++;
-      }
-    });
+    const sameTextCount = allButtons.filter(
+      (otherBtn) => otherBtn.find("span").text().trim() === text
+    ).length;
 
     if (sameTextCount > 1) {
       if (subtitle) {
-        return (
-          text +
-          ' <span style="opacity:0.5">(' +
-          subtitle.substring(0, 30) +
-          ")</span>"
-        );
+        return `${text} <span style="opacity:0.5">(${subtitle.substring(
+          0,
+          30
+        )})</span>`;
       }
-
-      var viewClass = classes.split(" ").find(function (c) {
-        return c.indexOf("view--") === 0;
-      });
+      const viewClass = classes.split(" ").find((c) => c.startsWith("view--"));
       if (viewClass) {
-        var identifier = viewClass.replace("view--", "").replace(/_/g, " ");
-        identifier = capitalize(identifier);
-        return text + ' <span style="opacity:0.5">(' + identifier + ")</span>";
+        const identifier = capitalize(
+          viewClass.replace("view--", "").replace(/_/g, " ")
+        );
+        return `${text} <span style="opacity:0.5">(${identifier})</span>`;
       }
     }
 
@@ -698,50 +493,41 @@
   }
 
   function createFolderButton(folder) {
-    var firstBtnId = folder.buttons[0];
-    var firstBtn = findButton(firstBtnId);
-    var icon =
-      '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">' +
-      '<path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>' +
-      "</svg>";
+    const firstBtn = findButton(folder.buttons[0]);
+    let icon =
+      '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>';
 
     if (firstBtn) {
-      var btnIcon = firstBtn.find("svg").first();
+      const btnIcon = firstBtn.find("svg").first();
       if (btnIcon.length) {
         icon = btnIcon.prop("outerHTML");
       }
     }
 
-    var btn = $(
-      '<div class="full-start__button selector button--folder" data-folder-id="' +
-        folder.id +
-        '">' +
-        icon +
-        "<span>" +
-        folder.name +
-        "</span>" +
-        "</div>"
-    );
+    const btn = $(`
+      <div class="full-start__button selector button--folder" data-folder-id="${folder.id}">
+        ${icon}
+        <span>${folder.name}</span>
+      </div>
+    `);
 
-    btn.on("hover:enter", function () {
-      openFolderMenu(folder);
-    });
+    btn.on("hover:enter", () => openFolderMenu(folder));
 
     return btn;
   }
 
   function openFolderMenu(folder) {
-    var items = [];
+    const items = folder.buttons
+      .map((btnId) => {
+        const btn = findButton(btnId);
+        if (!btn) return null;
 
-    folder.buttons.forEach(function (btnId) {
-      var btn = findButton(btnId);
-      if (btn) {
-        var displayName = getButtonDisplayName(btn, allButtonsOriginal);
-        var iconElement = btn.find("svg").first();
-        var icon = iconElement.length ? iconElement.prop("outerHTML") : "";
-        var subtitle = btn.attr("data-subtitle") || "";
+        const displayName = getButtonDisplayName(btn, allButtonsOriginal);
+        const iconElement = btn.find("svg").first();
+        const icon = iconElement.length ? iconElement.prop("outerHTML") : "";
+        const subtitle = btn.attr("data-subtitle") || "";
 
-        var item = {
+        const item = {
           title: displayName.replace(/<[^>]*>/g, ""),
           button: btn,
           btnId: btnId,
@@ -756,19 +542,15 @@
           item.subtitle = subtitle;
         }
 
-        items.push(item);
-      }
-    });
+        return item;
+      })
+      .filter(Boolean);
 
     Lampa.Select.show({
       title: folder.name,
       items: items,
-      onSelect: function (item) {
-        item.button.trigger("hover:enter");
-      },
-      onBack: function () {
-        Lampa.Controller.toggle("full_start");
-      },
+      onSelect: (item) => item.button.trigger("hover:enter"),
+      onBack: () => Lampa.Controller.toggle("full_start"),
     });
   }
 
@@ -781,12 +563,10 @@
         nosave: true,
         nomic: true,
       },
-      function (newName) {
+      (newName) => {
         if (newName) {
-          var folders = getFolders();
-          var targetFolder = folders.find(function (f) {
-            return f.id === folder.id;
-          });
+          const folders = getFolders();
+          const targetFolder = folders.find((f) => f.id === folder.id);
           if (targetFolder) {
             targetFolder.name = newName;
             setFolders(folders);
@@ -799,47 +579,43 @@
   }
 
   function openFolderEditDialog(folder) {
-    var list = $('<div class="menu-edit-list"></div>');
+    const list = $('<div class="menu-edit-list"></div>');
 
-    folder.buttons.forEach(function (btnId) {
-      var btn = findButton(btnId);
+    folder.buttons.forEach((btnId) => {
+      const btn = findButton(btnId);
       if (btn) {
-        var displayName = getButtonDisplayName(btn, allButtonsOriginal);
-        var iconElement = btn.find("svg").first();
-        var icon = iconElement.length ? iconElement.clone() : $("<svg></svg>");
+        const displayName = getButtonDisplayName(btn, allButtonsOriginal);
+        const iconElement = btn.find("svg").first();
+        const icon = iconElement.length
+          ? iconElement.clone()
+          : $("<svg></svg>");
 
-        var item = $(
-          '<div class="menu-edit-list__item">' +
-            '<div class="menu-edit-list__icon"></div>' +
-            '<div class="menu-edit-list__title">' +
-            displayName +
-            "</div>" +
-            '<div class="menu-edit-list__move move-up selector">' +
-            '<svg width="22" height="14" viewBox="0 0 22 14" fill="none" xmlns="http://www.w3.org/2000/svg">' +
-            '<path d="M2 12L11 3L20 12" stroke="currentColor" stroke-width="4" stroke-linecap="round"/>' +
-            "</svg>" +
-            "</div>" +
-            '<div class="menu-edit-list__move move-down selector">' +
-            '<svg width="22" height="14" viewBox="0 0 22 14" fill="none" xmlns="http://www.w3.org/2000/svg">' +
-            '<path d="M2 2L11 11L20 2" stroke="currentColor" stroke-width="4" stroke-linecap="round"/>' +
-            "</svg>" +
-            "</div>" +
-            "</div>"
-        );
+        const item = $(`
+          <div class="menu-edit-list__item">
+            <div class="menu-edit-list__icon"></div>
+            <div class="menu-edit-list__title">${displayName}</div>
+            <div class="menu-edit-list__move move-up selector">
+              <svg width="22" height="14" viewBox="0 0 22 14" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2 12L11 3L20 12" stroke="currentColor" stroke-width="4" stroke-linecap="round"/></svg>
+            </div>
+            <div class="menu-edit-list__move move-down selector">
+              <svg width="22" height="14" viewBox="0 0 22 14" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2 2L11 11L20 2" stroke="currentColor" stroke-width="4" stroke-linecap="round"/></svg>
+            </div>
+          </div>
+        `);
 
         item.find(".menu-edit-list__icon").append(icon);
         item.data("btnId", btnId);
 
-        item.find(".move-up").on("hover:enter", function () {
-          var prev = item.prev();
+        item.find(".move-up").on("hover:enter", () => {
+          const prev = item.prev();
           if (prev.length) {
             item.insertBefore(prev);
             saveFolderButtonOrder(folder, list);
           }
         });
 
-        item.find(".move-down").on("hover:enter", function () {
-          var next = item.next();
+        item.find(".move-down").on("hover:enter", () => {
+          const next = item.next();
           if (next.length) {
             item.insertAfter(next);
             saveFolderButtonOrder(folder, list);
@@ -855,7 +631,7 @@
       html: list,
       size: "small",
       scroll_to_center: true,
-      onBack: function () {
+      onBack: () => {
         Lampa.Modal.close();
         openEditDialog();
       },
@@ -863,22 +639,21 @@
   }
 
   function saveFolderButtonOrder(folder, list) {
-    var newOrder = [];
-    list.find(".menu-edit-list__item").each(function () {
-      var btnId = $(this).data("btnId");
-      newOrder.push(btnId);
-    });
+    const newOrder = list
+      .find(".menu-edit-list__item")
+      .map(function () {
+        return $(this).data("btnId");
+      })
+      .get();
 
     folder.buttons = newOrder;
 
-    var folders = getFolders();
-    for (var i = 0; i < folders.length; i++) {
-      if (folders[i].id === folder.id) {
-        folders[i].buttons = newOrder;
-        break;
-      }
+    let folders = getFolders();
+    const folderIndex = folders.findIndex((f) => f.id === folder.id);
+    if (folderIndex !== -1) {
+      folders[folderIndex].buttons = newOrder;
+      setFolders(folders);
     }
-    setFolders(folders);
 
     updateFolderIcon(folder);
   }
@@ -886,33 +661,29 @@
   function updateFolderIcon(folder) {
     if (!folder.buttons || folder.buttons.length === 0) return;
 
-    var folderBtn = currentContainer.find(
-      '.button--folder[data-folder-id="' + folder.id + '"]'
+    const folderBtn = currentContainer.find(
+      `.button--folder[data-folder-id="${folder.id}"]`
     );
     if (folderBtn.length) {
-      var firstBtnId = folder.buttons[0];
-      var firstBtn = findButton(firstBtnId);
+      const firstBtn = findButton(folder.buttons[0]);
 
       if (firstBtn) {
-        var iconElement = firstBtn.find("svg").first();
+        const iconElement = firstBtn.find("svg").first();
         if (iconElement.length) {
-          var btnIcon = iconElement.clone();
-          folderBtn.find("svg").replaceWith(btnIcon);
+          folderBtn.find("svg").replaceWith(iconElement.clone());
         }
       } else {
-        var defaultIcon =
-          '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">' +
-          '<path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>' +
-          "</svg>";
+        const defaultIcon =
+          '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>';
         folderBtn.find("svg").replaceWith(defaultIcon);
       }
     }
   }
 
   function createFolder(name, buttonIds) {
-    var folders = getFolders();
-    var folder = {
-      id: "folder_" + Date.now(),
+    const folders = getFolders();
+    const folder = {
+      id: `folder_${Date.now()}`,
       name: name,
       buttons: buttonIds,
     };
@@ -922,10 +693,8 @@
   }
 
   function deleteFolder(folderId) {
-    var folders = getFolders();
-    folders = folders.filter(function (f) {
-      return f.id !== folderId;
-    });
+    let folders = getFolders();
+    folders = folders.filter((f) => f.id !== folderId);
     setFolders(folders);
   }
 
@@ -938,54 +707,52 @@
         value: "",
         nomic: true,
       },
-      function (folderName) {
-        if (!folderName || !folderName.trim()) {
-          Lampa.Noty.show("Введіть назву папки");
-          openEditDialog();
-          return;
-        }
+      (folderName) => {
+        // if (!folderName || !folderName.trim()) {
+        //   Lampa.Noty.show("Введіть назву папки");
+        //   openEditDialog();
+        //   return;
+        // }
         openSelectButtonsDialog(folderName.trim());
       }
     );
   }
 
   function openSelectButtonsDialog(folderName) {
-    var selectedButtons = [];
-    var list = $('<div class="menu-edit-list"></div>');
+    const selectedButtons = [];
+    const list = $('<div class="menu-edit-list"></div>');
 
-    var buttonsInFolders = getButtonsInFolders();
-    var sortedButtons = sortByCustomOrder(allButtonsOriginal.slice());
+    const buttonsInFolders = getButtonsInFolders();
+    const sortedButtons = sortByCustomOrder(allButtonsOriginal.slice());
 
-    sortedButtons.forEach(function (btn) {
-      var btnId = getButtonId(btn);
+    sortedButtons.forEach((btn) => {
+      const btnId = getButtonId(btn);
 
-      if (buttonsInFolders.indexOf(btnId) !== -1) {
+      if (buttonsInFolders.includes(btnId)) {
         return;
       }
 
-      var displayName = getButtonDisplayName(btn, sortedButtons);
-      var iconElement = btn.find("svg").first();
-      var icon = iconElement.length ? iconElement.clone() : $("<svg></svg>");
+      const displayName = getButtonDisplayName(btn, sortedButtons);
+      const iconElement = btn.find("svg").first();
+      const icon = iconElement.length ? iconElement.clone() : $("<svg></svg>");
 
-      var item = $(
-        '<div class="menu-edit-list__item">' +
-          '<div class="menu-edit-list__icon"></div>' +
-          '<div class="menu-edit-list__title">' +
-          displayName +
-          "</div>" +
-          '<div class="menu-edit-list__toggle selector">' +
-          '<svg width="26" height="26" viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg">' +
-          '<rect x="1.89111" y="1.78369" width="21.793" height="21.793" rx="3.5" stroke="currentColor" stroke-width="3"/>' +
-          '<path d="M7.44873 12.9658L10.8179 16.3349L18.1269 9.02588" stroke="currentColor" stroke-width="3" class="dot" opacity="0" stroke-linecap="round"/>' +
-          "</svg>" +
-          "</div>" +
-          "</div>"
-      );
+      const item = $(`
+        <div class="menu-edit-list__item">
+          <div class="menu-edit-list__icon"></div>
+          <div class="menu-edit-list__title">${displayName}</div>
+          <div class="menu-edit-list__toggle selector">
+            <svg width="26" height="26" viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="1.89111" y="1.78369" width="21.793" height="21.793" rx="3.5" stroke="currentColor" stroke-width="3"/>
+              <path d="M7.44873 12.9658L10.8179 16.3349L18.1269 9.02588" stroke="currentColor" stroke-width="3" class="dot" opacity="0" stroke-linecap="round"/>
+            </svg>
+          </div>
+        </div>
+      `);
 
       item.find(".menu-edit-list__icon").append(icon);
 
-      item.find(".menu-edit-list__toggle").on("hover:enter", function () {
-        var index = selectedButtons.indexOf(btnId);
+      item.find(".menu-edit-list__toggle").on("hover:enter", () => {
+        const index = selectedButtons.indexOf(btnId);
         if (index !== -1) {
           selectedButtons.splice(index, 1);
           item.find(".dot").attr("opacity", "0");
@@ -998,73 +765,56 @@
       list.append(item);
     });
 
-    var createBtn = $(
-      '<div class="selector folder-create-confirm">' +
-        '<div style="text-align: center; padding: 1em;">Створити папку "' +
-        folderName +
-        '"</div>' +
-        "</div>"
-    );
+    const createBtn = $(`
+      <div class="selector folder-create-confirm">
+        <div style="text-align: center; padding: 1em;">Створити папку "${folderName}"</div>
+      </div>
+    `);
 
-    createBtn.on("hover:enter", function () {
+    createBtn.on("hover:enter", () => {
       if (selectedButtons.length < 2) {
         Lampa.Noty.show("Виберіть мінімум 2 кнопки");
         return;
       }
 
-      var folder = createFolder(folderName, selectedButtons);
-
-      var itemOrder = getItemOrder();
+      const folder = createFolder(folderName, selectedButtons);
+      let itemOrder = getItemOrder();
 
       if (itemOrder.length === 0) {
-        currentButtons.forEach(function (btn) {
-          itemOrder.push({
-            type: "button",
-            id: getButtonId(btn),
-          });
-        });
+        itemOrder = currentButtons.map((btn) => ({
+          type: "button",
+          id: getButtonId(btn),
+        }));
       }
 
-      var folderAdded = false;
+      const selectedSet = new Set(selectedButtons);
+      let folderPlaced = false;
 
-      for (var i = 0; i < selectedButtons.length; i++) {
-        var btnId = selectedButtons[i];
-
-        for (var j = 0; j < itemOrder.length; j++) {
-          if (itemOrder[j].type === "button" && itemOrder[j].id === btnId) {
-            if (!folderAdded) {
-              itemOrder[j] = {
-                type: "folder",
-                id: folder.id,
-              };
-              folderAdded = true;
-            } else {
-              itemOrder.splice(j, 1);
-              j--;
+      const newItemOrder = itemOrder
+        .map((item) => {
+          if (item.type === "button" && selectedSet.has(item.id)) {
+            if (!folderPlaced) {
+              folderPlaced = true;
+              return { type: "folder", id: folder.id };
             }
-            break;
+            return null;
           }
-        }
+          return item;
+        })
+        .filter(Boolean);
 
-        for (var k = 0; k < currentButtons.length; k++) {
-          if (getButtonId(currentButtons[k]) === btnId) {
-            currentButtons.splice(k, 1);
-            break;
-          }
-        }
+      if (!folderPlaced) {
+        newItemOrder.push({ type: "folder", id: folder.id });
       }
 
-      if (!folderAdded) {
-        itemOrder.push({
-          type: "folder",
-          id: folder.id,
-        });
-      }
+      setItemOrder(newItemOrder);
 
-      setItemOrder(itemOrder);
+      currentButtons = currentButtons.filter(
+        (btn) => !selectedSet.has(getButtonId(btn))
+      );
 
       Lampa.Modal.close();
-      Lampa.Noty.show('Папку "' + folderName + '" створено');
+      Lampa.Noty.show(`Папку "${folderName}" створено`);
 
       if (currentContainer) {
         currentContainer.data("buttons-processed", false);
@@ -1080,7 +830,7 @@
       html: list,
       size: "medium",
       scroll_to_center: true,
-      onBack: function () {
+      onBack: () => {
         Lampa.Modal.close();
         openEditDialog();
       },
@@ -1089,111 +839,79 @@
 
   function openEditDialog() {
     if (currentContainer) {
-      var categories = categorizeButtons(currentContainer);
-      var allButtons = []
-        .concat(categories.online)
-        .concat(categories.torrent)
-        .concat(categories.trailer)
-        .concat(categories.book)
-        .concat(categories.reaction)
-        .concat(categories.other);
+      const categories = categorizeButtons(currentContainer);
+      const allButtons = Object.values(categories).flat();
+      allButtonsCache = sortByCustomOrder(allButtons);
 
-      allButtons = sortByCustomOrder(allButtons);
-      allButtonsCache = allButtons;
+      const folders = getFolders();
+      const buttonsInFolders = folders.flatMap((folder) => folder.buttons);
 
-      var folders = getFolders();
-      var buttonsInFolders = [];
-      folders.forEach(function (folder) {
-        buttonsInFolders = buttonsInFolders.concat(folder.buttons);
-      });
-
-      var filteredButtons = allButtons.filter(function (btn) {
-        return buttonsInFolders.indexOf(getButtonId(btn)) === -1;
-      });
-
-      currentButtons = filteredButtons;
+      currentButtons = allButtonsCache.filter(
+        (btn) => !buttonsInFolders.includes(getButtonId(btn))
+      );
     }
 
-    var list = $('<div class="menu-edit-list"></div>');
-    var hidden = getHiddenButtons();
-    var folders = getFolders();
-    var itemOrder = getItemOrder();
+    const list = $('<div class="menu-edit-list"></div>');
+    const hidden = getHiddenButtons();
+    const folders = getFolders();
+    const itemOrder = getItemOrder();
 
     function createFolderItem(folder) {
-      var item = $(
-        '<div class="menu-edit-list__item folder-item selector">' +
-          '<div class="menu-edit-list__icon">' +
-          '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">' +
-          '<path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>' +
-          "</svg>" +
-          "</div>" +
-          '<div class="menu-edit-list__title">' +
-          folder.name +
-          ' <span style="opacity:0.5">(' +
-          folder.buttons.length +
-          ")</span></div>" +
-          '<div class="menu-edit-list__move move-up selector">' +
-          '<svg width="22" height="14" viewBox="0 0 22 14" fill="none" xmlns="http://www.w3.org/2000/svg">' +
-          '<path d="M2 12L11 3L20 12" stroke="currentColor" stroke-width="4" stroke-linecap="round"/>' +
-          "</svg>" +
-          "</div>" +
-          '<div class="menu-edit-list__move move-down selector">' +
-          '<svg width="22" height="14" viewBox="0 0 22 14" fill="none" xmlns="http://www.w3.org/2000/svg">' +
-          '<path d="M2 2L11 11L20 2" stroke="currentColor" stroke-width="4" stroke-linecap="round"/>' +
-          "</svg>" +
-          "</div>" +
-          '<div class="menu-edit-list__rename selector">' +
-          '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>' +
-          "</div>" +
-          '<div class="menu-edit-list__delete selector">' +
-          '<svg width="26" height="26" viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg">' +
-          '<rect x="1.89111" y="1.78369" width="21.793" height="21.793" rx="3.5" stroke="currentColor" stroke-width="3"/>' +
-          '<path d="M9.5 9.5L16.5 16.5M16.5 9.5L9.5 16.5" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>' +
-          "</svg>" +
-          "</div>" +
-          "</div>"
-      );
+      const item = $(`
+        <div class="menu-edit-list__item folder-item selector">
+          <div class="menu-edit-list__icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
+          </div>
+          <div class="menu-edit-list__title">${folder.name} <span style="opacity:0.5">(${folder.buttons.length})</span></div>
+          <div class="menu-edit-list__move move-up selector">
+            <svg width="22" height="14" viewBox="0 0 22 14" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2 12L11 3L20 12" stroke="currentColor" stroke-width="4" stroke-linecap="round"/></svg>
+          </div>
+          <div class="menu-edit-list__move move-down selector">
+            <svg width="22" height="14" viewBox="0 0 22 14" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2 2L11 11L20 2" stroke="currentColor" stroke-width="4" stroke-linecap="round"/></svg>
+          </div>
+          <div class="menu-edit-list__rename selector">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          </div>
+          <div class="menu-edit-list__delete selector">
+            <svg width="26" height="26" viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="1.89111" y="1.78369" width="21.793" height="21.793" rx="3.5" stroke="currentColor" stroke-width="3"/><path d="M9.5 9.5L16.5 16.5M16.5 9.5L9.5 16.5" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg>
+          </div>
+        </div>
+      `);
 
       item.data("folderId", folder.id);
       item.data("itemType", "folder");
 
-      item.on("hover:enter", function (e) {
+      item.on("hover:enter", (e) => {
         if (
           !$(e.target).closest(
             ".menu-edit-list__move, .menu-edit-list__rename, .menu-edit-list__delete"
           ).length
         ) {
           Lampa.Modal.close();
-          setTimeout(function () {
-            openFolderEditDialog(folder);
-          }, 100);
+          setTimeout(() => openFolderEditDialog(folder), 100);
         }
       });
-      item.find(".move-up").on("hover:enter", function () {
-        var prev = item.prev();
-        while (prev.length && prev.hasClass("menu-edit-list__create-folder")) {
-          prev = prev.prev();
-        }
+      item.find(".move-up").on("hover:enter", () => {
+        const prev = item
+          .prevAll(":not(.menu-edit-list__create-folder)")
+          .first();
         if (prev.length) {
           item.insertBefore(prev);
           saveItemOrder();
         }
       });
 
-      item.find(".move-down").on("hover:enter", function () {
-        var next = item.next();
-        while (next.length && next.hasClass("folder-reset-button")) {
-          next = next.next();
-        }
-        if (next.length && !next.hasClass("folder-reset-button")) {
+      item.find(".move-down").on("hover:enter", () => {
+        const next = item.nextAll(":not(.folder-reset-button)").first();
+        if (next.length) {
           item.insertAfter(next);
           saveItemOrder();
         }
       });
 
-      item.find(".menu-edit-list__rename").on("hover:enter", function () {
+      item.find(".menu-edit-list__rename").on("hover:enter", () => {
         Lampa.Modal.close();
-        setTimeout(function () {
+        setTimeout(() => {
           Lampa.Input.edit(
             {
               title: "Перейменувати папку",
@@ -1202,12 +920,10 @@
               nosave: true,
               nomic: true,
             },
-            function (newName) {
+            (newName) => {
               if (newName && newName.trim()) {
-                var folders = getFolders();
-                var targetFolder = folders.find(function (f) {
-                  return f.id === folder.id;
-                });
+                const folders = getFolders();
+                const targetFolder = folders.find((f) => f.id === folder.id);
                 if (targetFolder) {
                   targetFolder.name = newName.trim();
                   setFolders(folders);
@@ -1220,199 +936,34 @@
         }, 100);
       });
 
-      item.find(".menu-edit-list__delete").on("hover:enter", function () {
-        var folderId = folder.id;
-        var folderButtons = folder.buttons.slice();
+      item.find(".menu-edit-list__delete").on("hover:enter", () => {
+        const folderId = folder.id;
+        const folderButtons = new Set(folder.buttons);
 
         deleteFolder(folderId);
 
-        var itemOrder = getItemOrder();
-        var newItemOrder = [];
-
-        for (var i = 0; i < itemOrder.length; i++) {
-          if (itemOrder[i].type === "folder" && itemOrder[i].id === folderId) {
-            continue;
-          }
-          if (itemOrder[i].type === "button") {
-            var isInFolder = false;
-            for (var j = 0; j < folderButtons.length; j++) {
-              if (itemOrder[i].id === folderButtons[j]) {
-                isInFolder = true;
-                break;
-              }
-            }
-            if (isInFolder) {
-              continue;
-            }
-          }
-          newItemOrder.push(itemOrder[i]);
-        }
-
+        let itemOrder = getItemOrder();
+        const newItemOrder = itemOrder.filter(
+          (item) =>
+            !(item.type === "folder" && item.id === folderId) &&
+            !(item.type === "button" && folderButtons.has(item.id))
+        );
         setItemOrder(newItemOrder);
 
-        var customOrder = getCustomOrder();
-        var newCustomOrder = [];
-        for (var i = 0; i < customOrder.length; i++) {
-          var found = false;
-          for (var j = 0; j < folderButtons.length; j++) {
-            if (customOrder[i] === folderButtons[j]) {
-              found = true;
-              break;
-            }
-          }
-          if (!found) {
-            newCustomOrder.push(customOrder[i]);
-          }
-        }
+        let customOrder = getCustomOrder();
+        const newCustomOrder = customOrder.filter(
+          (id) => !folderButtons.has(id)
+        );
         setCustomOrder(newCustomOrder);
 
         item.remove();
         Lampa.Noty.show("Папку видалено");
 
-        setTimeout(function () {
+        setTimeout(() => {
           if (currentContainer) {
-            currentContainer
-              .find(".button--play, .button--edit-order, .button--folder")
-              .remove();
             currentContainer.data("buttons-processed", false);
-
-            var targetContainer = currentContainer.find(
-              ".full-start-new__buttons"
-            );
-            var existingButtons = targetContainer
-              .find(".full-start__button")
-              .toArray();
-
-            allButtonsOriginal.forEach(function (originalBtn) {
-              var btnId = getButtonId(originalBtn);
-              var exists = false;
-
-              for (var i = 0; i < existingButtons.length; i++) {
-                if (getButtonId($(existingButtons[i])) === btnId) {
-                  exists = true;
-                  break;
-                }
-              }
-
-              if (!exists) {
-                var clonedBtn = originalBtn.clone(true, true);
-                clonedBtn.css({
-                  opacity: "1",
-                  animation: "none",
-                });
-                targetContainer.append(clonedBtn);
-              }
-            });
-
             reorderButtons(currentContainer);
-
-            setTimeout(function () {
-              var updatedItemOrder = [];
-              targetContainer
-                .find(".full-start__button")
-                .not(".button--edit-order")
-                .each(function () {
-                  var $btn = $(this);
-                  if ($btn.hasClass("button--folder")) {
-                    var fId = $btn.attr("data-folder-id");
-                    updatedItemOrder.push({
-                      type: "folder",
-                      id: fId,
-                    });
-                  } else {
-                    var btnId = getButtonId($btn);
-                    updatedItemOrder.push({
-                      type: "button",
-                      id: btnId,
-                    });
-                  }
-                });
-              setItemOrder(updatedItemOrder);
-
-              var categories = categorizeButtons(currentContainer);
-              var allButtons = []
-                .concat(categories.online)
-                .concat(categories.torrent)
-                .concat(categories.trailer)
-                .concat(categories.book)
-                .concat(categories.reaction)
-                .concat(categories.other);
-
-              allButtons = sortByCustomOrder(allButtons);
-              allButtonsCache = allButtons;
-
-              var folders = getFolders();
-              var buttonsInFolders = [];
-              folders.forEach(function (folder) {
-                buttonsInFolders = buttonsInFolders.concat(folder.buttons);
-              });
-
-              var filteredButtons = allButtons.filter(function (btn) {
-                return buttonsInFolders.indexOf(getButtonId(btn)) === -1;
-              });
-
-              currentButtons = filteredButtons;
-
-              folderButtons.forEach(function (btnId) {
-                var btn = allButtons.find(function (b) {
-                  return getButtonId(b) === btnId;
-                });
-                if (btn) {
-                  var btnItem = createButtonItem(btn);
-
-                  var inserted = false;
-                  list
-                    .find(".menu-edit-list__item")
-                    .not(".menu-edit-list__create-folder, .folder-reset-button")
-                    .each(function () {
-                      var $existingItem = $(this);
-                      var existingType = $existingItem.data("itemType");
-
-                      if (existingType === "button") {
-                        var existingBtnId = $existingItem.data("buttonId");
-                        var existingIndex = updatedItemOrder.findIndex(
-                          function (item) {
-                            return (
-                              item.type === "button" &&
-                              item.id === existingBtnId
-                            );
-                          }
-                        );
-                        var newIndex = updatedItemOrder.findIndex(function (
-                          item
-                        ) {
-                          return item.type === "button" && item.id === btnId;
-                        });
-
-                        if (
-                          newIndex !== -1 &&
-                          existingIndex !== -1 &&
-                          newIndex < existingIndex
-                        ) {
-                          btnItem.insertBefore($existingItem);
-                          inserted = true;
-                          return false;
-                        }
-                      }
-                    });
-
-                  if (!inserted) {
-                    var resetButton = list.find(".folder-reset-button");
-                    if (resetButton.length) {
-                      btnItem.insertBefore(resetButton);
-                    } else {
-                      list.append(btnItem);
-                    }
-                  }
-                }
-              });
-
-              setTimeout(function () {
-                try {
-                  Lampa.Controller.toggle("modal");
-                } catch (e) {}
-              }, 100);
-            }, 100);
+            openEditDialog(); // Re-open edit dialog to reflect changes
           }
         }, 50);
       });
@@ -1421,85 +972,64 @@
     }
 
     function createButtonItem(btn) {
-      var displayName = getButtonDisplayName(btn, currentButtons);
-      var icon = btn.find("svg").clone();
-      var btnId = getButtonId(btn);
-      var isHidden = hidden.indexOf(btnId) !== -1;
+      const displayName = getButtonDisplayName(btn, currentButtons);
+      const icon = btn.find("svg").clone();
+      const btnId = getButtonId(btn);
+      const isHidden = hidden.includes(btnId);
 
-      var item = $(
-        '<div class="menu-edit-list__item">' +
-          '<div class="menu-edit-list__icon"></div>' +
-          '<div class="menu-edit-list__title">' +
-          displayName +
-          "</div>" +
-          '<div class="menu-edit-list__move move-up selector">' +
-          '<svg width="22" height="14" viewBox="0 0 22 14" fill="none" xmlns="http://www.w3.org/2000/svg">' +
-          '<path d="M2 12L11 3L20 12" stroke="currentColor" stroke-width="4" stroke-linecap="round"/>' +
-          "</svg>" +
-          "</div>" +
-          '<div class="menu-edit-list__move move-down selector">' +
-          '<svg width="22" height="14" viewBox="0 0 22 14" fill="none" xmlns="http://www.w3.org/2000/svg">' +
-          '<path d="M2 2L11 11L20 2" stroke="currentColor" stroke-width="4" stroke-linecap="round"/>' +
-          "</svg>" +
-          "</div>" +
-          '<div class="menu-edit-list__rename selector">' +
-          '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>' +
-          "</div>" +
-          '<div class="menu-edit-list__toggle toggle selector">' +
-          '<svg width="26" height="26" viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg">' +
-          '<rect x="1.89111" y="1.78369" width="21.793" height="21.793" rx="3.5" stroke="currentColor" stroke-width="3"/>' +
-          '<path d="M7.44873 12.9658L10.8179 16.3349L18.1269 9.02588" stroke="currentColor" stroke-width="3" class="dot" opacity="' +
-          (isHidden ? "0" : "1") +
-          '" stroke-linecap="round"/>' +
-          "</svg>" +
-          "</div>" +
-          "</div>"
-      );
+      const item = $(`
+        <div class="menu-edit-list__item">
+          <div class="menu-edit-list__icon"></div>
+          <div class="menu-edit-list__title">${displayName}</div>
+          <div class="menu-edit-list__move move-up selector">
+            <svg width="22" height="14" viewBox="0 0 22 14" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2 12L11 3L20 12" stroke="currentColor" stroke-width="4" stroke-linecap="round"/></svg>
+          </div>
+          <div class="menu-edit-list__move move-down selector">
+            <svg width="22" height="14" viewBox="0 0 22 14" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2 2L11 11L20 2" stroke="currentColor" stroke-width="4" stroke-linecap="round"/></svg>
+          </div>
+          <div class="menu-edit-list__rename selector">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          </div>
+          <div class="menu-edit-list__toggle toggle selector">
+            <svg width="26" height="26" viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="1.89111" y="1.78369" width="21.793" height="21.793" rx="3.5" stroke="currentColor" stroke-width="3"/>
+              <path d="M7.44873 12.9658L10.8179 16.3349L18.1269 9.02588" stroke="currentColor" stroke-width="3" class="dot" opacity="${
+                isHidden ? "0" : "1"
+              }" stroke-linecap="round"/>
+            </svg>
+          </div>
+        </div>
+      `);
 
       item.find(".menu-edit-list__icon").append(icon);
-      item.data("button", btn);
       item.data("buttonId", btnId);
       item.data("itemType", "button");
 
-      item.find(".move-up").on("hover:enter", function () {
-        var prev = item.prev();
-        while (prev.length && prev.hasClass("menu-edit-list__create-folder")) {
-          prev = prev.prev();
-        }
-        if (prev.length && !prev.hasClass("menu-edit-list__create-folder")) {
+      item.find(".move-up").on("hover:enter", () => {
+        const prev = item
+          .prevAll(":not(.menu-edit-list__create-folder)")
+          .first();
+        if (prev.length) {
           item.insertBefore(prev);
-          var btnIndex = currentButtons.indexOf(btn);
-          if (btnIndex > 0) {
-            currentButtons.splice(btnIndex, 1);
-            currentButtons.splice(btnIndex - 1, 0, btn);
-          }
           saveItemOrder();
         }
       });
 
-      item.find(".move-down").on("hover:enter", function () {
-        var next = item.next();
-        while (next.length && next.hasClass("folder-reset-button")) {
-          next = next.next();
-        }
-        if (next.length && !next.hasClass("folder-reset-button")) {
+      item.find(".move-down").on("hover:enter", () => {
+        const next = item.nextAll(":not(.folder-reset-button)").first();
+        if (next.length) {
           item.insertAfter(next);
-          var btnIndex = currentButtons.indexOf(btn);
-          if (btnIndex < currentButtons.length - 1) {
-            currentButtons.splice(btnIndex, 1);
-            currentButtons.splice(btnIndex + 1, 0, btn);
-          }
           saveItemOrder();
         }
       });
 
-      item.find(".menu-edit-list__rename").on("hover:enter", function () {
-        var currentName = getButtonDisplayName(btn, currentButtons).replace(
+      item.find(".menu-edit-list__rename").on("hover:enter", () => {
+        const currentName = getButtonDisplayName(btn, currentButtons).replace(
           /<[^>]*>/g,
           ""
         );
         Lampa.Modal.close();
-        setTimeout(function () {
+        setTimeout(() => {
           Lampa.Input.edit(
             {
               free: true,
@@ -1508,9 +1038,9 @@
               value: currentName,
               nomic: true,
             },
-            function (newName) {
+            (newName) => {
               if (newName && newName.trim()) {
-                var renamedButtons = getRenamedButtons();
+                const renamedButtons = getRenamedButtons();
                 renamedButtons[btnId] = newName.trim();
                 setRenamedButtons(renamedButtons);
                 item.find(".menu-edit-list__title").html(newName.trim());
@@ -1523,9 +1053,9 @@
         }, 100);
       });
 
-      item.find(".toggle").on("hover:enter", function () {
-        var hidden = getHiddenButtons();
-        var index = hidden.indexOf(btnId);
+      item.find(".toggle").on("hover:enter", () => {
+        let hidden = getHiddenButtons();
+        const index = hidden.indexOf(btnId);
 
         if (index !== -1) {
           hidden.splice(index, 1);
@@ -1543,81 +1073,63 @@
       return item;
     }
 
+    const renderedItems = new Set();
+
     if (itemOrder.length > 0) {
-      itemOrder.forEach(function (item) {
+      itemOrder.forEach((item) => {
         if (item.type === "folder") {
-          var folder = folders.find(function (f) {
-            return f.id === item.id;
-          });
+          const folder = folders.find((f) => f.id === item.id);
           if (folder) {
             list.append(createFolderItem(folder));
+            renderedItems.add(folder.id);
           }
         } else if (item.type === "button") {
-          var btn = currentButtons.find(function (b) {
-            return getButtonId(b) === item.id;
-          });
+          const btn = currentButtons.find((b) => getButtonId(b) === item.id);
           if (btn) {
             list.append(createButtonItem(btn));
+            renderedItems.add(item.id);
           }
         }
-      });
-
-      currentButtons.forEach(function (btn) {
-        var btnId = getButtonId(btn);
-        var found = itemOrder.some(function (item) {
-          return item.type === "button" && item.id === btnId;
-        });
-        if (!found) {
-          list.append(createButtonItem(btn));
-        }
-      });
-
-      folders.forEach(function (folder) {
-        var found = itemOrder.some(function (item) {
-          return item.type === "folder" && item.id === folder.id;
-        });
-        if (!found) {
-          list.append(createFolderItem(folder));
-        }
-      });
-    } else {
-      folders.forEach(function (folder) {
-        list.append(createFolderItem(folder));
-      });
-
-      currentButtons.forEach(function (btn) {
-        list.append(createButtonItem(btn));
       });
     }
 
-    var createFolderBtn = $(
-      '<div class="menu-edit-list__item menu-edit-list__create-folder selector">' +
-        '<div class="menu-edit-list__icon">' +
-        '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">' +
-        '<path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>' +
-        '<line x1="12" y1="11" x2="12" y2="17"></line>' +
-        '<line x1="9" y1="14" x2="15" y2="14"></line>' +
-        "</svg>" +
-        "</div>" +
-        '<div class="menu-edit-list__title">Створити папку</div>' +
-        "</div>"
-    );
+    folders.forEach((folder) => {
+      if (!renderedItems.has(folder.id)) {
+        list.append(createFolderItem(folder));
+      }
+    });
 
-    createFolderBtn.on("hover:enter", function () {
+    currentButtons.forEach((btn) => {
+      const btnId = getButtonId(btn);
+      if (!renderedItems.has(btnId)) {
+        list.append(createButtonItem(btn));
+      }
+    });
+
+    const createFolderBtn = $(`
+      <div class="menu-edit-list__item menu-edit-list__create-folder selector">
+        <div class="menu-edit-list__icon">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path><line x1="12" y1="11" x2="12" y2="17"></line><line x1="9" y1="14" x2="15" y2="14"></line></svg>
+        </div>
+        <div class="menu-edit-list__title">Створити папку</div>
+      </div>
+    `);
+
+    createFolderBtn.on("hover:enter", () => {
       Lampa.Modal.close();
       openCreateFolderDialog();
     });
 
-    var resetBtn = $(
-      '<div class="menu-edit-list__item folder-reset-button selector">' +
-        '<div class="menu-edit-list__icon">' +
-        '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"></polyline><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path></svg>' +
-        "</div>" +
-        '<div class="menu-edit-list__title">Скинути</div>' +
-        "</div>"
-    );
+    const resetBtn = $(`
+      <div class="menu-edit-list__item folder-reset-button selector">
+        <div class="menu-edit-list__icon">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"></polyline><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path></svg>
+        </div>
+        <div class="menu-edit-list__title">Скинути</div>
+      </div>
+    `);
 
-    resetBtn.on("hover:enter", function () {
+    resetBtn.on("hover:enter", () => {
       Lampa.Storage.set("button_renamed", {});
       Lampa.Storage.set("button_custom_order", []);
       Lampa.Storage.set("button_hidden", []);
@@ -1626,25 +1138,15 @@
       Lampa.Modal.close();
       Lampa.Noty.show("Налаштування скинуто");
 
-      setTimeout(function () {
+      setTimeout(() => {
         if (currentContainer) {
-          currentContainer
-            .find(".full-start__button")
-            .not(".button--edit-order")
-            .remove();
-          allButtonsOriginal.forEach(function (btn) {
-            currentContainer
-              .find(".button--edit-order")
-              .before(btn.clone(true, true));
-          });
           currentContainer.data("buttons-processed", false);
           reorderButtons(currentContainer);
-          refreshController();
         }
       }, 100);
     });
 
-    var bottomControls = $('<div class="bottom-controls"></div>');
+    const bottomControls = $('<div class="bottom-controls"></div>');
     bottomControls.append(createFolderBtn);
     bottomControls.append(resetBtn);
     list.append(bottomControls);
@@ -1654,7 +1156,7 @@
       html: list,
       size: "small",
       scroll_to_center: true,
-      onBack: function () {
+      onBack: () => {
         Lampa.Modal.close();
         applyChanges();
         Lampa.Controller.toggle("full_start");
@@ -1663,7 +1165,7 @@
   }
 
   function reorderButtons(container) {
-    var targetContainer = container.find(".full-start-new__buttons");
+    const targetContainer = container.find(".full-start-new__buttons");
     if (!targetContainer.length) return false;
 
     currentContainer = container;
@@ -1671,203 +1173,93 @@
       .find(".button--play, .button--edit-order, .button--folder")
       .remove();
 
-    var categories = categorizeButtons(container);
+    const categories = categorizeButtons(container);
+    const allButtons = Object.values(categories).flat();
 
-    var allButtons = []
-      .concat(categories.online)
-      .concat(categories.torrent)
-      .concat(categories.trailer)
-      .concat(categories.book)
-      .concat(categories.reaction)
-      .concat(categories.other);
-
-    allButtons = sortByCustomOrder(allButtons);
-    allButtonsCache = allButtons;
+    allButtonsCache = sortByCustomOrder(allButtons);
 
     if (allButtonsOriginal.length === 0) {
-      allButtons.forEach(function (btn) {
-        allButtonsOriginal.push(btn.clone(true, true));
-      });
+      allButtonsOriginal = allButtons.map((btn) => btn.clone(true, true));
     }
 
-    var folders = getFolders();
-    var buttonsInFolders = [];
-    folders.forEach(function (folder) {
-      buttonsInFolders = buttonsInFolders.concat(folder.buttons);
-    });
+    const folders = getFolders();
+    const buttonsInFolders = new Set(
+      folders.flatMap((folder) => folder.buttons)
+    );
 
-    var filteredButtons = allButtons.filter(function (btn) {
-      return buttonsInFolders.indexOf(getButtonId(btn)) === -1;
-    });
-
-    currentButtons = filteredButtons;
-    applyHiddenButtons(filteredButtons);
+    currentButtons = allButtonsCache.filter(
+      (btn) => !buttonsInFolders.has(getButtonId(btn))
+    );
+    applyHiddenButtons(currentButtons);
 
     targetContainer.children().detach();
 
-    var visibleButtons = [];
-    var itemOrder = getItemOrder();
+    let visibleButtons = [];
+    const itemOrder = getItemOrder();
+    const renderedItems = new Set();
 
     if (itemOrder.length > 0) {
-      var addedFolders = [];
-      var addedButtons = [];
-
-      itemOrder.forEach(function (item) {
+      itemOrder.forEach((item) => {
         if (item.type === "folder") {
-          var folder = folders.find(function (f) {
-            return f.id === item.id;
-          });
-          if (folder) {
-            var folderBtn = createFolderButton(folder);
+          const folder = folders.find((f) => f.id === item.id);
+          if (folder && !renderedItems.has(folder.id)) {
+            const folderBtn = createFolderButton(folder);
             targetContainer.append(folderBtn);
             visibleButtons.push(folderBtn);
-            addedFolders.push(folder.id);
+            renderedItems.add(folder.id);
           }
         } else if (item.type === "button") {
-          var btn = filteredButtons.find(function (b) {
-            return getButtonId(b) === item.id;
-          });
-          if (btn && !btn.hasClass("hidden")) {
+          const btn = currentButtons.find(
+            (b) => getButtonId(b) === item.id && !b.hasClass("hidden")
+          );
+          if (btn && !renderedItems.has(item.id)) {
             targetContainer.append(btn);
             visibleButtons.push(btn);
-            addedButtons.push(getButtonId(btn));
+            renderedItems.add(item.id);
           }
-        }
-      });
-
-      filteredButtons.forEach(function (btn) {
-        var btnId = getButtonId(btn);
-        if (addedButtons.indexOf(btnId) === -1 && !btn.hasClass("hidden")) {
-          var insertBefore = null;
-          var btnType = getButtonType(btn);
-          var typeOrder = [
-            "online",
-            "torrent",
-            "trailer",
-            "book",
-            "reaction",
-            "other",
-          ];
-          var btnTypeIndex = typeOrder.indexOf(btnType);
-          if (btnTypeIndex === -1) btnTypeIndex = 999;
-
-          if (
-            btnId === "modss_online_button" ||
-            btnId === "showy_online_button"
-          ) {
-            var firstNonPriority = targetContainer
-              .find(".full-start__button")
-              .not(".button--edit-order, .button--folder")
-              .filter(function () {
-                var id = getButtonId($(this));
-                return (
-                  id !== "modss_online_button" && id !== "showy_online_button"
-                );
-              })
-              .first();
-
-            if (firstNonPriority.length) {
-              insertBefore = firstNonPriority;
-            }
-
-            if (btnId === "showy_online_button") {
-              var modsBtn = targetContainer
-                .find(".full-start__button")
-                .filter(function () {
-                  return getButtonId($(this)) === "modss_online_button";
-                });
-              if (modsBtn.length) {
-                insertBefore = modsBtn.next();
-                if (
-                  !insertBefore.length ||
-                  insertBefore.hasClass("button--edit-order")
-                ) {
-                  insertBefore = null;
-                }
-              }
-            }
-          } else {
-            targetContainer
-              .find(".full-start__button")
-              .not(".button--edit-order, .button--folder")
-              .each(function () {
-                var existingBtn = $(this);
-                var existingId = getButtonId(existingBtn);
-
-                if (
-                  existingId === "modss_online_button" ||
-                  existingId === "showy_online_button"
-                ) {
-                  return true;
-                }
-
-                var existingType = getButtonType(existingBtn);
-                var existingTypeIndex = typeOrder.indexOf(existingType);
-                if (existingTypeIndex === -1) existingTypeIndex = 999;
-
-                if (btnTypeIndex < existingTypeIndex) {
-                  insertBefore = existingBtn;
-                  return false;
-                }
-              });
-          }
-
-          if (insertBefore && insertBefore.length) {
-            btn.insertBefore(insertBefore);
-          } else {
-            targetContainer.append(btn);
-          }
-          visibleButtons.push(btn);
-        }
-      });
-
-      folders.forEach(function (folder) {
-        if (addedFolders.indexOf(folder.id) === -1) {
-          var folderBtn = createFolderButton(folder);
-          targetContainer.append(folderBtn);
-          visibleButtons.push(folderBtn);
-        }
-      });
-    } else {
-      folders.forEach(function (folder) {
-        var folderBtn = createFolderButton(folder);
-        targetContainer.append(folderBtn);
-        visibleButtons.push(folderBtn);
-      });
-
-      filteredButtons.forEach(function (btn) {
-        if (!btn.hasClass("hidden")) {
-          targetContainer.append(btn);
-          visibleButtons.push(btn);
         }
       });
     }
 
-    var editButton = createEditButton();
+    folders.forEach((folder) => {
+      if (!renderedItems.has(folder.id)) {
+        const folderBtn = createFolderButton(folder);
+        targetContainer.append(folderBtn);
+        visibleButtons.push(folderBtn);
+        renderedItems.add(folder.id);
+      }
+    });
+
+    currentButtons.forEach((btn) => {
+      const btnId = getButtonId(btn);
+      if (!renderedItems.has(btnId) && !btn.hasClass("hidden")) {
+        targetContainer.append(btn);
+        visibleButtons.push(btn);
+        renderedItems.add(btnId);
+      }
+    });
+
+    const editButton = createEditButton();
     targetContainer.append(editButton);
     visibleButtons.push(editButton);
 
     applyRenamedButtons(
-      visibleButtons.filter(function (b) {
-        return !b.hasClass("button--folder");
-      })
+      visibleButtons.filter((b) => !b.hasClass("button--folder"))
     );
     applyButtonAnimation(visibleButtons);
 
-    setTimeout(function () {
-      setupButtonNavigation(container);
-    }, 100);
+    setTimeout(() => setupButtonNavigation(container), 100);
 
     return true;
   }
 
   function setupButtonNavigation(container) {
-    // Lampa автоматически обрабатывает навигацию для flex-wrap: wrap
-    // Просто переконаємося, що контролер оновлено
     if (Lampa.Controller && typeof Lampa.Controller.toggle === "function") {
       try {
         Lampa.Controller.toggle("full_start");
-      } catch (e) {}
+      } catch (e) {
+        console.error("Error toggling controller:", e);
+      }
     }
   }
 
@@ -1875,63 +1267,58 @@
     if (!Lampa.Controller || typeof Lampa.Controller.toggle !== "function")
       return;
 
-    setTimeout(function () {
+    setTimeout(() => {
       try {
         Lampa.Controller.toggle("full_start");
 
         if (currentContainer) {
-          setTimeout(function () {
-            setupButtonNavigation(currentContainer);
-          }, 100);
+          setTimeout(() => setupButtonNavigation(currentContainer), 100);
         }
-      } catch (e) {}
+      } catch (e) {
+        console.error("Error refreshing controller:", e);
+      }
     }, 50);
   }
 
   function init() {
-    var style = $(
-      "<style>" +
-        "@keyframes button-fade-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }" +
-        ".full-start__button { opacity: 0; }" +
-        ".full-start__button.hidden { display: none !important; }" +
-        ".button--folder { cursor: pointer; }" +
-        ".full-start-new__buttons { " +
-        "display: flex !important; " +
-        "flex-direction: row !important; " +
-        "flex-wrap: wrap !important; " +
-        "gap: 0.5em !important; " +
-        "}" +
-        ".full-start-new__buttons.buttons-loading .full-start__button { visibility: hidden !important; }" +
-        ".menu-edit-list__create-folder { background: rgba(100,200,100,0.2); border: 3px solid transparent; }" +
-        ".menu-edit-list__create-folder.focus { background: rgba(100,200,100,0.3); border-color: rgba(255,255,255,0.8); }" +
-        ".menu-edit-list__delete { width: 2.4em; height: 2.4em; display: flex; align-items: center; justify-content: center; cursor: pointer; }" +
-        ".menu-edit-list__delete svg { width: 1.2em !important; height: 1.2em !important; }" +
-        ".menu-edit-list__delete.focus { border: 2px solid rgba(255,255,255,0.8); border-radius: 0.3em; }" +
-        ".menu-edit-list__rename { width: 2.4em; height: 2.4em; display: flex; align-items: center; justify-content: center; cursor: pointer; }" +
-        ".menu-edit-list__rename svg { width: 1.2em !important; height: 1.2em !important; }" +
-        ".menu-edit-list__rename.focus { border: 2px solid rgba(255,255,255,0.8); border-radius: 0.3em; }" +
-        ".folder-item .menu-edit-list__move { margin-right: 0; }" +
-        ".folder-create-confirm { background: rgba(100,200,100,0.3); margin-top: 1em; border-radius: 0.3em; }" +
-        ".folder-create-confirm.focus { border: 3px solid rgba(255,255,255,0.8); }" +
-        ".bottom-controls { display: flex; gap: 0.5em; margin-top: 1em; }" +
-        ".bottom-controls > .menu-edit-list__item { width: calc(50% - 0.25em); margin-bottom: 0; justify-content: center; }" +
-        ".folder-reset-button { background: rgba(200,100,100,0.3); border: 3px solid transparent; }" +
-        ".folder-reset-button.focus { background: rgba(200,100,100,0.4); border-color: rgba(255,255,255,0.8); }" +
-        ".menu-edit-list__toggle.focus { border: 2px solid rgba(255,255,255,0.8); border-radius: 0.3em; }" +
-        "</style>"
+    const style = $(
+      `<style>
+        @keyframes button-fade-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+        .full-start__button { opacity: 0; }
+        .full-start__button.hidden { display: none !important; }
+        .button--folder { cursor: pointer; }
+        .full-start-new__buttons { display: flex !important; flex-direction: row !important; flex-wrap: wrap !important; gap: 0.5em !important; }
+        .full-start-new__buttons.buttons-loading .full-start__button { visibility: hidden !important; }
+        .menu-edit-list__create-folder { background: rgba(100,200,100,0.2); border: 3px solid transparent; }
+        .menu-edit-list__create-folder.focus { background: rgba(100,200,100,0.3); border-color: rgba(255,255,255,0.8); }
+        .menu-edit-list__delete { width: 2.4em; height: 2.4em; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+        .menu-edit-list__delete svg { width: 1.2em !important; height: 1.2em !important; }
+        .menu-edit-list__delete.focus { border: 2px solid rgba(255,255,255,0.8); border-radius: 0.3em; }
+        .menu-edit-list__rename { width: 2.4em; height: 2.4em; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+        .menu-edit-list__rename svg { width: 1.2em !important; height: 1.2em !important; }
+        .menu-edit-list__rename.focus { border: 2px solid rgba(255,255,255,0.8); border-radius: 0.3em; }
+        .folder-item .menu-edit-list__move { margin-right: 0; }
+        .folder-create-confirm { background: rgba(100,200,100,0.3); margin-top: 1em; border-radius: 0.3em; }
+        .folder-create-confirm.focus { border: 3px solid rgba(255,255,255,0.8); }
+        .bottom-controls { display: flex; gap: 0.5em; margin-top: 1em; }
+        .bottom-controls > .menu-edit-list__item { width: calc(50% - 0.25em); margin-bottom: 0; justify-content: center; }
+        .folder-reset-button { background: rgba(200,100,100,0.3); border: 3px solid transparent; }
+        .folder-reset-button.focus { background: rgba(200,100,100,0.4); border-color: rgba(255,255,255,0.8); }
+        .menu-edit-list__toggle.focus { border: 2px solid rgba(255,255,255,0.8); border-radius: 0.3em; }
+      </style>`
     );
     $("body").append(style);
 
-    Lampa.Listener.follow("full", function (e) {
+    Lampa.Listener.follow("full", (e) => {
       if (e.type !== "complite") return;
 
-      var container = e.object.activity.render();
-      var targetContainer = container.find(".full-start-new__buttons");
+      const container = e.object.activity.render();
+      const targetContainer = container.find(".full-start-new__buttons");
       if (targetContainer.length) {
         targetContainer.addClass("buttons-loading");
       }
 
-      setTimeout(function () {
+      setTimeout(() => {
         try {
           if (!container.data("buttons-processed")) {
             container.data("buttons-processed", true);
@@ -1943,6 +1330,7 @@
             }
           }
         } catch (err) {
+          console.error("Error processing buttons:", err);
           if (targetContainer.length) {
             targetContainer.removeClass("buttons-loading");
           }
