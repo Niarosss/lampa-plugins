@@ -1623,15 +1623,19 @@
     });
 
     Lampa.SettingsApi.addParam({
-      parser: "buttons",
-      name: "Buttons",
       section: "interface",
-    });
-
-    Lampa.Settings.listener.follow("open", function (e) {
-      if (e.name === "Buttons") {
-        openEditDialog();
-      }
+      param: {
+        name: "buttons_editor_btn",
+        type: "button",
+      },
+      field: {
+        name: "Редактор кнопок",
+      },
+      onRender: function (item) {
+        item.on("hover:enter", function () {
+          openEditDialog();
+        });
+      },
     });
 
     window.plugin_buttons_ready = true;
