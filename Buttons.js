@@ -1,94 +1,6 @@
 (function () {
   "use strict";
 
-  Lampa.Lang.add({
-    buttons_settings_name: {
-      en: "Buttons editor",
-      uk: "Редактор кнопок",
-    },
-    buttons_settings_desc: {
-      en: "Customize the position and visibility of buttons",
-      uk: "Налаштування позиції та видимості кнопок",
-    },
-    buttons_editor_enabled: {
-      en: "Enable editor",
-      uk: "Увімкнути редактор",
-    },
-    folder_rename: {
-      en: "Rename folder",
-      uk: "Перейменувати папку",
-    },
-    folder_renamed: {
-      en: "Folder renamed",
-      uk: "Папку перейменовано",
-    },
-    folder_name: {
-      en: "Folder name",
-      uk: "Назва папки",
-    },
-    folder_enter_name: {
-      en: "Enter a folder name",
-      uk: "Введіть назву папки",
-    },
-    button_order_in_folder: {
-      en: "Button order in folder",
-      uk: "Порядок кнопок у папці",
-    },
-    button_unnamed: {
-      en: "Button",
-      uk: "Кнопка",
-    },
-    button_more: {
-      en: "More",
-      uk: "Ще",
-    },
-  });
-
-  var buttons_icon =
-    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 29" fill="none"><use xlink:href="#sprite-edit"></use></svg>';
-
-  function createButtonsSettings() {
-    Lampa.SettingsApi.addComponent({
-      component: "buttons_settings",
-      name: Lampa.Lang.translate("buttons_settings_name"),
-      description: Lampa.Lang.translate("buttons_settings_desc"),
-      icon: buttons_icon,
-    });
-
-    Lampa.SettingsApi.addParam({
-      component: "buttons_settings",
-      param: {
-        type: "toggle",
-        name: "buttons_editor_enabled",
-        default: true,
-      },
-      field: {
-        name: Lampa.Lang.translate("buttons_editor_enabled"),
-      },
-      onChange: function (value) {
-        Lampa.Storage.set("buttons_editor_enabled", value);
-      },
-    });
-
-    Lampa.SettingsApi.addParam({
-      component: "interface",
-      param: {
-        type: "button",
-      },
-      field: {
-        name: Lampa.Lang.translate("buttons_settings_name"),
-        description: Lampa.Lang.translate("buttons_settings_desc"),
-      },
-      onChange: function () {
-        Lampa.Settings.create("buttons_settings");
-      },
-    });
-  }
-
-  function startPlugin() {
-    createButtonsSettings();
-  }
-
   var LAMPAC_ICON =
     '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><path d="M20.331 14.644l-13.794-13.831 17.55 10.075zM2.938 0c-0.813 0.425-1.356 1.2-1.356 2.206v27.581c0 1.006 0.544 1.781 1.356 2.206l16.038-16zM29.512 14.1l-3.681-2.131-4.106 4.031 4.106 4.031 3.756-2.131c1.125-0.893 1.125-2.906-0.075-3.8zM6.538 31.188l17.55-10.075-3.756-3.756z" fill="currentColor"></path></svg>';
 
@@ -115,7 +27,6 @@
   var allButtonsOriginal = [];
   var currentContainer = null;
 
-  // Допоміжна функція для пошуку кнопки
   function findButton(btnId) {
     var btn = allButtonsOriginal.find(function (b) {
       return getButtonId(b) === btnId;
@@ -128,7 +39,6 @@
     return btn;
   }
 
-  // Допоміжна функція для отримання всіх ID кнопок у папках
   function getButtonsInFolders() {
     var folders = getFolders();
     var buttonsInFolders = [];
@@ -398,7 +308,6 @@
       openEditDialog();
     });
 
-    // Перевіряємо налаштування та приховуємо кнопку, якщо редактор вимкнено
     if (Lampa.Storage.get("buttons_editor_enabled") === false) {
       btn.hide();
     }
@@ -417,7 +326,7 @@
   function saveItemOrder() {
     var order = [];
     var items = $(".menu-edit-list .menu-edit-list__item").not(
-      ".menu-edit-list__create-folder"
+      ".menu-edit-list__create-folder, .bottom-controls .menu-edit-list__item"
     );
 
     items.each(function () {
@@ -757,10 +666,10 @@
           .replace(/_/g, " ");
         text = capitalize(text);
       } else {
-        text = Lampa.Lang.translate("button_unnamed");
+        text = "Кнопка";
       }
       if (btn.hasClass("button--options")) {
-        text = Lampa.Lang.translate("button_more");
+        text = "Ще";
       }
       return text;
     }
@@ -870,10 +779,10 @@
     });
   }
 
-  function openRenameFolderDialog(folder) {
+  function openRenameFolderDialog(folder, onsave) {
     Lampa.Input.edit(
       {
-        title: Lampa.Lang.translate("folder_rename"),
+        title: "Перейменувати папку",
         value: folder.name,
         free: true,
         nosave: true,
@@ -888,8 +797,8 @@
           if (targetFolder) {
             targetFolder.name = newName;
             setFolders(folders);
-            Lampa.Noty.show(Lampa.Lang.translate("folder_renamed"));
-            applyChanges();
+            Lampa.Noty.show("Папку перейменовано");
+            if (onsave) onsave();
           }
         }
       }
@@ -949,7 +858,7 @@
     });
 
     Lampa.Modal.open({
-      title: Lampa.Lang.translate("button_order_in_folder"),
+      title: "Порядок кнопок у папці",
       html: list,
       size: "small",
       scroll_to_center: true,
@@ -1027,27 +936,26 @@
     setFolders(folders);
   }
 
-  function openCreateFolderDialog() {
+  function openCreateFolderDialog(onsave) {
     Lampa.Input.edit(
       {
         free: true,
-        title: Lampa.Lang.translate("folder_name"),
+        title: "Назва папки",
         nosave: true,
         value: "",
         nomic: true,
       },
       function (folderName) {
         if (!folderName || !folderName.trim()) {
-          Lampa.Noty.show(Lampa.Lang.translate("folder_enter_name"));
-          openEditDialog();
+          Lampa.Noty.show("Введіть назву папки");
           return;
         }
-        openSelectButtonsDialog(folderName.trim());
+        openSelectButtonsDialog(folderName.trim(), onsave);
       }
     );
   }
 
-  function openSelectButtonsDialog(folderName) {
+  function openSelectButtonsDialog(folderName, onsave) {
     var selectedButtons = [];
     var list = $('<div class="menu-edit-list"></div>');
 
@@ -1110,65 +1018,11 @@
         return;
       }
 
-      var folder = createFolder(folderName, selectedButtons);
-
-      var itemOrder = getItemOrder();
-
-      if (itemOrder.length === 0) {
-        currentButtons.forEach(function (btn) {
-          itemOrder.push({
-            type: "button",
-            id: getButtonId(btn),
-          });
-        });
-      }
-
-      var folderAdded = false;
-
-      for (var i = 0; i < selectedButtons.length; i++) {
-        var btnId = selectedButtons[i];
-
-        for (var j = 0; j < itemOrder.length; j++) {
-          if (itemOrder[j].type === "button" && itemOrder[j].id === btnId) {
-            if (!folderAdded) {
-              itemOrder[j] = {
-                type: "folder",
-                id: folder.id,
-              };
-              folderAdded = true;
-            } else {
-              itemOrder.splice(j, 1);
-              j--;
-            }
-            break;
-          }
-        }
-
-        for (var k = 0; k < currentButtons.length; k++) {
-          if (getButtonId(currentButtons[k]) === btnId) {
-            currentButtons.splice(k, 1);
-            break;
-          }
-        }
-      }
-
-      if (!folderAdded) {
-        itemOrder.push({
-          type: "folder",
-          id: folder.id,
-        });
-      }
-
-      setItemOrder(itemOrder);
+      createFolder(folderName, selectedButtons);
 
       Lampa.Modal.close();
       Lampa.Noty.show('Папку "' + folderName + '" створено');
-
-      if (currentContainer) {
-        currentContainer.data("buttons-processed", false);
-        reorderButtons(currentContainer);
-      }
-      refreshController();
+      if (onsave) onsave();
     });
 
     list.append(createBtn);
@@ -1180,7 +1034,6 @@
       scroll_to_center: true,
       onBack: function () {
         Lampa.Modal.close();
-        openEditDialog();
       },
     });
   }
@@ -1200,10 +1053,7 @@
       allButtonsCache = allButtons;
 
       var folders = getFolders();
-      var buttonsInFolders = [];
-      folders.forEach(function (folder) {
-        buttonsInFolders = buttonsInFolders.concat(folder.buttons);
-      });
+      var buttonsInFolders = getButtonsInFolders();
 
       var filteredButtons = allButtons.filter(function (btn) {
         return buttonsInFolders.indexOf(getButtonId(btn)) === -1;
@@ -1212,14 +1062,39 @@
       currentButtons = filteredButtons;
     }
 
-    var list = $('<div class="menu-edit-list"></div>');
-    var hidden = getHiddenButtons();
-    var folders = getFolders();
-    var itemOrder = getItemOrder();
+    var scroll = new Lampa.Scroll({
+      mask: true,
+      over: true,
+    });
+    var body = scroll.render();
+    var items = [];
 
-    function createFolderItem(folder) {
+    function updateList() {
+      body.empty();
+      items.forEach(function (item) {
+        body.append(item);
+      });
+      Lampa.Utils.trigger(body, "update");
+    }
+
+    function createSortable() {
+      Lampa.Utils.sortable(
+        body,
+        ".menu-edit-list__item:not(.bottom-controls .menu-edit-list__item)",
+        "[data-item-id]",
+        {
+          onUpdate: function onUpdate(startIndex, newIndex) {
+            saveItemOrder();
+          },
+        }
+      );
+    }
+
+    function createFolderEditItem(folder, allItems) {
       var item = $(
-        '<div class="menu-edit-list__item folder-item selector">' +
+        '<div class="menu-edit-list__item folder-item selector" data-item-id="' +
+          folder.id +
+          '">' +
           '<div class="menu-edit-list__icon">' +
           '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">' +
           '<path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>' +
@@ -1230,16 +1105,6 @@
           ' <span style="opacity:0.5">(' +
           folder.buttons.length +
           ")</span></div>" +
-          '<div class="menu-edit-list__move move-up selector">' +
-          '<svg width="22" height="14" viewBox="0 0 22 14" fill="none" xmlns="http://www.w3.org/2000/svg">' +
-          '<path d="M2 12L11 3L20 12" stroke="currentColor" stroke-width="4" stroke-linecap="round"/>' +
-          "</svg>" +
-          "</div>" +
-          '<div class="menu-edit-list__move move-down selector">' +
-          '<svg width="22" height="14" viewBox="0 0 22 14" fill="none" xmlns="http://www.w3.org/2000/svg">' +
-          '<path d="M2 2L11 11L20 2" stroke="currentColor" stroke-width="4" stroke-linecap="round"/>' +
-          "</svg>" +
-          "</div>" +
           '<div class="menu-edit-list__rename selector">' +
           '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>' +
           "</div>" +
@@ -1258,287 +1123,38 @@
       item.on("hover:enter", function (e) {
         if (
           !$(e.target).closest(
-            ".menu-edit-list__move, .menu-edit-list__rename, .menu-edit-list__delete"
+            ".menu-edit-list__rename, .menu-edit-list__delete"
           ).length
         ) {
-          Lampa.Modal.close();
-          setTimeout(function () {
-            openFolderEditDialog(folder);
-          }, 100);
-        }
-      });
-      item.find(".move-up").on("hover:enter", function () {
-        var prev = item.prev();
-        while (prev.length && prev.hasClass("menu-edit-list__create-folder")) {
-          prev = prev.prev();
-        }
-        if (prev.length) {
-          item.insertBefore(prev);
-          saveItemOrder();
-        }
-      });
-
-      item.find(".move-down").on("hover:enter", function () {
-        var next = item.next();
-        while (next.length && next.hasClass("folder-reset-button")) {
-          next = next.next();
-        }
-        if (next.length && !next.hasClass("folder-reset-button")) {
-          item.insertAfter(next);
-          saveItemOrder();
+          openFolderEditDialog(folder);
         }
       });
 
       item.find(".menu-edit-list__rename").on("hover:enter", function () {
-        Lampa.Modal.close();
-        setTimeout(function () {
-          Lampa.Input.edit(
-            {
-              title: "Перейменувати папку",
-              value: folder.name,
-              free: true,
-              nosave: true,
-              nomic: true,
-            },
-            function (newName) {
-              if (newName && newName.trim()) {
-                var folders = getFolders();
-                var targetFolder = folders.find(function (f) {
-                  return f.id === folder.id;
-                });
-                if (targetFolder) {
-                  targetFolder.name = newName.trim();
-                  setFolders(folders);
-                  Lampa.Noty.show("Папку перейменовано");
-                }
-              }
-              openEditDialog();
-            }
-          );
-        }, 100);
+        openRenameFolderDialog(folder, renderList);
       });
 
       item.find(".menu-edit-list__delete").on("hover:enter", function () {
-        var folderId = folder.id;
-        var folderButtons = folder.buttons.slice();
-
-        deleteFolder(folderId);
-
-        var itemOrder = getItemOrder();
-        var newItemOrder = [];
-
-        for (var i = 0; i < itemOrder.length; i++) {
-          if (itemOrder[i].type === "folder" && itemOrder[i].id === folderId) {
-            continue;
-          }
-          if (itemOrder[i].type === "button") {
-            var isInFolder = false;
-            for (var j = 0; j < folderButtons.length; j++) {
-              if (itemOrder[i].id === folderButtons[j]) {
-                isInFolder = true;
-                break;
-              }
-            }
-            if (isInFolder) {
-              continue;
-            }
-          }
-          newItemOrder.push(itemOrder[i]);
-        }
-
-        setItemOrder(newItemOrder);
-
-        var customOrder = getCustomOrder();
-        var newCustomOrder = [];
-        for (var i = 0; i < customOrder.length; i++) {
-          var found = false;
-          for (var j = 0; j < folderButtons.length; j++) {
-            if (customOrder[i] === folderButtons[j]) {
-              found = true;
-              break;
-            }
-          }
-          if (!found) {
-            newCustomOrder.push(customOrder[i]);
-          }
-        }
-        setCustomOrder(newCustomOrder);
-
-        item.remove();
-        Lampa.Noty.show("Папку видалено");
-
-        setTimeout(function () {
-          if (currentContainer) {
-            currentContainer
-              .find(".button--play, .button--edit-order, .button--folder")
-              .remove();
-            currentContainer.data("buttons-processed", false);
-
-            var targetContainer = currentContainer.find(
-              ".full-start-new__buttons"
-            );
-            var existingButtons = targetContainer
-              .find(".full-start__button")
-              .toArray();
-
-            allButtonsOriginal.forEach(function (originalBtn) {
-              var btnId = getButtonId(originalBtn);
-              var exists = false;
-
-              for (var i = 0; i < existingButtons.length; i++) {
-                if (getButtonId($(existingButtons[i])) === btnId) {
-                  exists = true;
-                  break;
-                }
-              }
-
-              if (!exists) {
-                var clonedBtn = originalBtn.clone(true, true);
-                clonedBtn.css({
-                  opacity: "1",
-                  animation: "none",
-                });
-                targetContainer.append(clonedBtn);
-              }
-            });
-
-            reorderButtons(currentContainer);
-
-            setTimeout(function () {
-              var updatedItemOrder = [];
-              targetContainer
-                .find(".full-start__button")
-                .not(".button--edit-order")
-                .each(function () {
-                  var $btn = $(this);
-                  if ($btn.hasClass("button--folder")) {
-                    var fId = $btn.attr("data-folder-id");
-                    updatedItemOrder.push({
-                      type: "folder",
-                      id: fId,
-                    });
-                  } else {
-                    var btnId = getButtonId($btn);
-                    updatedItemOrder.push({
-                      type: "button",
-                      id: btnId,
-                    });
-                  }
-                });
-              setItemOrder(updatedItemOrder);
-
-              var categories = categorizeButtons(currentContainer);
-              var allButtons = []
-                .concat(categories.online)
-                .concat(categories.torrent)
-                .concat(categories.trailer)
-                .concat(categories.book)
-                .concat(categories.reaction)
-                .concat(categories.other);
-
-              allButtons = sortByCustomOrder(allButtons);
-              allButtonsCache = allButtons;
-
-              var folders = getFolders();
-              var buttonsInFolders = [];
-              folders.forEach(function (folder) {
-                buttonsInFolders = buttonsInFolders.concat(folder.buttons);
-              });
-
-              var filteredButtons = allButtons.filter(function (btn) {
-                return buttonsInFolders.indexOf(getButtonId(btn)) === -1;
-              });
-
-              currentButtons = filteredButtons;
-
-              folderButtons.forEach(function (btnId) {
-                var btn = allButtons.find(function (b) {
-                  return getButtonId(b) === btnId;
-                });
-                if (btn) {
-                  var btnItem = createButtonItem(btn);
-
-                  var inserted = false;
-                  list
-                    .find(".menu-edit-list__item")
-                    .not(".menu-edit-list__create-folder, .folder-reset-button")
-                    .each(function () {
-                      var $existingItem = $(this);
-                      var existingType = $existingItem.data("itemType");
-
-                      if (existingType === "button") {
-                        var existingBtnId = $existingItem.data("buttonId");
-                        var existingIndex = updatedItemOrder.findIndex(
-                          function (item) {
-                            return (
-                              item.type === "button" &&
-                              item.id === existingBtnId
-                            );
-                          }
-                        );
-                        var newIndex = updatedItemOrder.findIndex(function (
-                          item
-                        ) {
-                          return item.type === "button" && item.id === btnId;
-                        });
-
-                        if (
-                          newIndex !== -1 &&
-                          existingIndex !== -1 &&
-                          newIndex < existingIndex
-                        ) {
-                          btnItem.insertBefore($existingItem);
-                          inserted = true;
-                          return false;
-                        }
-                      }
-                    });
-
-                  if (!inserted) {
-                    var resetButton = list.find(".folder-reset-button");
-                    if (resetButton.length) {
-                      btnItem.insertBefore(resetButton);
-                    } else {
-                      list.append(btnItem);
-                    }
-                  }
-                }
-              });
-
-              setTimeout(function () {
-                try {
-                  Lampa.Controller.toggle("modal");
-                } catch (e) {}
-              }, 100);
-            }, 100);
-          }
-        }, 50);
+        deleteFolder(folder.id);
+        renderList();
       });
 
       return item;
     }
 
-    function createButtonItem(btn) {
-      var displayName = getButtonDisplayName(btn, currentButtons);
+    function createButtonEditItem(btn, hidden, allItems) {
+      var displayName = getButtonDisplayName(btn, allButtonsOriginal);
       var icon = btn.find("svg").clone();
       var btnId = getButtonId(btn);
       var isHidden = hidden.indexOf(btnId) !== -1;
 
       var item = $(
-        '<div class="menu-edit-list__item">' +
+        '<div class="menu-edit-list__item" data-item-id="' +
+          btnId +
+          '">' +
           '<div class="menu-edit-list__icon"></div>' +
           '<div class="menu-edit-list__title">' +
           displayName +
-          "</div>" +
-          '<div class="menu-edit-list__move move-up selector">' +
-          '<svg width="22" height="14" viewBox="0 0 22 14" fill="none" xmlns="http://www.w3.org/2000/svg">' +
-          '<path d="M2 12L11 3L20 12" stroke="currentColor" stroke-width="4" stroke-linecap="round"/>' +
-          "</svg>" +
-          "</div>" +
-          '<div class="menu-edit-list__move move-down selector">' +
-          '<svg width="22" height="14" viewBox="0 0 22 14" fill="none" xmlns="http://www.w3.org/2000/svg">' +
-          '<path d="M2 2L11 11L20 2" stroke="currentColor" stroke-width="4" stroke-linecap="round"/>' +
-          "</svg>" +
           "</div>" +
           '<div class="menu-edit-list__rename selector">' +
           '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>' +
@@ -1555,70 +1171,33 @@
       );
 
       item.find(".menu-edit-list__icon").append(icon);
-      item.data("button", btn);
       item.data("buttonId", btnId);
       item.data("itemType", "button");
 
-      item.find(".move-up").on("hover:enter", function () {
-        var prev = item.prev();
-        while (prev.length && prev.hasClass("menu-edit-list__create-folder")) {
-          prev = prev.prev();
-        }
-        if (prev.length && !prev.hasClass("menu-edit-list__create-folder")) {
-          item.insertBefore(prev);
-          var btnIndex = currentButtons.indexOf(btn);
-          if (btnIndex > 0) {
-            currentButtons.splice(btnIndex, 1);
-            currentButtons.splice(btnIndex - 1, 0, btn);
-          }
-          saveItemOrder();
-        }
-      });
-
-      item.find(".move-down").on("hover:enter", function () {
-        var next = item.next();
-        while (next.length && next.hasClass("folder-reset-button")) {
-          next = next.next();
-        }
-        if (next.length && !next.hasClass("folder-reset-button")) {
-          item.insertAfter(next);
-          var btnIndex = currentButtons.indexOf(btn);
-          if (btnIndex < currentButtons.length - 1) {
-            currentButtons.splice(btnIndex, 1);
-            currentButtons.splice(btnIndex + 1, 0, btn);
-          }
-          saveItemOrder();
-        }
-      });
-
       item.find(".menu-edit-list__rename").on("hover:enter", function () {
-        var currentName = getButtonDisplayName(btn, currentButtons).replace(
+        var currentName = getButtonDisplayName(btn, allButtonsOriginal).replace(
           /<[^>]*>/g,
           ""
         );
-        Lampa.Modal.close();
-        setTimeout(function () {
-          Lampa.Input.edit(
-            {
-              free: true,
-              title: "Нова назва кнопки",
-              nosave: true,
-              value: currentName,
-              nomic: true,
-            },
-            function (newName) {
-              if (newName && newName.trim()) {
-                var renamedButtons = getRenamedButtons();
-                renamedButtons[btnId] = newName.trim();
-                setRenamedButtons(renamedButtons);
-                item.find(".menu-edit-list__title").html(newName.trim());
-                btn.find("span").text(newName.trim());
-                Lampa.Noty.show("Кнопку перейменовано");
-              }
-              openEditDialog();
+        Lampa.Input.edit(
+          {
+            free: true,
+            title: "Нова назва кнопки",
+            nosave: true,
+            value: currentName,
+            nomic: true,
+          },
+          function (newName) {
+            if (newName && newName.trim()) {
+              var renamedButtons = getRenamedButtons();
+              renamedButtons[btnId] = newName.trim();
+              setRenamedButtons(renamedButtons);
+              item.find(".menu-edit-list__title").html(newName.trim());
+              btn.find("span").text(newName.trim());
+              Lampa.Noty.show("Кнопку перейменовано");
             }
-          );
-        }, 100);
+          }
+        );
       });
 
       item.find(".toggle").on("hover:enter", function () {
@@ -1627,11 +1206,9 @@
 
         if (index !== -1) {
           hidden.splice(index, 1);
-          btn.removeClass("hidden");
           item.find(".dot").attr("opacity", "1");
         } else {
           hidden.push(btnId);
-          btn.addClass("hidden");
           item.find(".dot").attr("opacity", "0");
         }
 
@@ -1641,123 +1218,122 @@
       return item;
     }
 
-    if (itemOrder.length > 0) {
-      itemOrder.forEach(function (item) {
-        if (item.type === "folder") {
-          var folder = folders.find(function (f) {
-            return f.id === item.id;
-          });
-          if (folder) {
-            list.append(createFolderItem(folder));
-          }
-        } else if (item.type === "button") {
-          var btn = currentButtons.find(function (b) {
-            return getButtonId(b) === item.id;
-          });
-          if (btn) {
-            list.append(createButtonItem(btn));
-          }
-        }
-      });
+    function renderList() {
+      items = [];
+      var folders = getFolders();
+      var hidden = getHiddenButtons();
+      var buttonsInFolders = getButtonsInFolders();
+      var itemOrder = getItemOrder();
+      var allItems = [];
 
-      currentButtons.forEach(function (btn) {
+      allButtonsCache.forEach(function (btn) {
         var btnId = getButtonId(btn);
-        var found = itemOrder.some(function (item) {
-          return item.type === "button" && item.id === btnId;
-        });
-        if (!found) {
-          list.append(createButtonItem(btn));
+        if (buttonsInFolders.indexOf(btnId) === -1) {
+          allItems.push({
+            type: "button",
+            id: btnId,
+            element: btn,
+          });
         }
       });
 
       folders.forEach(function (folder) {
-        var found = itemOrder.some(function (item) {
-          return item.type === "folder" && item.id === folder.id;
+        allItems.push({
+          type: "folder",
+          id: folder.id,
+          data: folder,
         });
-        if (!found) {
-          list.append(createFolderItem(folder));
-        }
-      });
-    } else {
-      folders.forEach(function (folder) {
-        list.append(createFolderItem(folder));
       });
 
-      currentButtons.forEach(function (btn) {
-        list.append(createButtonItem(btn));
+      var sortedItems = [];
+      var remainingItems = allItems.slice();
+
+      if (itemOrder.length > 0) {
+        itemOrder.forEach(function (orderedItem) {
+          var foundIndex = remainingItems.findIndex(function (item) {
+            return item.type === orderedItem.type && item.id === orderedItem.id;
+          });
+          if (foundIndex !== -1) {
+            sortedItems.push(remainingItems[foundIndex]);
+            remainingItems.splice(foundIndex, 1);
+          }
+        });
+        sortedItems = sortedItems.concat(remainingItems);
+      } else {
+        sortedItems = allItems;
+      }
+
+      sortedItems.forEach(function (item) {
+        if (item.type === "button") {
+          items.push(createButtonEditItem(item.element, hidden, allItems));
+        } else if (item.type === "folder") {
+          items.push(createFolderEditItem(item.data, allItems));
+        }
       });
+
+      var createFolderItem = $(
+        '<div class="menu-edit-list__item menu-edit-list__create-folder selector">' +
+          '<div class="menu-edit-list__icon">' +
+          '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">' +
+          '<path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>' +
+          '<line x1="12" y1="11" x2="12" y2="17"></line>' +
+          '<line x1="9" y1="14" x2="15" y2="14"></line>' +
+          "</svg>" +
+          "</div>" +
+          '<div class="menu-edit-list__title">Створити папку</div>' +
+          "</div>"
+      );
+
+      createFolderItem.on("hover:enter", function () {
+        openCreateFolderDialog(renderList);
+      });
+
+      var resetBtn = $(
+        '<div class="menu-edit-list__item folder-reset-button selector">' +
+          '<div class="menu-edit-list__icon">' +
+          '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"></polyline><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path></svg>' +
+          "</div>" +
+          '<div class="menu-edit-list__title">Скинути</div>' +
+          "</div>"
+      );
+
+      resetBtn.on("hover:enter", function () {
+        Lampa.Storage.set("button_renamed", {});
+        Lampa.Storage.set("button_custom_order", []);
+        Lampa.Storage.set("button_hidden", []);
+        Lampa.Storage.set("button_folders", []);
+        Lampa.Storage.set("button_item_order", []);
+        Lampa.Noty.show("Налаштування скинуто");
+        renderList();
+      });
+
+      var bottomControls = $('<div class="bottom-controls"></div>');
+      bottomControls.append(createFolderItem);
+      bottomControls.append(resetBtn);
+
+      items.push(bottomControls);
+      updateList();
     }
 
-    var createFolderBtn = $(
-      '<div class="menu-edit-list__item menu-edit-list__create-folder selector">' +
-        '<div class="menu-edit-list__icon">' +
-        '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">' +
-        '<path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>' +
-        '<line x1="12" y1="11" x2="12" y2="17"></line>' +
-        '<line x1="9" y1="14" x2="15" y2="14"></line>' +
-        "</svg>" +
-        "</div>" +
-        '<div class="menu-edit-list__title">Створити папку</div>' +
-        "</div>"
-    );
-
-    createFolderBtn.on("hover:enter", function () {
-      Lampa.Modal.close();
-      openCreateFolderDialog();
-    });
-
-    var resetBtn = $(
-      '<div class="menu-edit-list__item folder-reset-button selector">' +
-        '<div class="menu-edit-list__icon">' +
-        '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"></polyline><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path></svg>' +
-        "</div>" +
-        '<div class="menu-edit-list__title">Скинути</div>' +
-        "</div>"
-    );
-
-    resetBtn.on("hover:enter", function () {
-      Lampa.Storage.set("button_renamed", {});
-      Lampa.Storage.set("button_custom_order", []);
-      Lampa.Storage.set("button_hidden", []);
-      Lampa.Storage.set("button_folders", []);
-      Lampa.Storage.set("button_item_order", []);
-      Lampa.Modal.close();
-      Lampa.Noty.show("Налаштування скинуто");
-
-      setTimeout(function () {
-        if (currentContainer) {
-          currentContainer
-            .find(".full-start__button")
-            .not(".button--edit-order")
-            .remove();
-          allButtonsOriginal.forEach(function (btn) {
-            currentContainer
-              .find(".button--edit-order")
-              .before(btn.clone(true, true));
-          });
-          currentContainer.data("buttons-processed", false);
-          reorderButtons(currentContainer);
-          refreshController();
-        }
-      }, 100);
-    });
-
-    var bottomControls = $('<div class="bottom-controls"></div>');
-    bottomControls.append(createFolderBtn);
-    bottomControls.append(resetBtn);
-    list.append(bottomControls);
-
-    Lampa.Modal.open({
-      title: "Налаштування кнопок",
-      html: list,
-      size: "small",
-      scroll_to_center: true,
-      onBack: function () {
-        Lampa.Modal.close();
+    Lampa.Settings.create(
+      "buttons_editor",
+      {},
+      function (data) {
+        saveItemOrder();
         applyChanges();
-        Lampa.Controller.toggle("full_start");
+        Lampa.Controller.toggle("settings_component");
       },
-    });
+      function () {
+        applyChanges();
+        Lampa.Controller.toggle("settings_component");
+      },
+      function (html) {
+        html.empty();
+        html.append(body);
+        renderList();
+        createSortable();
+      }
+    );
   }
 
   function reorderButtons(container) {
@@ -1960,8 +1536,6 @@
   }
 
   function setupButtonNavigation(container) {
-    // Lampa автоматически обрабатывает навигацию для flex-wrap: wrap
-    // Просто переконаємося, що контролер оновлено
     if (Lampa.Controller && typeof Lampa.Controller.toggle === "function") {
       try {
         Lampa.Controller.toggle("full_start");
@@ -1986,7 +1560,7 @@
     }, 50);
   }
 
-  function init() {
+  function startPlugin() {
     var style = $(
       "<style>" +
         "@keyframes button-fade-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }" +
@@ -2047,16 +1621,26 @@
         }
       }, 400);
     });
+
+    Lampa.SettingsApi.addParam({
+      parser: "buttons",
+      name: "Buttons",
+      section: "interface",
+    });
+
+    Lampa.Settings.listener.follow("open", function (e) {
+      if (e.name === "Buttons") {
+        openEditDialog();
+      }
+    });
+
+    window.plugin_buttons_ready = true;
+    Lampa.Listener.send("plugin_buttons_ready");
   }
 
-  init();
+  startPlugin();
 
   if (typeof module !== "undefined" && module.exports) {
     module.exports = {};
   }
-  Lampa.Listener.follow("app", function (e) {
-    if (e.type == "ready") {
-      startPlugin();
-    }
-  });
 })();

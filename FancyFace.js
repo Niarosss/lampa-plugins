@@ -1,243 +1,11 @@
 (function () {
   "use strict";
 
-  Lampa.Lang.add({
-    fancyface_name: {
-      en: "FancyFace",
-      uk: "FancyFace",
-    },
-    fancyface_desc: {
-      en: "Visual customization of the interface",
-      uk: "Візуальна кастомізація інтерфейсу",
-    },
-    fancyface_settings: {
-      en: "FancyFace settings",
-      uk: "Налаштування FancyFace",
-    },
-    enabled: {
-      en: "Enabled",
-      uk: "Увімкнено",
-    },
-    show_movie_type: {
-      en: "Show content type (movie/series)",
-      uk: "Показувати тип контенту (фільм/серіал)",
-    },
-    theme: {
-      en: "Theme",
-      uk: "Тема",
-    },
-    colored_ratings: {
-      en: "Colored ratings",
-      uk: "Кольорові рейтинги",
-    },
-    seasons_info_mode: {
-      en: "Seasons and episodes information",
-      uk: "Інформація про сезони та серії",
-    },
-    show_episodes_on_main: {
-      en: "Show episodes on main screen",
-      uk: "Показувати серії на головному екрані",
-    },
-    label_position: {
-      en: "Label position",
-      uk: "Позиція мітки",
-    },
-    colored_elements: {
-      en: "Colored status and age rating",
-      uk: "Кольоровий статус та віковий рейтинг",
-    },
-    show_original_names: {
-      en: "Show original titles",
-      uk: "Показувати оригінальні назви",
-    },
-    hide_trailers: {
-      en: "Hide trailers",
-      uk: "Приховувати трейлери",
-    },
-    theme_default: {
-      en: "Default",
-      uk: "За замовчуванням",
-    },
-    theme_neon: {
-      en: "Neon",
-      uk: "Неон",
-    },
-    theme_dark_night: {
-      en: "Dark Night",
-      uk: "Темна ніч",
-    },
-    theme_blue_cosmos: {
-      en: "Blue Cosmos",
-      uk: "Синій космос",
-    },
-    theme_sunset: {
-      en: "Sunset",
-      uk: "Захід сонця",
-    },
-    theme_emerald: {
-      en: "Emerald",
-      uk: "Смарагд",
-    },
-    seasons_info_aired: {
-      en: "Aired",
-      uk: "Вийшло",
-    },
-    seasons_info_total: {
-      en: "Total",
-      uk: "Всього",
-    },
-    seasons_info_none: {
-      en: "Disabled",
-      uk: "Вимкнено",
-    },
-    label_pos_top_right: {
-      en: "Top right",
-      uk: "Вгорі праворуч",
-    },
-    label_pos_top_left: {
-      en: "Top left",
-      uk: "Вгорі зліва",
-    },
-    label_pos_bottom_right: {
-      en: "Bottom right",
-      uk: "Внизу праворуч",
-    },
-    label_pos_bottom_left: {
-      en: "Bottom left",
-      uk: "Внизу зліва",
-    },
-    status_ended: { en: "Ended", uk: "Завершено" },
-    status_canceled: { en: "Canceled", uk: "Скасовано" },
-    status_returning: { en: "Returning Series", uk: "Виходить" },
-    status_in_production: { en: "In Production", uk: "У виробництві" },
-    status_planned: { en: "Planned", uk: "Заплановано" },
-    status_pilot: { en: "Pilot", uk: "Пілотний" },
-    status_released: { en: "Released", uk: "Випущено" },
-    status_rumored: { en: "Rumored", uk: "За чутками" },
-    status_post_production: { en: "Post Production", uk: "Пост-продакшн" },
-    status_unknown: { en: "Unknown", uk: "Невідомо" },
-    label_serial: { en: "Series", uk: "Серіал" },
-    label_movie: { en: "Movie", uk: "Фільм" },
-  });
-
-  var fancyface_icon =
-    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zM12 18a6 6 0 1 1 6-6 6 6 0 0 1-6 6z"/><path d="M12 12m-2 0a2 2 0 1 0 4 0 2 2 0 1 0-4 0"/></svg>';
-
-  function createFancyFaceSettings() {
-    Lampa.SettingsApi.addComponent({
-      component: "fancyface_settings",
-      name: Lampa.Lang.translate("fancyface_name"),
-      description: Lampa.Lang.translate("fancyface_desc"),
-      icon: fancyface_icon,
-    });
-
-    var settings = [
-      { key: "enabled", type: "toggle", name: Lampa.Lang.translate("enabled") },
-      {
-        key: "show_movie_type",
-        type: "toggle",
-        name: Lampa.Lang.translate("show_movie_type"),
-      },
-      {
-        key: "theme",
-        type: "select",
-        name: Lampa.Lang.translate("theme"),
-        values: {
-          default: Lampa.Lang.translate("theme_default"),
-          neon: Lampa.Lang.translate("theme_neon"),
-          dark_night: Lampa.Lang.translate("theme_dark_night"),
-          blue_cosmos: Lampa.Lang.translate("theme_blue_cosmos"),
-          sunset: Lampa.Lang.translate("theme_sunset"),
-          emerald: Lampa.Lang.translate("theme_emerald"),
-        },
-      },
-      {
-        key: "colored_ratings",
-        type: "toggle",
-        name: Lampa.Lang.translate("colored_ratings"),
-      },
-      {
-        key: "seasons_info_mode",
-        type: "select",
-        name: Lampa.Lang.translate("seasons_info_mode"),
-        values: {
-          aired: Lampa.Lang.translate("seasons_info_aired"),
-          total: Lampa.Lang.translate("seasons_info_total"),
-          none: Lampa.Lang.translate("seasons_info_none"),
-        },
-      },
-      {
-        key: "show_episodes_on_main",
-        type: "toggle",
-        name: Lampa.Lang.translate("show_episodes_on_main"),
-      },
-      {
-        key: "label_position",
-        type: "select",
-        name: Lampa.Lang.translate("label_position"),
-        values: {
-          "top-right": Lampa.Lang.translate("label_pos_top_right"),
-          "top-left": Lampa.Lang.translate("label_pos_top_left"),
-          "bottom-right": Lampa.Lang.translate("label_pos_bottom_right"),
-          "bottom-left": Lampa.Lang.translate("label_pos_bottom_left"),
-        },
-      },
-      {
-        key: "colored_elements",
-        type: "toggle",
-        name: Lampa.Lang.translate("colored_elements"),
-      },
-      {
-        key: "show_original_names",
-        type: "toggle",
-        name: Lampa.Lang.translate("show_original_names"),
-      },
-      {
-        key: "hide_trailers",
-        type: "toggle",
-        name: Lampa.Lang.translate("hide_trailers"),
-      },
-    ];
-
-    settings.forEach(function (setting) {
-      Lampa.SettingsApi.addParam({
-        component: "fancyface_settings",
-        param: {
-          type: setting.type,
-          name: setting.key,
-          values: setting.values,
-          default: FancyFace.settings[setting.key],
-        },
-        field: {
-          name: setting.name,
-        },
-        onChange: function (value) {
-          FancyFace.settings[setting.key] = value;
-          Lampa.Storage.set("fancyface_settings", FancyFace.settings);
-          // maybe need to call some update function here
-        },
-      });
-    });
-
-    Lampa.SettingsApi.addParam({
-      component: "interface",
-      param: {
-        type: "button",
-      },
-      field: {
-        name: Lampa.Lang.translate("fancyface_name"),
-        description: Lampa.Lang.translate("fancyface_desc"),
-      },
-      onChange: function () {
-        Lampa.Settings.create("fancyface_settings");
-      },
-    });
-  }
-
   var FancyFace = {
     name: "FancyFace",
     version: "1.0.3",
     debug: false,
+    // Налаштування за замовчуванням
     settings: {
       enabled: true,
       show_movie_type: true,
@@ -245,10 +13,10 @@
       colored_ratings: true,
       seasons_info_mode: "aired",
       show_episodes_on_main: false,
-      label_position: "top-right",
-      colored_elements: true,
-      show_original_names: true,
-      hide_trailers: false,
+      label_position: "top-right", // 'top-right', 'top-left', 'bottom-right', 'bottom-left'
+      colored_elements: true, // Об'єднана настройка для статусів і вікових обмежень
+      show_original_names: true, // Показ оригінальної назви фільму або серіалу
+      hide_trailers: false, // Приховування трейлерів
     },
   };
 
@@ -451,23 +219,16 @@
 
         // Функція для перекладу статусу серіалу українською
         function getStatusText(status) {
-          if (status === "Ended") return Lampa.Lang.translate("status_ended");
-          if (status === "Canceled")
-            return Lampa.Lang.translate("status_canceled");
-          if (status === "Returning Series")
-            return Lampa.Lang.translate("status_returning");
-          if (status === "In Production")
-            return Lampa.Lang.translate("status_in_production");
-          if (status === "Planned")
-            return Lampa.Lang.translate("status_planned");
-          if (status === "Pilot") return Lampa.Lang.translate("status_pilot");
-          if (status === "Released")
-            return Lampa.Lang.translate("status_released");
-          if (status === "Rumored")
-            return Lampa.Lang.translate("status_rumored");
-          if (status === "Post Production")
-            return Lampa.Lang.translate("status_post_production");
-          return status || Lampa.Lang.translate("status_unknown");
+          if (status === "Ended") return "Завершено";
+          if (status === "Canceled") return "Скасовано";
+          if (status === "Returning Series") return "Виходить";
+          if (status === "In Production") return "У виробництві";
+          if (status === "Planned") return "Заплановано";
+          if (status === "Pilot") return "Пілотний";
+          if (status === "Released") return "Випущено";
+          if (status === "Rumored") return "За чутками";
+          if (status === "Post Production") return "Пост-продакшн";
+          return status || "Невідомо";
         }
 
         // Вибираємо, яку інформацію відображати залежно від налаштування
@@ -837,12 +598,12 @@
       if (is_tv) {
         // Для серіалів
         label.addClass("serial-label");
-        label.text(Lampa.Lang.translate("label_serial"));
+        label.text("Серіал");
         label.data("type", "serial");
       } else {
         // Для фільмів
         label.addClass("movie-label");
-        label.text(Lampa.Lang.translate("label_movie"));
+        label.text("Фільм");
         label.data("type", "movie");
       }
 
@@ -919,11 +680,11 @@
 
             if (is_tv) {
               label.addClass("serial-label");
-              label.text(Lampa.Lang.translate("label_serial"));
+              label.text("Серіал");
               label.css("background-color", "#3498db");
             } else {
               label.addClass("movie-label");
-              label.text(Lampa.Lang.translate("label_movie"));
+              label.text("Фільм");
               label.css("background-color", "#2ecc71");
             }
 
@@ -2100,32 +1861,4 @@
 
   // Експортуємо об'єкт плагіна для зовнішнього доступу
   window.season_info = FancyFace;
-  function startPlugin() {
-    // Завантажуємо налаштування
-    var storedSettings = Lampa.Storage.get("fancyface_settings");
-    if (storedSettings) {
-      FancyFace.settings = $.extend(FancyFace.settings, storedSettings);
-    }
-
-    createFancyFaceSettings();
-
-    // Ініціалізуємо функції, якщо плагін увімкнено
-    if (FancyFace.settings.enabled) {
-      addSeasonInfo();
-      changeMovieTypeLabels();
-      applyTheme(FancyFace.settings.theme);
-      // Тут можуть бути інші функції ініціалізації
-    }
-  }
-
-  // Підключення плагіна
-  if (window.appready) {
-    startPlugin();
-  } else {
-    Lampa.Listener.follow("app", function (e) {
-      if (e.type === "ready") {
-        startPlugin();
-      }
-    });
-  }
 })();
