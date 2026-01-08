@@ -897,7 +897,7 @@
 
     function createFolderItem(folder) {
       const item = $(`
-        <div class="menu-edit-list__item folder-item selector">
+        <div class="menu-edit-list__item folder-item">
           <div class="menu-edit-list__icon">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
           </div>
@@ -907,6 +907,9 @@
           </div>
           <div class="menu-edit-list__move move-down selector">
             <svg width="22" height="14" viewBox="0 0 22 14" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2 2L11 11L20 2" stroke="currentColor" stroke-width="4" stroke-linecap="round"/></svg>
+          </div>
+          <div class="menu-edit-list__edit-content selector">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
           </div>
           <div class="menu-edit-list__rename selector">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
@@ -920,16 +923,11 @@
       item.data("folderId", folder.id);
       item.data("itemType", "folder");
 
-      item.on("hover:enter", (e) => {
-        if (
-          !$(e.target).closest(
-            ".menu-edit-list__move, .menu-edit-list__rename, .menu-edit-list__delete"
-          ).length
-        ) {
-          Lampa.Modal.close();
-          setTimeout(() => openFolderEditDialog(folder), 100);
-        }
+      item.find(".menu-edit-list__edit-content").on("hover:enter", () => {
+        Lampa.Modal.close();
+        setTimeout(() => openFolderEditDialog(folder), 100);
       });
+
       item.find(".move-up").on("hover:enter", () => {
         const prev = item
           .prevAll(":not(.menu-edit-list__create-folder)")
@@ -1177,8 +1175,18 @@
 
       setTimeout(() => {
         if (currentContainer) {
+          const targetContainer = currentContainer.find(
+            ".full-start-new__buttons"
+          );
+          if (targetContainer.length) {
+            targetContainer.find(".full-start__button").remove();
+            allButtonsOriginal.forEach((btn) => {
+              targetContainer.append(btn.clone(true, true));
+            });
+          }
           currentContainer.data("buttons-processed", false);
           reorderButtons(currentContainer);
+          refreshController();
         }
       }, 100);
     });
@@ -1328,12 +1336,9 @@
         .full-start-new__buttons.buttons-loading .full-start__button { visibility: hidden !important; }
         .menu-edit-list__create-folder { background: rgba(100,200,100,0.2); border: 3px solid transparent; }
         .menu-edit-list__create-folder.focus { background: rgba(100,200,100,0.3); border-color: rgba(255,255,255,0.8); }
-        .menu-edit-list__delete { width: 2.4em; height: 2.4em; display: flex; align-items: center; justify-content: center; cursor: pointer; }
-        .menu-edit-list__delete svg { width: 1.2em !important; height: 1.2em !important; }
-        .menu-edit-list__delete.focus { border: 2px solid rgba(255,255,255,0.8); border-radius: 0.3em; }
-        .menu-edit-list__rename { width: 2.4em; height: 2.4em; display: flex; align-items: center; justify-content: center; cursor: pointer; }
-        .menu-edit-list__rename svg { width: 1.2em !important; height: 1.2em !important; }
-        .menu-edit-list__rename.focus { border: 2px solid rgba(255,255,255,0.8); border-radius: 0.3em; }
+        .menu-edit-list__delete, .menu-edit-list__rename, .menu-edit-list__edit-content { width: 2.4em; height: 2.4em; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+        .menu-edit-list__delete svg, .menu-edit-list__rename svg, .menu-edit-list__edit-content svg { width: 1.2em !important; height: 1.2em !important; }
+        .menu-edit-list__delete.focus, .menu-edit-list__rename.focus, .menu-edit-list__edit-content.focus { border: 2px solid rgba(255,255,255,0.8); border-radius: 0.3em; }
         .folder-item .menu-edit-list__move { margin-right: 0; }
         .folder-create-confirm { background: rgba(100,200,100,0.3); margin-top: 1em; border-radius: 0.3em; }
         .folder-create-confirm.focus { border: 3px solid rgba(255,255,255,0.8); }
@@ -1342,6 +1347,8 @@
         .folder-reset-button { background: rgba(200,100,100,0.3); border: 3px solid transparent; }
         .folder-reset-button.focus { background: rgba(200,100,100,0.4); border-color: rgba(255,255,255,0.8); }
         .menu-edit-list__toggle.focus { border: 2px solid rgba(255,255,255,0.8); border-radius: 0.3em; }
+        .button--folder.folder--no-name { min-width: 3.5em; max-width: 3.5em; justify-content: center; }
+        .button--folder.folder--no-name > span { display: none; }
       </style>`
     );
     $("body").append(style);
