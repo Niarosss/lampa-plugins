@@ -1,16 +1,16 @@
 (function () {
   "use strict";
 
-  var LAMPAC_ICON =
-    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><path d="M20.331 14.644l-13.794-13.831 17.55 10.075zM2.938 0c-0.813 0.425-1.356 1.2-1.356 2.206v27.581c0 1.006 0.544 1.781 1.356 2.206l16.038-16zM29.512 14.1l-3.681-2.131-4.106 4.031 4.106 4.031 3.756-2.131c1.125-0.893 1.125-2.906-0.075-3.8zM6.538 31.188l17.55-10.075-3.756-3.756z" fill="currentColor"></path></svg>';
+  const LAMPAC_ICON =
+    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="-1 0 12 12"><path fill-rule="evenodd" d="m9.074 7.733-5.766 3.898C1.903 12.581 0 11.583 0 9.898V2.101C0 .415 1.903-.582 3.308.368l5.766 3.898a2.088 2.088 0 0 1 0 3.467"/></svg>';
 
-  var EXCLUDED_CLASSES = [
+  const EXCLUDED_CLASSES = [
     "button--play",
     "button--edit-order",
     "button--folder",
   ];
 
-  var DEFAULT_GROUPS = [
+  const DEFAULT_GROUPS = [
     {
       name: "online",
       patterns: ["online", "lampac", "modss", "showy"],
@@ -22,32 +22,24 @@
     { name: "reaction", patterns: ["reaction"], label: "Реакції" },
   ];
 
-  var currentButtons = [];
-  var allButtonsCache = [];
-  var allButtonsOriginal = [];
-  var currentContainer = null;
+  let currentButtons = [];
+  let allButtonsCache = [];
+  let allButtonsOriginal = [];
+  let currentContainer = null;
 
   // Допоміжна функція для пошуку кнопки
   function findButton(btnId) {
-    var btn = allButtonsOriginal.find(function (b) {
-      return getButtonId(b) === btnId;
-    });
+    let btn = allButtonsOriginal.find((b) => getButtonId(b) === btnId);
     if (!btn) {
-      btn = allButtonsCache.find(function (b) {
-        return getButtonId(b) === btnId;
-      });
+      btn = allButtonsCache.find((b) => getButtonId(b) === btnId);
     }
     return btn;
   }
 
   // Допоміжна функція для отримання всіх ID кнопок у папках
   function getButtonsInFolders() {
-    var folders = getFolders();
-    var buttonsInFolders = [];
-    folders.forEach(function (folder) {
-      buttonsInFolders = buttonsInFolders.concat(folder.buttons);
-    });
-    return buttonsInFolders;
+    const folders = getFolders();
+    return folders.flatMap((folder) => folder.buttons);
   }
 
   function getCustomOrder() {
@@ -91,34 +83,32 @@
   }
 
   function generateButtonId(button) {
-    var classes = button.attr("class") || "";
-    var text = button.find("span").text().trim().replace(/\s+/g, "_");
-    var subtitle = button.attr("data-subtitle") || "";
+    const classes = button.attr("class") || "";
+    const text = button.find("span").text().trim().replace(/\s+/g, "_");
+    const subtitle = button.attr("data-subtitle") || "";
 
     if (
-      classes.indexOf("modss") !== -1 ||
-      text.indexOf("MODS") !== -1 ||
-      text.indexOf("MOD") !== -1
+      classes.includes("modss") ||
+      text.includes("MODS") ||
+      text.includes("MOD")
     ) {
       return "modss_online_button";
     }
 
-    if (classes.indexOf("showy") !== -1 || text.indexOf("Showy") !== -1) {
+    if (classes.includes("showy") || text.includes("Showy")) {
       return "showy_online_button";
     }
 
-    var viewClasses = classes
+    const viewClasses = classes
       .split(" ")
-      .filter(function (c) {
-        return c.indexOf("view--") === 0 || c.indexOf("button--") === 0;
-      })
+      .filter((c) => c.startsWith("view--") || c.startsWith("button--"))
       .join("_");
 
     if (!viewClasses && !text) {
       return "button_unknown";
     }
 
-    var id = viewClasses + "_" + text;
+    let id = viewClasses + "_" + text;
 
     if (subtitle) {
       id = id + "_" + subtitle.replace(/\s+/g, "_").substring(0, 30);
