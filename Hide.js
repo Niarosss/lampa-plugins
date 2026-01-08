@@ -461,18 +461,6 @@
                 .addClass("menu-hide-icon");
 
               var isHidden = menuHiddenItems.indexOf(text) !== -1;
-              var status = isHidden
-                ? Lampa.Lang.translate("hidden")
-                : Lampa.Lang.translate("shown");
-
-              // Створюємо елемент значення
-              var $value = $('<div class="settings-param__value"/>')
-                .text(status)
-                .addClass(isHidden ? "menu-hide-hidden" : "menu-hide-shown")
-                .css({
-                  "font-size": "15px",
-                  "padding-right": "10px",
-                });
 
               // Додаємо текст елемента поруч з іконкою
               var $text = $("<span/>")
@@ -483,8 +471,19 @@
                   "flex-grow": "1",
                 });
 
+              var $toggle = $(
+                '<div class="menu-edit-list__toggle toggle selector">' +
+                  '<svg width="26" height="26" viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg">' +
+                  '<rect x="1.89111" y="1.78369" width="21.793" height="21.793" rx="3.5" stroke="currentColor" stroke-width="3"/>' +
+                  '<path d="M7.44873 12.9658L10.8179 16.3349L18.1269 9.02588" stroke="currentColor" stroke-width="3" class="dot" opacity="' +
+                  (isHidden ? "0" : "1") +
+                  '" stroke-linecap="round"/>' +
+                  "</svg>" +
+                  "</div>"
+              );
+
               $name.find("svg, img").after($text);
-              $name.append($value);
+              $name.append($toggle);
 
               // Функція переключення стану
               function toggleItem() {
@@ -500,22 +499,8 @@
                 Lampa.Storage.set("menu_hide", hiddenItems);
                 updateMenuVisibility();
 
-                var newStatus = $(
-                  '<div class="menu-edit-list__toggle toggle selector">' +
-                    '<svg width="26" height="26" viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg">' +
-                    '<rect x="1.89111" y="1.78369" width="21.793" height="21.793" rx="3.5" stroke="currentColor" stroke-width="3"/>' +
-                    '<path d="M7.44873 12.9658L10.8179 16.3349L18.1269 9.02588" stroke="currentColor" stroke-width="3" class="dot" opacity="' +
-                    (hiddenItems.indexOf(text) !== -1 ? "0" : "1") +
-                    '" stroke-linecap="round"/>' +
-                    "</svg>" +
-                    "</div>"
-                );
-
                 var isNowHidden = hiddenItems.indexOf(text) !== -1;
-                $value
-                  .text(newStatus)
-                  .toggleClass("menu-hide-hidden", isNowHidden)
-                  .toggleClass("menu-hide-shown", !isNowHidden);
+                $toggle.find(".dot").attr("opacity", isNowHidden ? "0" : "1");
               }
 
               // Універсальний обробник для всіх платформ
@@ -636,16 +621,13 @@
             onRender: function (item) {
               item.addClass("menu-hide-item");
 
-              // Видаляємо опис
               item.find(".settings-param__descr").remove();
 
-              // Налаштування для контейнера
               item.css({
                 padding: "10px",
                 margin: "0",
               });
 
-              // Налаштування для параметра
               item.find(".settings-param").css({
                 padding: "0 15px",
                 display: "flex",
@@ -653,7 +635,6 @@
                 "justify-content": "space-between",
               });
 
-              // Налаштування для імені параметра
               var $name = item.find(".settings-param__name");
               $name.css({
                 margin: "0",
@@ -664,7 +645,6 @@
                 width: "100%",
               });
 
-              // Розмір іконки
               $name
                 .find("svg, img")
                 .css({
@@ -676,20 +656,7 @@
                 .addClass("menu-hide-icon");
 
               var isHidden = headHiddenItems.indexOf(id) !== -1;
-              var status = isHidden
-                ? Lampa.Lang.translate("hidden")
-                : Lampa.Lang.translate("shown");
 
-              // Создаем элемент значення
-              var $value = $('<div class="settings-param__value"/>')
-                .text(status)
-                .addClass(isHidden ? "menu-hide-hidden" : "menu-hide-shown")
-                .css({
-                  "font-size": "15px",
-                  "padding-right": "10px",
-                });
-
-              // Добавляем текст элемента рядом с иконкой
               var $text = $("<span/>")
                 .text(title)
                 .addClass("menu-hide-text")
@@ -698,8 +665,19 @@
                   "flex-grow": "1",
                 });
 
+              var $toggle = $(
+                '<div class="menu-edit-list__toggle toggle selector">' +
+                  '<svg width="26" height="26" viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg">' +
+                  '<rect x="1.89111" y="1.78369" width="21.793" height="21.793" rx="3.5" stroke="currentColor" stroke-width="3"/>' +
+                  '<path d="M7.44873 12.9658L10.8179 16.3349L18.1269 9.02588" stroke="currentColor" stroke-width="3" class="dot" opacity="' +
+                  (isHidden ? "0" : "1") +
+                  '" stroke-linecap="round"/>' +
+                  "</svg>" +
+                  "</div>"
+              );
+
               $name.find("svg, img").after($text);
-              $name.append($value);
+              $name.append($toggle);
 
               // Функція переключення стану
               function toggleItem() {
@@ -715,16 +693,8 @@
                 Lampa.Storage.set("head_hidden_items", hiddenItems);
                 updateHeadVisibility();
 
-                var newStatus =
-                  hiddenItems.indexOf(id) !== -1
-                    ? Lampa.Lang.translate("hidden")
-                    : Lampa.Lang.translate("shown");
-
                 var isNowHidden = hiddenItems.indexOf(id) !== -1;
-                $value
-                  .text(newStatus)
-                  .toggleClass("menu-hide-hidden", isNowHidden)
-                  .toggleClass("menu-hide-shown", !isNowHidden);
+                $toggle.find(".dot").attr("opacity", isNowHidden ? "0" : "1");
               }
 
               // Універсальний обробник для всіх платформ
@@ -853,18 +823,6 @@
                   .addClass("menu-hide-icon");
 
                 var isHidden = settingsHiddenItems.indexOf(component) !== -1;
-                var status = isHidden
-                  ? Lampa.Lang.translate("hidden")
-                  : Lampa.Lang.translate("shown");
-
-                // Создаем элемент значення
-                var $value = $('<div class="settings-param__value"/>')
-                  .text(status)
-                  .addClass(isHidden ? "menu-hide-hidden" : "menu-hide-shown")
-                  .css({
-                    "font-size": "15px",
-                    "padding-right": "10px",
-                  });
 
                 // Додавання тексту елемента поруч із значком
                 var $text = $("<span/>")
@@ -875,8 +833,19 @@
                     "flex-grow": "1",
                   });
 
+                var $toggle = $(
+                  '<div class="menu-edit-list__toggle toggle selector">' +
+                    '<svg width="26" height="26" viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg">' +
+                    '<rect x="1.89111" y="1.78369" width="21.793" height="21.793" rx="3.5" stroke="currentColor" stroke-width="3"/>' +
+                    '<path d="M7.44873 12.9658L10.8179 16.3349L18.1269 9.02588" stroke="currentColor" stroke-width="3" class="dot" opacity="' +
+                    (isHidden ? "0" : "1") +
+                    '" stroke-linecap="round"/>' +
+                    "</svg>" +
+                    "</div>"
+                );
+
                 $name.find("svg, img").after($text);
-                $name.append($value);
+                $name.append($toggle);
 
                 // Функція перемикання стану
                 function toggleItem() {
@@ -898,16 +867,8 @@
                   Lampa.Storage.set("settings_hidden_items", hiddenItems);
                   updateSettingsVisibility();
 
-                  var newStatus =
-                    hiddenItems.indexOf(component) !== -1
-                      ? Lampa.Lang.translate("hidden")
-                      : Lampa.Lang.translate("shown");
-
                   var isNowHidden = hiddenItems.indexOf(component) !== -1;
-                  $value
-                    .text(newStatus)
-                    .toggleClass("menu-hide-hidden", isNowHidden)
-                    .toggleClass("menu-hide-shown", !isNowHidden);
+                  $toggle.find(".dot").attr("opacity", isNowHidden ? "0" : "1");
                 }
 
                 // Універсальний обробник для всіх платформ
