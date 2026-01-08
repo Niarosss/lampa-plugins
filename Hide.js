@@ -62,39 +62,6 @@
         opacity: 0.6 !important; \
         pointer-events: none !important; \
     }\
-    .settings-param__value {\
-        position: relative;\
-        width: 26px;\
-        height: 26px;\
-    }\
-    .settings-param__value::before {\
-        content: '';\
-        position: absolute;\
-        left: 0; top: 0;\
-        width: 100%;\
-        height: 100%;\
-        border: 3px solid currentColor;\
-        border-radius: 3.5px;\
-        box-sizing: border-box;\
-    }\
-    .settings-param__value::after {\
-        content: '';\
-        position: absolute;\
-        left: 5px; top: 2px;\
-        width: 10px;\
-        height: 15px;\
-        border: solid currentColor;\
-        border-width: 0 3px 3px 0;\
-        transform: rotate(45deg);\
-        opacity: 0;\
-        transition: opacity .2s ease;\
-    }\
-    .settings-param__value.is-active::after {\
-        opacity: 1;\
-    }\
-    .menu-hide-item .settings-param__value span {\
-        display: none;\
-    }\
     /* Стиль для подяки */ \
     .credits-text { \
         text-align: center; \
@@ -195,6 +162,19 @@
   // Іконка годинника
   var timeIcon =
     '<svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>';
+
+  function renderVisibilityIcon(isHidden) {
+    return (
+      '<svg width="26" height="26" viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg">' +
+      '<rect x="1.89111" y="1.78369" width="21.793" height="21.793" rx="3.5" stroke="currentColor" stroke-width="3"/>' +
+      '<path d="M7.44873 12.9658L10.8179 16.3349L18.1269 9.02588" ' +
+      'stroke="currentColor" stroke-width="3" stroke-linecap="round" ' +
+      'opacity="' +
+      (isHidden ? "0" : "1") +
+      '"/>' +
+      "</svg>"
+    );
+  }
 
   // Ініціалізуємо плагіни
   function startPlugin() {
@@ -299,7 +279,8 @@
         var $item = $(this);
         var $value = $item.find(".settings-param__value");
         if ($value.length) {
-          $value.addClass("is-active");
+          $value.text(Lampa.Lang.translate("shown"));
+          $value.removeClass("menu-hide-hidden").addClass("menu-hide-shown");
         }
       });
     }
@@ -493,9 +474,9 @@
                 .addClass("menu-hide-icon");
 
               var isHidden = menuHiddenItems.indexOf(text) !== -1;
-              var $value = item.find(".settings-param__value");
-              $value.append("<span></span>"); // Lampa needs some content
-              if (!isHidden) $value.addClass("is-active");
+              var $value = $('<div class="settings-param__value"/>').html(
+                renderVisibilityIcon(isHidden)
+              );
 
               // Додаємо текст елемента поруч з іконкою
               var $text = $("<span/>")
@@ -507,6 +488,7 @@
                 });
 
               $name.find("svg, img").after($text);
+              $name.append($value);
 
               // Функція переключення стану
               function toggleItem() {
@@ -522,10 +504,13 @@
                 Lampa.Storage.set("menu_hide", hiddenItems);
                 updateMenuVisibility();
 
-                $value.toggleClass(
-                  "is-active",
-                  hiddenItems.indexOf(text) === -1
-                );
+                var newStatus =
+                  hiddenItems.indexOf(text) !== -1
+                    ? Lampa.Lang.translate("hidden")
+                    : Lampa.Lang.translate("shown");
+
+                var isNowHidden = hiddenItems.indexOf(text) !== -1;
+                $value.html(renderVisibilityIcon(isNowHidden));
               }
 
               // Універсальний обробник для всіх платформ
@@ -685,10 +670,9 @@
                 })
                 .addClass("menu-hide-icon");
 
-              var isHidden = headHiddenItems.indexOf(id) !== -1;
-              var $value = item.find(".settings-param__value");
-              $value.append("<span></span>");
-              if (!isHidden) $value.addClass("is-active");
+              var $value = $('<div class="settings-param__value"/>').html(
+                renderVisibilityIcon(isHidden)
+              );
 
               // Добавляем текст элемента рядом с иконкой
               var $text = $("<span/>")
@@ -700,6 +684,7 @@
                 });
 
               $name.find("svg, img").after($text);
+              $name.append($value);
 
               // Функція переключення стану
               function toggleItem() {
@@ -715,7 +700,13 @@
                 Lampa.Storage.set("head_hidden_items", hiddenItems);
                 updateHeadVisibility();
 
-                $value.toggleClass("is-active", hiddenItems.indexOf(id) === -1);
+                var newStatus =
+                  hiddenItems.indexOf(id) !== -1
+                    ? Lampa.Lang.translate("hidden")
+                    : Lampa.Lang.translate("shown");
+
+                var isNowHidden = hiddenItems.indexOf(id) !== -1;
+                $value.html(renderVisibilityIcon(isNowHidden));
               }
 
               // Універсальний обробник для всіх платформ
@@ -844,9 +835,9 @@
                   .addClass("menu-hide-icon");
 
                 var isHidden = settingsHiddenItems.indexOf(component) !== -1;
-                var $value = item.find(".settings-param__value");
-                $value.append("<span></span>");
-                if (!isHidden) $value.addClass("is-active");
+                var $value = $('<div class="settings-param__value"/>').html(
+                  renderVisibilityIcon(isHidden)
+                );
 
                 // Додавання тексту елемента поруч із значком
                 var $text = $("<span/>")
@@ -858,6 +849,7 @@
                   });
 
                 $name.find("svg, img").after($text);
+                $name.append($value);
 
                 // Функція перемикання стану
                 function toggleItem() {
@@ -879,10 +871,13 @@
                   Lampa.Storage.set("settings_hidden_items", hiddenItems);
                   updateSettingsVisibility();
 
-                  $value.toggleClass(
-                    "is-active",
-                    hiddenItems.indexOf(component) === -1
-                  );
+                  var newStatus =
+                    hiddenItems.indexOf(component) !== -1
+                      ? Lampa.Lang.translate("hidden")
+                      : Lampa.Lang.translate("shown");
+
+                  var isNowHidden = hiddenItems.indexOf(component) !== -1;
+                  $value.html(renderVisibilityIcon(isNowHidden));
                 }
 
                 // Універсальний обробник для всіх платформ
