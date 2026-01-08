@@ -503,12 +503,6 @@
 
                 Lampa.Storage.set("menu_hide", hiddenItems);
                 updateMenuVisibility();
-
-                var newStatus =
-                  hiddenItems.indexOf(text) !== -1
-                    ? Lampa.Lang.translate("hidden")
-                    : Lampa.Lang.translate("shown");
-
                 var isNowHidden = hiddenItems.indexOf(text) !== -1;
                 $value.html(renderVisibilityIcon(isNowHidden));
               }
@@ -670,6 +664,7 @@
                 })
                 .addClass("menu-hide-icon");
 
+              var isHidden = headHiddenItems.indexOf(id) !== -1;
               var $value = $('<div class="settings-param__value"/>').html(
                 renderVisibilityIcon(isHidden)
               );
@@ -699,11 +694,6 @@
 
                 Lampa.Storage.set("head_hidden_items", hiddenItems);
                 updateHeadVisibility();
-
-                var newStatus =
-                  hiddenItems.indexOf(id) !== -1
-                    ? Lampa.Lang.translate("hidden")
-                    : Lampa.Lang.translate("shown");
 
                 var isNowHidden = hiddenItems.indexOf(id) !== -1;
                 $value.html(renderVisibilityIcon(isNowHidden));
@@ -870,11 +860,6 @@
 
                   Lampa.Storage.set("settings_hidden_items", hiddenItems);
                   updateSettingsVisibility();
-
-                  var newStatus =
-                    hiddenItems.indexOf(component) !== -1
-                      ? Lampa.Lang.translate("hidden")
-                      : Lampa.Lang.translate("shown");
 
                   var isNowHidden = hiddenItems.indexOf(component) !== -1;
                   $value.html(renderVisibilityIcon(isNowHidden));
