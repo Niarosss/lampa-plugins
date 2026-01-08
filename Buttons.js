@@ -1002,7 +1002,7 @@
           if (currentContainer) {
             currentContainer.data("buttons-processed", false);
             reorderButtons(currentContainer);
-            openEditDialog(); // Re-open edit dialog to reflect changes
+            openEditDialog();
           }
         }, 50);
       });
@@ -1327,7 +1327,7 @@
     }, 50);
   }
 
-  function init() {
+  function startPlugin() {
     const style = $(
       `<style>
         @keyframes button-fade-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
@@ -1422,7 +1422,15 @@
     });
   }
 
-  init();
+  if (window.appready) {
+    startPlugin();
+  } else {
+    Lampa.Listener.follow("app", function (e) {
+      if (e.type === "ready") {
+        startPlugin();
+      }
+    });
+  }
 
   if (typeof module !== "undefined" && module.exports) {
     module.exports = {};

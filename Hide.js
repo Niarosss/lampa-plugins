@@ -185,14 +185,6 @@
     };
     Lampa.Manifest.plugins = manifest;
 
-    console.log("Manifest registered:", manifest);
-    console.log("All plugins:", Lampa.Manifest.plugins);
-
-    // Перевірка після ініціалізації
-    setTimeout(() => {
-      console.log("Plugins after init:", Lampa.Plugins.get());
-    }, 1000);
-
     // Функції для приховування/показу пунктів меню
     function updateMenuVisibility() {
       const hiddenItems = Lampa.Storage.get("menu_hide", []);

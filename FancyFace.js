@@ -16,7 +16,6 @@
       label_position: "top-right", // 'top-right', 'top-left', 'bottom-right', 'bottom-left'
       colored_elements: true, // Об'єднана настройка для статусів і вікових обмежень
       show_original_names: true, // Показ оригінальної назви фільму або серіалу
-      hide_trailers: false, // Приховування трейлерів
     },
   };
 
@@ -1324,15 +1323,6 @@
     });
   }
 
-  // Функція приховування трейлерів
-  function hideTrailers() {
-    Lampa.Listener.follow("full", function (e) {
-      if (e.type == "complite") {
-        e.object.activity.render().find(".view--trailer").remove();
-      }
-    });
-  }
-
   // Функція для зміни кольору вікових обмежень
   function colorizeAgeRating() {
     if (!FancyFace.settings.colored_elements) return;
@@ -1679,23 +1669,6 @@
       },
     });
 
-    Lampa.SettingsApi.addParam({
-      component: "season_info",
-      param: {
-        name: "hide_trailers",
-        type: "trigger",
-        default: false,
-      },
-      field: {
-        name: "Приховати трейлери",
-        description: "Перемикання відображення трейлерів",
-      },
-      onChange: function (value) {
-        FancyFace.settings.hide_trailers = value;
-        Lampa.Settings.update();
-      },
-    });
-
     FancyFace.settings.show_movie_type = Lampa.Storage.get(
       "season_info_show_movie_type",
       true
@@ -1725,10 +1698,6 @@
       "show_original_names",
       true
     );
-    FancyFace.settings.hide_trailers = Lampa.Storage.get(
-      "hide_trailers",
-      false
-    );
 
     // Встановлюємо enabled на основі seasons_info_mode
     FancyFace.settings.enabled =
@@ -1739,10 +1708,6 @@
     // Запускаємо функції плагіна залежно від налаштувань
     if (FancyFace.settings.enabled) {
       addSeasonInfo();
-    }
-
-    if (FancyFace.settings.hide_trailers) {
-      hideTrailers();
     }
     // Змінюємо мітки типу контенту
     changeMovieTypeLabels();
@@ -1788,11 +1753,16 @@
     });
   }
 
-  Lampa.Manifest.plugins = {
+  let manifest = {
     name: "FancyFace",
     version: FancyFace.version,
     description: "Покращений інтерфейс для застосунку Lampa",
+    author: "@Niaros",
+    url: "https://niarosss.github.io/lampa-plugins/Hide.js",
+    type: "other",
+    component: "menu_filter",
   };
+  Lampa.Manifest.plugins = manifest;
 
   window.season_info = FancyFace;
 })();
