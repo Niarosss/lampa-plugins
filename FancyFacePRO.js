@@ -563,7 +563,6 @@
       component: "season_info",
       param: {
         name: "hide_menu_button",
-        name: "hide_menu_button",
         type: "button",
       },
       field: {
@@ -615,7 +614,12 @@
       $(".settings-folder").each(function () {
         const $item = $(this);
         const component = $item.data("component");
-        if (component && component !== "menu_filter") {
+        // Don't allow hiding the menu_filter itself or this plugin's settings component
+        if (
+          component &&
+          component !== "menu_filter" &&
+          component !== "season_info"
+        ) {
           $item.toggleClass("hidden", hiddenItems.includes(component));
         }
       });
@@ -860,20 +864,6 @@
    * Инициализирует функциональность редактора кнопок.
    */
   function initButtonsFeature() {
-    Lampa.SettingsApi.addComponent({
-      component: "season_info",
-      param: {
-        name: "buttons_editor_open",
-        type: "button",
-      },
-      field: {
-        name: "Відкрити редактор кнопок",
-        description:
-          "Відкрити вікно для сортування, приховання та групування кнопок у папки.",
-      },
-      onChange: openEditDialog,
-    });
-
     Lampa.SettingsApi.addParam({
       component: "season_info",
       param: {
