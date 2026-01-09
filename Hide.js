@@ -919,17 +919,7 @@
         }
       }, 500);
     }
-
-    // Підключення плагіна
-    if (window.appready) {
-      initPlugin();
-    } else {
-      Lampa.Listener.follow("app", function (e) {
-        if (e.type === "ready") {
-          initPlugin();
-        }
-      });
-    }
+    initPlugin();
   }
 
   // Підключення плагіна
