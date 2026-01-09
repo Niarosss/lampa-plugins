@@ -456,8 +456,9 @@
       icon: `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M4 5C4 4.44772 4.44772 4 5 4H19C19.5523 4 20 4.44772 20 5V7C20 7.55228 19.5523 8 19 8H5C4.44772 8 4 7.55228 4 7V5Z" stroke="white" stroke-width="2"/><path d="M4 11C4 10.4477 4.44772 10 5 10H19C19.5523 10 20 10.4477 20 11V13C20 13.5523 19.5523 14 19 14H5C4.44772 14 4 13.5523 4 13V11Z" stroke="white" stroke-width="2"/><path d="M4 17C4 16.4477 4.44772 16 5 16H19C19.5523 16 20 16.4477 20 17V19C20 19.5523 19.5523 20 19 20H5C4.44772 20 4 19.5523 4 19V17Z" stroke="white" stroke-width="2"/></svg>`,
     });
 
-    const settingsFields = [
-      {
+    Lampa.SettingsApi.addParam({
+      component: "season_info",
+      param: {
         name: "seasons_info_mode",
         type: "select",
         values: {
@@ -466,9 +467,20 @@
           total: "Повна кількість",
         },
         default: "aired",
-        field: { name: "Інформація про серії" },
       },
-      {
+      field: {
+        name: "Інформація про серії",
+        description: "Оберіть, як відображати інформацію про серії та сезони",
+      },
+      onChange: function (value) {
+        FancyFace.settings.seasons_info_mode = value;
+        Lampa.Settings.update();
+      },
+    });
+
+    Lampa.SettingsApi.addParam({
+      component: "season_info",
+      param: {
         name: "label_position",
         type: "select",
         values: {
@@ -478,15 +490,41 @@
           "bottom-left": "Нижній лівий кут",
         },
         default: "top-right",
-        field: { name: "Розташування мітки про серії" },
       },
-      {
+      field: {
+        name: "Розташування мітки про серії",
+        description: "Оберіть позицію мітки на постері",
+      },
+      onChange: function (value) {
+        FancyFace.settings.label_position = value;
+        Lampa.Settings.update();
+      },
+    });
+
+    Lampa.SettingsApi.addParam({
+      component: "season_info",
+      param: {
         name: "season_info_show_movie_type",
         type: "trigger",
         default: true,
-        field: { name: "Змінити мітки типу" },
       },
-      {
+      field: {
+        name: "Змінити мітки типу",
+        description: 'Змінити "TV" на "Серіал" та додати мітку "Фільм"',
+      },
+      onChange: function (value) {
+        FancyFace.settings.show_movie_type = value;
+        Lampa.Storage.set("season_info_show_movie_type", value);
+        $("body").attr("data-movie-labels", value ? "on" : "off");
+        if (!value) {
+          $(".content-label").remove();
+        }
+      },
+    });
+
+    Lampa.SettingsApi.addParam({
+      component: "season_info",
+      param: {
         name: "theme_select",
         type: "select",
         values: {
@@ -500,50 +538,120 @@
           aurora: "Aurora",
         },
         default: "default",
-        field: { name: "Тема інтерфейсу" },
-        onChange: applyTheme,
       },
-      {
+      field: {
+        name: "Тема інтерфейсу",
+        description: "Оберіть тему оформлення інтерфейсу",
+      },
+      onChange: function (value) {
+        FancyFace.settings.theme = value;
+        Lampa.Storage.set("theme_select", value);
+        applyTheme(value);
+      },
+    });
+
+    Lampa.SettingsApi.addParam({
+      component: "season_info",
+      param: {
         name: "colored_ratings",
         type: "trigger",
         default: true,
-        field: { name: "Кольорові рейтинги" },
       },
-      {
+      field: {
+        name: "Кольорові рейтинги",
+        description: "Змінювати колір рейтингу залежно від оцінки",
+      },
+      onChange: function (value) {
+        FancyFace.settings.colored_ratings = value;
+        Lampa.Storage.set("colored_ratings", value);
+        if (!value) {
+          $(".card__vote, .full-start__rate, .full-start-new__rate").css(
+            "color",
+            ""
+          );
+        }
+      },
+    });
+
+    Lampa.SettingsApi.addParam({
+      component: "season_info",
+      param: {
         name: "colored_elements",
         type: "trigger",
         default: true,
-        field: { name: "Кольорові елементи" },
       },
-      {
+      field: {
+        name: "Кольорові елементи",
+        description:
+          "Відображати статуси серіалів та вікові обмеження кольоровими",
+      },
+      onChange: function (value) {
+        FancyFace.settings.colored_elements = value;
+        Lampa.Storage.set("colored_elements", value);
+        if (!value) {
+          $(".full-start__status").css({
+            "background-color": "",
+            color: "",
+            padding: "",
+            "border-radius": "",
+            "font-weight": "",
+            display: "",
+          });
+          $(".full-start__pg").css({
+            "background-color": "",
+            color: "",
+            "font-weight": "",
+          });
+        }
+      },
+    });
+
+    Lampa.SettingsApi.addParam({
+      component: "season_info",
+      param: {
         name: "show_original_names",
         type: "trigger",
         default: true,
-        field: { name: "Показувати оригінальні назви" },
       },
-    ];
-
-    settingsFields.forEach((setting) => {
-      Lampa.SettingsApi.addParam({
-        component: "season_info",
-        param: {
-          name: setting.name,
-          type: setting.type,
-          values: setting.values,
-          default: setting.default,
-        },
-        field: setting.field,
-        onChange: function (value) {
-          FancyFace.settings[setting.name.replace("season_info_", "")] = value;
-          Lampa.Settings.update();
-          if (setting.onChange) setting.onChange(value);
-        },
-      });
+      field: {
+        name: "Показувати оригінальні назви",
+        description: "Відображення оригінальної назви фільму/серіалу в картці",
+      },
+      onChange: function (value) {
+        FancyFace.settings.show_original_names = value;
+        Lampa.Storage.set("show_original_names", value);
+      },
     });
 
-    Object.keys(FancyFace.settings).forEach((key) => {
-      FancyFace.settings[key] = Lampa.Storage.get(key, FancyFace.settings[key]);
-    });
+    FancyFace.settings.show_movie_type = Lampa.Storage.get(
+      "season_info_show_movie_type",
+      true
+    );
+    FancyFace.settings.theme = Lampa.Storage.get("theme_select", "default");
+    FancyFace.settings.colored_ratings = Lampa.Storage.get(
+      "colored_ratings",
+      true
+    );
+    FancyFace.settings.colored_elements = Lampa.Storage.get(
+      "colored_elements",
+      true
+    );
+    FancyFace.settings.seasons_info_mode = Lampa.Storage.get(
+      "seasons_info_mode",
+      "aired"
+    );
+    FancyFace.settings.show_episodes_on_main = Lampa.Storage.get(
+      "show_episodes_on_main",
+      false
+    );
+    FancyFace.settings.label_position = Lampa.Storage.get(
+      "label_position",
+      "top-right"
+    );
+    FancyFace.settings.show_original_names = Lampa.Storage.get(
+      "show_original_names",
+      true
+    );
 
     FancyFace.settings.enabled =
       FancyFace.settings.seasons_info_mode !== "none";
