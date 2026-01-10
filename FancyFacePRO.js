@@ -101,14 +101,15 @@
         opacity: 0.6 !important; \
         pointer-events: none !important; \
     }\
+    .settings-folder[data-component='menu_filter']:display:none;\
 </style>"
   ).appendTo("head");
 
   // Мультимовна підтримка
   Lampa.Lang.add({
     menu_items_hide: {
-      en: "Setting the visibility of elements",
-      uk: "Перемикання видимості елементів",
+      en: "Management of interface elements",
+      uk: "Керування елементами інтерфейсу",
     },
     left_menu_title: {
       en: "Left menu",
@@ -122,9 +123,9 @@
       en: "Settings menu",
       uk: "Праве меню",
     },
-    plugin_description: {
-      en: "Plugin for hiding interface elements",
-      uk: "Плагін для керування елементами нтерфейсу",
+    hide_description: {
+      en: "Menu for hiding interface elements",
+      uk: "Меню для керування елементами нтерфейсу",
     },
     hidden: {
       en: "Hidden",
@@ -2333,7 +2334,7 @@
     Lampa.SettingsApi.addComponent({
       component: "menu_filter",
       name: Lampa.Lang.translate("menu_items_hide"),
-      description: Lampa.Lang.translate("plugin_description"),
+      description: Lampa.Lang.translate("hide_description"),
     });
 
     Lampa.SettingsApi.addParam({
@@ -2534,7 +2535,7 @@
       },
       field: {
         name: Lampa.Lang.translate("menu_items_hide"),
-        description: Lampa.Lang.translate("plugin_description"),
+        description: Lampa.Lang.translate("hide_description"),
       },
       onChange: function () {
         Lampa.Settings.create("menu_filter", {
