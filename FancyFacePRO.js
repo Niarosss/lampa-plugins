@@ -208,7 +208,7 @@
       en: "Enter new folder name",
       uk: "Введіть нову назву папки",
     },
-    folder_ranemad: {
+    folder_renamed: {
       en: "Folder renamed",
       uk: "Папку перейменовано",
     },
@@ -216,9 +216,149 @@
       en: "Enter new button name",
       uk: "Введіть нову назву кнопки",
     },
-    button_ranemad: {
+    button_renamed: {
       en: "Button renamed",
       uk: "Кнопку перейменовано",
+    },
+    create_folder: {
+      en: "Create folder",
+      uk: "Створити папку",
+    },
+    folder_deleted: {
+      en: "Folder deleted",
+      uk: "Папку видалено",
+    },
+    folder_buttons_order: {
+      en: "Button order in folder",
+      uk: "Порядок кнопок у папці",
+    },
+    folder_name_title: {
+      en: "Folder name",
+      uk: "Назва папки",
+    },
+    create_folder_no_name: {
+      en: "Create folder without name",
+      uk: "Створити папку без назви",
+    },
+    select_min_2_buttons: {
+      en: "Select at least 2 buttons",
+      uk: "Оберіть щонайменше 2 кнопки",
+    },
+    folder_created_param: {
+      en: 'Folder "{folderName}" created',
+      uk: 'Папку "{folderName}" створено',
+    },
+    folder_created_no_name: {
+      en: "Unnamed folder created",
+      uk: "Папку без назви створено",
+    },
+    add_content_to_folder: {
+      en: "Add content to folder",
+      uk: "Додайте вміст до папки",
+    },
+    reset_settings: {
+      en: "Reset",
+      uk: "Скинути",
+    },
+    button_settings_title: {
+      en: "Button settings",
+      uk: "Налаштування кнопок",
+    },
+    original_title_label: {
+      en: "Original title:",
+      uk: "Оригінальна назва:",
+    },
+    plugin_fancy_description: {
+      en: "Comprehensive interface improvement for the Lampa application",
+      uk: "Комплексне покращення інтерфейсу для застосунку Lampa",
+    },
+    additional_interface_settings: {
+      en: "Additional interface settings",
+      uk: "Додаткові налаштування інтерфейсу",
+    },
+    series_info_title: {
+      en: "Series information",
+      uk: "Інформація про серії",
+    },
+    series_info_description: {
+      en: "Choose how to display information about series and seasons",
+      uk: "Оберіть, як відображати інформацію про серії та сезони",
+    },
+    settings_info_off: {
+      en: "Disable",
+      uk: "Вимкнути",
+    },
+    settings_info_aired: {
+      en: "Aired",
+      uk: "Актуальна інформація",
+    },
+    settings_info_total: {
+      en: "Total",
+      uk: "Повна кількість",
+    },
+    label_position_title: {
+      en: "Label position for series",
+      uk: "Розташування мітки про серії",
+    },
+    label_position_description: {
+      en: "Select the position of the label on the poster",
+      uk: "Оберіть позицію мітки на постері",
+    },
+    label_top_right: {
+      en: "Top right corner",
+      uk: "Верхній правий кут",
+    },
+    label_top_left: {
+      en: "Top left corner",
+      uk: "Верхній лівий кут",
+    },
+    label_bottom_right: {
+      en: "Bottom right corner",
+      uk: "Нижній правий кут",
+    },
+    label_bottom_left: {
+      en: "Bottom left corner",
+      uk: "Нижній лівий кут",
+    },
+    change_labels_title: {
+      en: "Change labels",
+      uk: "Змінити мітки",
+    },
+    change_labels_description: {
+      en: 'Change "TV" to "Series" and add a "Movie" label',
+      uk: 'Змінити "TV" на "Серіал" та додати мітку "Фільм"',
+    },
+    interface_theme_title: {
+      en: "Interface theme",
+      uk: "Тема інтерфейсу",
+    },
+    interface_theme_description: {
+      en: "Select the interface theme",
+      uk: "Оберіть тему оформлення інтерфейсу",
+    },
+    colored_ratings_title: {
+      en: "Colored ratings",
+      uk: "Кольорові рейтинги",
+    },
+    colored_ratings_description: {
+      en: "Change the rating color depending on the score",
+      uk: "Змінювати колір рейтингу залежно від оцінки",
+    },
+    colored_elements_title: {
+      en: "Colored elements",
+      uk: "Кольорові елементи",
+    },
+    colored_elements_description: {
+      en: "Display series statuses and age restrictions in color",
+      uk: "Відображати статуси серіалів та вікові обмеження кольоровими",
+    },
+    show_original_title: {
+      en: "Show original titles",
+      uk: "Показувати оригінальні назви",
+    },
+    show_original_title_description: {
+      en: "Display the original title of the movie/series in the card",
+      uk: "Відображення оригінальної назви фільму/серіалу в картці",
     },
   });
 
@@ -500,7 +640,6 @@
 
     btn.on("hover:enter", openEditDialog);
 
-    // Перевіряємо налаштування та приховуємо кнопку, якщо редактор вимкнено
     if (Lampa.Storage.get("buttons_editor") === false) {
       btn.hide();
     }
@@ -567,7 +706,7 @@
             usedButtons.add(newBtnId);
             return newBtnId;
           }
-          return oldBtnId; // Keep old ID if no match found
+          return oldBtnId;
         })
         .filter(Boolean);
 
@@ -835,7 +974,7 @@
             Lampa.Input.edit(
               {
                 free: true,
-                title: "Нова назва кнопки",
+                title: Lampa.Lang.translate("new_button_name"),
                 nosave: true,
                 value: currentName,
                 nomic: true,
@@ -845,7 +984,7 @@
                   const renamedButtons = getRenamedButtons();
                   renamedButtons[btnId] = newName.trim();
                   setRenamedButtons(renamedButtons);
-                  Lampa.Noty.show("Кнопку перейменовано");
+                  Lampa.Noty.show(Lampa.Lang.translate("button_renamed"));
                 }
                 openFolderEditDialog(folder);
               }
@@ -858,7 +997,7 @@
     });
 
     Lampa.Modal.open({
-      title: "Порядок кнопок у папці",
+      title: Lampa.Lang.translate("folder_buttons_order"),
       html: list,
       size: "small",
       scroll_to_center: true,
@@ -933,7 +1072,7 @@
     Lampa.Input.edit(
       {
         free: true,
-        title: "Назва папки",
+        title: Lampa.Lang.translate("folder_name_title"),
         nosave: true,
         value: "",
         nomic: true,
@@ -993,8 +1132,8 @@
 
     const confirmText =
       folderName && folderName.trim()
-        ? `Створити папку "${folderName}"`
-        : "Створити папку без назви";
+        ? `${Lampa.Lang.translate("create_folder")} "${folderName}"`
+        : Lampa.Lang.translate("create_folder_no_name");
 
     const createBtn = $(`
       <div class="selector folder-create-confirm">
@@ -1004,7 +1143,7 @@
 
     createBtn.on("hover:enter", () => {
       if (selectedButtons.length < 2) {
-        Lampa.Noty.show("Виберіть мінімум 2 кнопки");
+        Lampa.Noty.show(Lampa.Lang.translate("select_min_2_buttons"));
         return;
       }
 
@@ -1047,8 +1186,11 @@
       Lampa.Modal.close();
       const notifyText =
         folderName && folderName.trim()
-          ? `Папку "${folderName}" створено`
-          : "Папку без назви створено";
+          ? Lampa.Lang.translate("folder_created_param").replace(
+              "{folderName}",
+              folderName
+            )
+          : Lampa.Lang.translate("folder_created_no_name");
       Lampa.Noty.show(notifyText);
 
       if (currentContainer) {
@@ -1061,7 +1203,7 @@
     list.append(createBtn);
 
     Lampa.Modal.open({
-      title: "Виберіть кнопки для папки",
+      title: Lampa.Lang.translate("add_content_to_folder"),
       html: list,
       size: "medium",
       scroll_to_center: true,
@@ -1190,7 +1332,7 @@
         setCustomOrder(newCustomOrder);
 
         item.remove();
-        Lampa.Noty.show("Папку видалено");
+        Lampa.Noty.show(Lampa.Lang.translate("folder_deleted"));
 
         setTimeout(() => {
           if (currentContainer) {
@@ -1342,7 +1484,9 @@
         <div class="menu-edit-list__icon">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path><line x1="12" y1="11" x2="12" y2="17"></line><line x1="9" y1="14" x2="15" y2="14"></line></svg>
         </div>
-        <div class="menu-edit-list__title">Створити папку</div>
+        <div class="menu-edit-list__title">${Lampa.Lang.translate(
+          "create_folder"
+        )}</div>
       </div>
     `);
 
@@ -1356,7 +1500,9 @@
         <div class="menu-edit-list__icon">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"></polyline><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path></svg>
         </div>
-        <div class="menu-edit-list__title">Скинути</div>
+        <div class="menu-edit-list__title">${Lampa.Lang.translate(
+          "reset_settings"
+        )}</div>
       </div>
     `);
 
@@ -1393,7 +1539,7 @@
     list.append(bottomControls);
 
     Lampa.Modal.open({
-      title: "Налаштування кнопок",
+      title: Lampa.Lang.translate("button_settings_title"),
       html: list,
       size: "small",
       scroll_to_center: true,
@@ -1884,7 +2030,9 @@
     $(".original_title", render).remove();
     $(".full-start-new__title", render).after(
       `<div class="original_title" style="margin-bottom: 2em; text-align: left;">
-          <div style="font-size: 1.2em; opacity: 0.8;">Оригінальна назва: ${orig}</div>
+          <div style="font-size: 1.2em; opacity: 0.8;">${Lampa.Lang.translate(
+            "original_title_label"
+          )} ${orig}</div>
       </div>`
     );
   }
@@ -1950,13 +2098,13 @@
     Lampa.Manifest.plugins = {
       name: "FancyFace",
       version: FancyFace.version,
-      description: "Покращений інтерфейс для застосунку Lampa",
+      description: Lampa.Lang.translate("plugin_fancy_description"),
       author: "@Niaros",
     };
 
     Lampa.SettingsApi.addComponent({
       component: "fancy_mod",
-      name: "Додаткові налаштування інтерфейсу",
+      name: Lampa.Lang.translate("additional_interface_settings"),
       icon: `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M4 5C4 4.44772 4.44772 4 5 4H19C19.5523 4 20 4.44772 20 5V7C20 7.55228 19.5523 8 19 8H5C4.44772 8 4 7.55228 4 7V5Z" stroke="white" stroke-width="2"/><path d="M4 11C4 10.4477 4.44772 10 5 10H19C19.5523 10 20 10.4477 20 11V13C20 13.5523 19.5523 14 19 14H5C4.44772 14 4 13.5523 4 13V11Z" stroke="white" stroke-width="2"/><path d="M4 17C4 16.4477 4.44772 16 5 16H19C19.5523 16 20 16.4477 20 17V19C20 19.5523 19.5523 20 19 20H5C4.44772 20 4 19.5523 4 19V17Z" stroke="white" stroke-width="2"/></svg>`,
     });
 
@@ -1993,15 +2141,15 @@
         name: "seasons_info_mode",
         type: "select",
         values: {
-          none: "Вимкнути",
-          aired: "Актуальна інформація",
-          total: "Повна кількість",
+          none: Lampa.Lang.translate("settings_info_off"),
+          aired: Lampa.Lang.translate("settings_info_aired"),
+          total: Lampa.Lang.translate("settings_info_total"),
         },
         default: "aired",
       },
       field: {
-        name: "Інформація про серії",
-        description: "Оберіть, як відображати інформацію про серії та сезони",
+        name: Lampa.Lang.translate("series_info_title"),
+        description: Lampa.Lang.translate("series_info_description"),
       },
       onChange: function (value) {
         FancyFace.settings.seasons_info_mode = value;
@@ -2015,16 +2163,16 @@
         name: "label_position",
         type: "select",
         values: {
-          "top-right": "Верхній правий кут",
-          "top-left": "Верхній лівий кут",
-          "bottom-right": "Нижній правий кут",
-          "bottom-left": "Нижній лівий кут",
+          "top-right": Lampa.Lang.translate("label_top_right"),
+          "top-left": Lampa.Lang.translate("label_top_left"),
+          "bottom-right": Lampa.Lang.translate("label_bottom_right"),
+          "bottom-left": Lampa.Lang.translate("label_bottom_left"),
         },
         default: "top-right",
       },
       field: {
-        name: "Розташування мітки про серії",
-        description: "Оберіть позицію мітки на постері",
+        name: Lampa.Lang.translate("label_position_title"),
+        description: Lampa.Lang.translate("label_position_description"),
       },
       onChange: function (value) {
         FancyFace.settings.label_position = value;
@@ -2040,8 +2188,8 @@
         default: true,
       },
       field: {
-        name: "Змінити мітки типу",
-        description: 'Змінити "TV" на "Серіал" та додати мітку "Фільм"',
+        name: Lampa.Lang.translate("change_labels_title"),
+        description: Lampa.Lang.translate("change_labels_description"),
       },
       onChange: function (value) {
         FancyFace.settings.show_movie_type = value;
@@ -2071,8 +2219,8 @@
         default: "default",
       },
       field: {
-        name: "Тема інтерфейсу",
-        description: "Оберіть тему оформлення інтерфейсу",
+        name: Lampa.Lang.translate("interface_theme_title"),
+        description: Lampa.Lang.translate("interface_theme_description"),
       },
       onChange: function (value) {
         FancyFace.settings.theme = value;
@@ -2089,8 +2237,8 @@
         default: true,
       },
       field: {
-        name: "Кольорові рейтинги",
-        description: "Змінювати колір рейтингу залежно від оцінки",
+        name: Lampa.Lang.translate("colored_ratings_title"),
+        description: Lampa.Lang.translate("colored_ratings_description"),
       },
       onChange: function (value) {
         FancyFace.settings.colored_ratings = value;
@@ -2112,9 +2260,8 @@
         default: true,
       },
       field: {
-        name: "Кольорові елементи",
-        description:
-          "Відображати статуси серіалів та вікові обмеження кольоровими",
+        name: Lampa.Lang.translate("colored_elements_title"),
+        description: Lampa.Lang.translate("colored_elements_description"),
       },
       onChange: function (value) {
         FancyFace.settings.colored_elements = value;
@@ -2145,8 +2292,8 @@
         default: true,
       },
       field: {
-        name: "Показувати оригінальні назви",
-        description: "Відображення оригінальної назви фільму/серіалу в картці",
+        name: Lampa.Lang.translate("show_original_title"),
+        description: Lampa.Lang.translate("show_original_title_description"),
       },
       onChange: function (value) {
         FancyFace.settings.show_original_names = value;
