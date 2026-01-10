@@ -3,8 +3,7 @@
 
   const FancyFace = {
     name: "FancyFacePro",
-    version: "1.0.0",
-    debug: false,
+    version: "1.0.1",
     settings: {
       enabled: true,
       show_movie_type: true,
@@ -17,7 +16,6 @@
       show_original_names: true,
       buttons_editor: true,
     },
-    observer: null,
   };
 
   // -- Стилі для приховування елементів та оформлення ---
@@ -101,7 +99,6 @@
         opacity: 0.6 !important; \
         pointer-events: none !important; \
     }\
-    .settings-folder[data-component='menu_filter']{display:none;}\
 </style>"
   ).appendTo("head");
 
@@ -421,7 +418,9 @@
     },
   });
 
-  // --- Buttons editor functionalaty ---
+  const mainIcon = `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M4 5C4 4.44772 4.44772 4 5 4H19C19.5523 4 20 4.44772 20 5V7C20 7.55228 19.5523 8 19 8H5C4.44772 8 4 7.55228 4 7V5Z" stroke="white" stroke-width="2"/><path d="M4 11C4 10.4477 4.44772 10 5 10H19C19.5523 10 20 10.4477 20 11V13C20 13.5523 19.5523 14 19 14H5C4.44772 14 4 13.5523 4 13V11Z" stroke="white" stroke-width="2"/><path d="M4 17C4 16.4477 4.44772 16 5 16H19C19.5523 16 20 16.4477 20 17V19C20 19.5523 19.5523 20 19 20H5C4.44772 20 4 19.5523 4 19V17Z" stroke="white" stroke-width="2"/></svg>`;
+
+  const eyeIcon = `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="12" r="3" stroke="white" stroke-width="2"/></svg>`;
 
   const resetIcon = `<svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg>`;
 
@@ -2328,13 +2327,14 @@
     Lampa.SettingsApi.addComponent({
       component: "fancy_mod",
       name: Lampa.Lang.translate("additional_interface_settings"),
-      icon: `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M4 5C4 4.44772 4.44772 4 5 4H19C19.5523 4 20 4.44772 20 5V7C20 7.55228 19.5523 8 19 8H5C4.44772 8 4 7.55228 4 7V5Z" stroke="white" stroke-width="2"/><path d="M4 11C4 10.4477 4.44772 10 5 10H19C19.5523 10 20 10.4477 20 11V13C20 13.5523 19.5523 14 19 14H5C4.44772 14 4 13.5523 4 13V11Z" stroke="white" stroke-width="2"/><path d="M4 17C4 16.4477 4.44772 16 5 16H19C19.5523 16 20 16.4477 20 17V19C20 19.5523 19.5523 20 19 20H5C4.44772 20 4 19.5523 4 19V17Z" stroke="white" stroke-width="2"/></svg>`,
+      icon: mainIcon,
     });
 
     Lampa.SettingsApi.addComponent({
       component: "menu_filter",
       name: Lampa.Lang.translate("menu_items_hide"),
       description: Lampa.Lang.translate("hide_description"),
+      icon: eyeIcon,
     });
 
     Lampa.SettingsApi.addParam({
@@ -3163,6 +3163,18 @@
     }
 
     initGlobalObserver();
+
+    Lampa.Settings.listener.follow("open", () => {
+      setTimeout(() => {
+        const ourSettings = $('.settings-folder[data-component="season_info"]');
+        const interfaceSettings = $(
+          '.settings-folder[data-component="interface"]'
+        );
+        if (ourSettings.length && interfaceSettings.length) {
+          ourSettings.insertAfter(interfaceSettings);
+        }
+      }, 100);
+    });
   }
 
   if (window.appready) {
