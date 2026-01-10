@@ -2872,6 +2872,9 @@
       this.render = function () {
         return this.container || $("<div></div>");
       };
+      this.start = function () {
+        // пусто, нічого не робимо
+      };
     });
 
     Lampa.Listener.follow("full", (e) => {
