@@ -555,30 +555,6 @@
     });
   }
 
-  function openRenameFolderDialog(folder) {
-    Lampa.Input.edit(
-      {
-        title: "Перейменувати папку",
-        value: folder.name,
-        free: true,
-        nosave: true,
-        nomic: true,
-      },
-      (newName) => {
-        if (newName) {
-          const folders = getFolders();
-          const targetFolder = folders.find((f) => f.id === folder.id);
-          if (targetFolder) {
-            targetFolder.name = newName;
-            setFolders(folders);
-            Lampa.Noty.show("Папку перейменовано");
-            applyChanges();
-          }
-        }
-      }
-    );
-  }
-
   function openFolderEditDialog(folder) {
     const list = $('<div class="menu-edit-list"></div>');
 
@@ -740,11 +716,6 @@
         nomic: true,
       },
       (folderName) => {
-        // if (!folderName || !folderName.trim()) {
-        //   Lampa.Noty.show("Введіть назву папки");
-        //   openEditDialog();
-        //   return;
-        // }
         openSelectButtonsDialog(folderName.trim());
       }
     );
