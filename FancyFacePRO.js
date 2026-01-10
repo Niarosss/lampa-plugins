@@ -1765,6 +1765,28 @@
     return statusMap[status] || Lampa.Lang.translate("status_unknown");
   }
 
+  function translateWithPlaceholders(key, placeholders = {}) {
+    let translatedText = Lampa.Lang.translate(key);
+    for (const placeholder in placeholders) {
+      translatedText = translatedText.replace(
+        `{${placeholder}}`,
+        placeholders[placeholder]
+      );
+    }
+    return translatedText;
+  }
+
+  function translateWithPlaceholders(key, placeholders = {}) {
+    let translatedText = Lampa.Lang.translate(key);
+    for (const placeholder in placeholders) {
+      translatedText = translatedText.replace(
+        `{${placeholder}}`,
+        placeholders[placeholder]
+      );
+    }
+    return translatedText;
+  }
+
   // --- Інформація про сезони ---
 
   function calculateAiredInfo(movie) {
@@ -1860,7 +1882,7 @@
         movie.status === "Ended" || movie.status === "Canceled";
 
       if (isCompleted) {
-        const seasonEpisodeText = Lampa.Lang.translate(
+        const seasonEpisodeText = translateWithPlaceholders(
           "season_episode_text_completed",
           {
             seasons_count: displaySeasons,
@@ -1873,7 +1895,7 @@
           .append($("<div></div>").text(seasonEpisodeText))
           .append($("<div></div>").text(getStatusText(movie.status)));
       } else {
-        let text = Lampa.Lang.translate("season_episode_text_completed", {
+        let text = translateWithPlaceholders("season_episode_text_completed", {
           seasons_count: displaySeasons,
           seasons_word: seasonsText,
           episodes_count: displayEpisodes,
@@ -1884,7 +1906,7 @@
           totalEpisodes > 0 &&
           airedEpisodes < totalEpisodes
         ) {
-          text = Lampa.Lang.translate("season_episode_text_ongoing", {
+          text = translateWithPlaceholders("season_episode_text_ongoing", {
             seasons_count: displaySeasons,
             seasons_word: seasonsText,
             episodes_count: airedEpisodes,
