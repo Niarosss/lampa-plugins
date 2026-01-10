@@ -2538,8 +2538,9 @@
 
     Lampa.Component.add("menu_filter", function () {
       this.create = function () {
-        const resetIcon = '<svg viewBox="0 0 24 24">...</svg>'; // твій ікон
-        const timeIcon = '<svg viewBox="0 0 24 24">...</svg>'; // іконка часу
+        let leftSettingsCreated = false;
+        let headSettingsCreated = false;
+        let settingsSettingsCreated = false;
 
         // ===== КНОПКА "Скинути всі приховані" =====
         Lampa.SettingsApi.addParam({
@@ -2948,7 +2949,7 @@
       window.title_plugin_inited = true;
     }
 
-    // initGlobalObserver();
+    initGlobalObserver();
   }
 
   if (window.appready) {
