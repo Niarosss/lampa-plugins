@@ -81,7 +81,6 @@
   // Styles from Buttons.js
   $(`<style>
         @keyframes button-fade-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-        .full-start__button { opacity: 0; }
         .full-start__button.hidden { display: none !important; }
         .button--folder { cursor: pointer; }
         .full-start-new__buttons { display: flex !important; flex-direction: row !important; flex-wrap: wrap !important; gap: 0.5em !important; }
@@ -198,6 +197,7 @@
       label_position: "top-right",
       colored_elements: true,
       show_original_names: true,
+      buttons_editor_enabled: true,
     },
     observer: null,
   };
@@ -321,6 +321,43 @@
   let allButtonsOriginal = [];
   let currentContainer = null;
 
+  function loadFancyFaceSettings() {
+    const settings = FancyFace.settings;
+    settings.show_movie_type = Lampa.Storage.get(
+      "fancy_mod_show_movie_type",
+      settings.show_movie_type
+    );
+    settings.theme = Lampa.Storage.get("theme_select", settings.theme);
+    settings.colored_ratings = Lampa.Storage.get(
+      "colored_ratings",
+      settings.colored_ratings
+    );
+    settings.colored_elements = Lampa.Storage.get(
+      "colored_elements",
+      settings.colored_elements
+    );
+    settings.seasons_info_mode = Lampa.Storage.get(
+      "seasons_info_mode",
+      settings.seasons_info_mode
+    );
+    settings.show_episodes_on_main = Lampa.Storage.get(
+      "show_episodes_on_main",
+      settings.show_episodes_on_main
+    );
+    settings.label_position = Lampa.Storage.get(
+      "label_position",
+      settings.label_position
+    );
+    settings.show_original_names = Lampa.Storage.get(
+      "show_original_names",
+      settings.show_original_names
+    );
+    settings.buttons_editor_enabled = Lampa.Storage.get(
+      "buttons_editor_enabled",
+      settings.buttons_editor_enabled
+    );
+  }
+
   // We will initialize all features within the startPlugin function.
   function startPlugin() {
     initFancyFaceFeature();
@@ -329,6 +366,8 @@
   }
 
   function initFancyFaceFeature() {
+    loadFancyFaceSettings();
+
     Lampa.Manifest.plugins["FancyFacePRO"] = {
       name: "FancyFace PRO",
       version: "1.1.0",
@@ -342,91 +381,33 @@
       icon: `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M4 5C4 4.44772 4.44772 4 5 4H19C19.5523 4 20 4.44772 20 5V7C20 7.55228 19.5523 8 19 8H5C4.44772 8 4 7.55228 4 7V5Z" stroke="white" stroke-width="2"/><path d="M4 11C4 10.4477 4.44772 10 5 10H19C19.5523 10 20 10.4477 20 11V13C20 13.5523 19.5523 14 19 14H5C4.44772 14 4 13.5523 4 13V11Z" stroke="white" stroke-width="2"/><path d="M4 17C4 16.4477 4.44772 16 5 16H19C19.5523 16 20 16.4477 20 17V19C20 19.5523 19.5523 20 19 20H5C4.44772 20 4 19.5523 4 19V17Z" stroke="white" stroke-width="2"/></svg>`,
     });
 
-    Lampa.SettingsApi.addParam({
-      component: "fancy_mod",
-      param: {
-        name: "hide_menu_button",
-        type: "button",
-      },
-      field: {
-        name: Lampa.Lang.translate("menu_items_hide"),
-        description: Lampa.Lang.translate("plugin_description"),
-      },
-      onChange: () => {
-        Lampa.Settings.create("menu_filter", {
-          onBack: () => {
-            Lampa.Settings.create("fancy_mod");
-          },
-        });
-      },
-    });
+    // --- General UI Group ---
 
     Lampa.SettingsApi.addParam({
       component: "fancy_mod",
       param: {
-        name: "seasons_info_mode",
+        name: "theme_select",
         type: "select",
         values: {
-          none: "Вимкнути",
-          aired: "Актуальна інформація",
-          total: "Повна кількість",
+          default: "Немає",
+          bywolf_mod: "Bywolf_mod",
+          dark_night: "Dark Night bywolf",
+          blue_cosmos: "Blue Cosmos",
+          neon: "Neon",
+          sunset: "Dark MOD",
+          emerald: "Emerald V1",
+          aurora: "Aurora",
         },
-        default: "aired",
+        default: FancyFace.settings.theme,
       },
       field: {
-        name: "Інформація про серії",
-        description: "Оберіть, як відображати інформацію про серії та сезони",
+        name: "Тема інтерфейсу",
+        description: "Оберіть тему оформлення інтерфейсу",
       },
       onChange: (value) => {
-        FancyFace.settings.seasons_info_mode = value;
-        Lampa.Settings.update();
-      },
-    });
-
-    Lampa.SettingsApi.addParam({
-      component: "fancy_mod",
-      param: {
-        name: "buttons_editor_enabled",
-        type: "trigger",
-        default: true,
-      },
-      field: {
-        name: "Редактор кнопок",
-      },
-      onChange: (value) => {
-        Lampa.Storage.set("buttons_editor_enabled", value);
-        setTimeout(() => {
-          if (value) {
-            $(".button--edit-order").show();
-            Lampa.Noty.show("Редактор кнопок увімкнено");
-          } else {
-            $(".button--edit-order").hide();
-            Lampa.Noty.show("Редактор кнопок вимкнено");
-          }
-        }, 100);
-      },
-    });
-
-    Lampa.SettingsApi.addParam({
-      component: "fancy_mod",
-      param: {
-        name: "label_position",
-        type: "select",
-        values: {
-          "top-right": "Верхній правий кут",
-          "top-left": "Верхній лівий кут",
-          "bottom-right": "Нижній правий кут",
-          "bottom-left": "Нижній лівий кут",
-        },
-        default: "top-right",
-      },
-      field: {
-        name: "Розташування мітки про серії",
-        description: "Оберіть позицію мітки на постері",
-      },
-      onChange: (value) => {
-        FancyFace.settings.label_position = value;
-        Lampa.Settings.update();
+        FancyFace.settings.theme = value;
+        Lampa.Storage.set("theme_select", value);
+        applyTheme(value);
       },
     });
 
@@ -435,7 +416,7 @@
       param: {
         name: "fancy_mod_show_movie_type",
         type: "trigger",
-        default: true,
+        default: FancyFace.settings.show_movie_type,
       },
       field: {
         name: "Змінити мітки типу",
@@ -454,37 +435,28 @@
     Lampa.SettingsApi.addParam({
       component: "fancy_mod",
       param: {
-        name: "theme_select",
-        type: "select",
-        values: {
-          default: "Немає",
-          bywolf_mod: "Bywolf_mod",
-          dark_night: "Dark Night bywolf",
-          blue_cosmos: "Blue Cosmos",
-          neon: "Neon",
-          sunset: "Dark MOD",
-          emerald: "Emerald V1",
-          aurora: "Aurora",
-        },
-        default: "default",
+        name: "show_original_names",
+        type: "trigger",
+        default: FancyFace.settings.show_original_names,
       },
       field: {
-        name: "Тема інтерфейсу",
-        description: "Оберіть тему оформлення інтерфейсу",
+        name: "Показувати оригінальні назви",
+        description: "Відображення оригінальної назви фільму/серіалу в картці",
       },
       onChange: (value) => {
-        FancyFace.settings.theme = value;
-        Lampa.Storage.set("theme_select", value);
-        applyTheme(value);
+        FancyFace.settings.show_original_names = value;
+        Lampa.Storage.set("show_original_names", value);
       },
     });
+
+    // --- Visual Elements Group ---
 
     Lampa.SettingsApi.addParam({
       component: "fancy_mod",
       param: {
         name: "colored_ratings",
         type: "trigger",
-        default: true,
+        default: FancyFace.settings.colored_ratings,
       },
       field: {
         name: "Кольорові рейтинги",
@@ -507,7 +479,7 @@
       param: {
         name: "colored_elements",
         type: "trigger",
-        default: true,
+        default: FancyFace.settings.colored_elements,
       },
       field: {
         name: "Кольорові елементи",
@@ -538,49 +510,94 @@
     Lampa.SettingsApi.addParam({
       component: "fancy_mod",
       param: {
-        name: "show_original_names",
-        type: "trigger",
-        default: true,
+        name: "label_position",
+        type: "select",
+        values: {
+          "top-right": "Верхній правий кут",
+          "top-left": "Верхній лівий кут",
+          "bottom-right": "Нижній правий кут",
+          "bottom-left": "Нижній лівий кут",
+        },
+        default: FancyFace.settings.label_position,
       },
       field: {
-        name: "Показувати оригінальні назви",
-        description: "Відображення оригінальної назви фільму/серіалу в картці",
+        name: "Розташування мітки про серії",
+        description: "Оберіть позицію мітки на постері",
       },
       onChange: (value) => {
-        FancyFace.settings.show_original_names = value;
-        Lampa.Storage.set("show_original_names", value);
+        FancyFace.settings.label_position = value;
+        Lampa.Storage.set("label_position", value);
+        Lampa.Settings.update();
       },
     });
 
-    FancyFace.settings.show_movie_type = Lampa.Storage.get(
-      "fancy_mod_show_movie_type",
-      true
-    );
-    FancyFace.settings.theme = Lampa.Storage.get("theme_select", "default");
-    FancyFace.settings.colored_ratings = Lampa.Storage.get(
-      "colored_ratings",
-      true
-    );
-    FancyFace.settings.colored_elements = Lampa.Storage.get(
-      "colored_elements",
-      true
-    );
-    FancyFace.settings.seasons_info_mode = Lampa.Storage.get(
-      "seasons_info_mode",
-      "aired"
-    );
-    FancyFace.settings.show_episodes_on_main = Lampa.Storage.get(
-      "show_episodes_on_main",
-      false
-    );
-    FancyFace.settings.label_position = Lampa.Storage.get(
-      "label_position",
-      "top-right"
-    );
-    FancyFace.settings.show_original_names = Lampa.Storage.get(
-      "show_original_names",
-      true
-    );
+    // --- Functionality Group ---
+
+    Lampa.SettingsApi.addParam({
+      component: "fancy_mod",
+      param: {
+        name: "seasons_info_mode",
+        type: "select",
+        values: {
+          none: "Вимкнути",
+          aired: "Актуальна інформація",
+          total: "Повна кількість",
+        },
+        default: FancyFace.settings.seasons_info_mode,
+      },
+      field: {
+        name: "Інформація про серії",
+        description: "Оберіть, як відображати інформацію про серії та сезони",
+      },
+      onChange: (value) => {
+        FancyFace.settings.seasons_info_mode = value;
+        Lampa.Storage.set("seasons_info_mode", value);
+        Lampa.Settings.update();
+      },
+    });
+
+    Lampa.SettingsApi.addParam({
+      component: "fancy_mod",
+      param: {
+        name: "buttons_editor_enabled",
+        type: "trigger",
+        default: FancyFace.settings.buttons_editor_enabled,
+      },
+      field: {
+        name: "Редактор кнопок",
+      },
+      onChange: (value) => {
+        Lampa.Storage.set("buttons_editor_enabled", value);
+        setTimeout(() => {
+          if (value) {
+            $(".button--edit-order").show();
+            Lampa.Noty.show("Редактор кнопок увімкнено");
+          } else {
+            $(".button--edit-order").hide();
+            Lampa.Noty.show("Редактор кнопок вимкнено");
+          }
+        }, 100);
+      },
+    });
+
+    Lampa.SettingsApi.addParam({
+      component: "fancy_mod",
+      param: {
+        name: "hide_menu_button",
+        type: "button",
+      },
+      field: {
+        name: Lampa.Lang.translate("menu_items_hide"),
+        description: Lampa.Lang.translate("plugin_description"),
+      },
+      onChange: () => {
+        Lampa.Settings.create("menu_filter", {
+          onBack: () => {
+            Lampa.Settings.create("fancy_mod");
+          },
+        });
+      },
+    });
 
     FancyFace.settings.enabled =
       FancyFace.settings.seasons_info_mode !== "none";
