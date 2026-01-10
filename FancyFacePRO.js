@@ -873,33 +873,28 @@
       settingsCreated.main = true;
     }
 
-    function handleMenuChanges() {
-      updateAllVisibility();
-      Lampa.Storage.listener.follow("change", (e) => {
-        if (
-          ["menu_hide", "head_hidden_items", "settings_hidden_items"].includes(
-            e.name
-          )
-        ) {
-          updateAllVisibility();
-        }
-      });
-      const observer = new MutationObserver(() => {
-        observer.disconnect();
-        if ($(".menu__list, .head__actions, .settings__body").length) {
-          createMenuSettings();
-          updateAllVisibility();
-        }
-        observer.observe(document.body, { childList: true, subtree: true });
-      });
-      observer.observe(document.body, { childList: true, subtree: true });
-    }
-
     const waitForMenu = setInterval(() => {
-      if ($(".menu__list, .head__actions, .settings__body").length) {
+      if (
+        $(".menu__list").length &&
+        $(".head__actions").length &&
+        $(".settings__body").length
+      ) {
         clearInterval(waitForMenu);
+
         createMenuSettings();
-        handleMenuChanges();
+        updateAllVisibility();
+
+        Lampa.Storage.listener.follow("change", (e) => {
+          if (
+            [
+              "menu_hide",
+              "head_hidden_items",
+              "settings_hidden_items",
+            ].includes(e.name)
+          ) {
+            updateAllVisibility();
+          }
+        });
       }
     }, 500);
   }
