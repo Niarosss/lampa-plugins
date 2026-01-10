@@ -20,6 +20,200 @@
     observer: null,
   };
 
+  // -- Стилі для приховування елементів та оформлення ---
+  $(
+    "<style>\
+      @keyframes button-fade-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }\
+        .full-start__button { opacity: 0; }\
+        .full-start__button.hidden { display: none !important; }\
+        .button--folder { cursor: pointer; }\
+        .full-start-new__buttons { display: flex !important; flex-direction: row !important; flex-wrap: wrap !important; gap: 0.5em !important; }\
+        .full-start-new__buttons.buttons-loading .full-start__button { visibility: hidden !important; }\
+        .menu-edit-list__create-folder { background: rgba(100,200,100,0.2); border: 3px solid transparent; }\
+        .menu-edit-list__create-folder.focus { background: rgba(100,200,100,0.3); border-color: rgba(255,255,255,0.8); }\
+        .menu-edit-list__delete, .menu-edit-list__rename, .menu-edit-list__edit-content { width: 2.4em; height: 2.4em; display: flex; align-items: center; justify-content: center; cursor: pointer; }\
+        .menu-edit-list__delete svg, .menu-edit-list__rename svg, .menu-edit-list__edit-content svg { width: 1.2em !important; height: 1.2em !important; }\
+        .menu-edit-list__delete.focus, .menu-edit-list__rename.focus, .menu-edit-list__edit-content.focus { border: 2px solid rgba(255,255,255,0.8); border-radius: 0.3em; }\
+        .folder-item .menu-edit-list__move { margin-right: 0; }\
+        .folder-create-confirm { background: rgba(100,200,100,0.3); margin-top: 1em; border-radius: 0.3em; }\
+        .folder-create-confirm.focus { border: 3px solid rgba(255,255,255,0.8); }\
+        .bottom-controls { display: flex; gap: 0.5em; margin-top: 1em; }\
+        .bottom-controls > .menu-edit-list__item { width: calc(50% - 0.25em); margin-bottom: 0; justify-content: center; }\
+        .folder-reset-button { background: rgba(200,100,100,0.3); border: 3px solid transparent; }\
+        .folder-reset-button.focus { background: rgba(200,100,100,0.4); border-color: rgba(255,255,255,0.8); }\
+        .menu-edit-list__toggle.focus { border: 2px solid rgba(255,255,255,0.8); border-radius: 0.3em; }\
+        .button--folder.folder--no-name { min-width: 3.5em; max-width: 3.5em; justify-content: center; }\
+        .button--folder.folder--no-name > span { display: none; }\
+    .hidden { display: none !important; }\
+    .menu-hide-item .settings-param { \
+        padding: 16px 40px !important; /* Збільшений відступ */ \
+        min-height: 54px !important; \
+        display: flex !important; \
+        align-items: center !important; \
+        border-radius: 12px !important; \
+        margin-bottom: 12px !important; \
+        background: rgba(255,255,255,0.05) !important; \
+        transition: all 0.2s ease !important; \
+    }\
+    .menu-hide-item .settings-param:hover { \
+        background: rgba(255,255,255,0.1) !important; \
+        transform: translateY(-2px) !important; \
+    }\
+    .menu-hide-icon { \
+        width: 30px !important; \
+        height: 30px !important; \
+        min-width: 30px !important; \
+        min-height: 30px !important; \
+        display: flex !important; \
+        align-items: center !important; \
+        justify-content: center !important; \
+        margin-right: 16px !important; \
+        margin-left: 10px !important; /* Додано відступ зліва */ \
+    }\
+    .menu-hide-text { \
+        font-size: 18px !important; \
+        flex-grow: 1 !important; \
+        font-weight: 500 !important; \
+        letter-spacing: 0.3px !important; \
+    }\
+    .menu-hide-hidden { \
+        color: #ff4e45 !important; \
+    }\
+    .menu-hide-shown { \
+        color: #4CAF50 !important; \
+    }\
+    .section-title .settings-param__name { \
+        font-size: 20px !important; \
+        font-weight: 600 !important; \
+        margin: 25px 0 15px 0 !important; \
+        padding-bottom: 8px !important; \
+        border-bottom: 2px solid rgba(255,255,255,0.1) !important; \
+        color: #fff !important; \
+    }\
+    .section-divider .settings-param { \
+        height: 1px !important; \
+        min-height: 1px !important; \
+        padding: 0 !important; \
+        background: rgba(255,255,255,0.1) !important; \
+        margin: 25px 0 !important; \
+    }\
+    /* Стиль для неактивної кнопки */ \
+    .settings-param.disable-hide { \
+        opacity: 0.6 !important; \
+        pointer-events: none !important; \
+    }\
+    /* Стиль для подяки */ \
+    .credits-text { \
+        text-align: center; \
+        color: #b0b0b0 !important; /* Сірий колір зі зниженою яскравістю */ \
+        font-size: 14px !important; \
+        padding: 15px 20px 5px !important; \
+        margin-top: 5px !important; \
+        line-height: 1.5; \
+    }\
+</style>"
+  ).appendTo("head");
+
+  // Мультимовна підтримка
+  Lampa.Lang.add({
+    menu_items_hide: {
+      en: "Setting the visibility of elements",
+      uk: "Перемикання видимості елементів",
+    },
+    left_menu_title: {
+      en: "Left menu",
+      uk: "Ліве меню",
+    },
+    head_title: {
+      en: "Head menu",
+      uk: "Верхнє меню",
+    },
+    settings_title: {
+      en: "Settings menu",
+      uk: "Праве меню",
+    },
+    plugin_description: {
+      en: "Plugin for hiding interface elements",
+      uk: "Плагін для керування елементами нтерфейсу",
+    },
+    hidden: {
+      en: "Hidden",
+      uk: "Приховано",
+    },
+    shown: {
+      en: "Shown",
+      uk: "Відображається",
+    },
+    no_name: {
+      en: "Unnamed element",
+      uk: "Елемент без назви",
+    },
+    head_action_search: {
+      en: "Search",
+      uk: "Пошук",
+    },
+    head_action_settings: {
+      en: "Settings",
+      uk: "Налаштування",
+    },
+    head_action_feed: {
+      en: "Feed",
+      uk: "Стрічка",
+    },
+    head_action_notice: {
+      en: "Notifications",
+      uk: "Сповіщення",
+    },
+    head_action_profile: {
+      en: "Profile",
+      uk: "Профіль",
+    },
+    head_action_fullscreen: {
+      en: "Fullscreen",
+      uk: "Повноекранний режим",
+    },
+    head_action_broadcast: {
+      en: "Broadcast",
+      uk: "Трансляція",
+    },
+    credits_text: {
+      en: "Brazenly licked in free access and rewritten for own needs, bugs fixed. Author - @Niaros",
+      uk: "Нахабно злизано у вільному доступі та переписано під власні потреби, виправлено баги. Автор - @Niaros",
+    },
+    reset_all_hidden: {
+      en: "Show all",
+      uk: "Показати все",
+    },
+    head_time: {
+      en: "Time",
+      uk: "Час і дата",
+    },
+    buttons_editor_title: {
+      en: "Buttons editor",
+      uk: "Редактор кнопок",
+    },
+    buttons_editor_description: {
+      en: "Buttons editor",
+      uk: "Редактор кнопок",
+    },
+    buttons_editor_on: {
+      en: "The button editor is enabled",
+      uk: "Редактор кнопок увімкнено",
+    },
+    buttons_editor_off: {
+      en: "The button editor is disabled",
+      uk: "Редактор кнопок вимкнено",
+    },
+    new_folder_name: {
+      en: "Enter new folder name",
+      uk: "Введіть нову назву папки",
+    },
+    folder_ranemad: {
+      en: "Folder renamed",
+      uk: "Папку перейменовано",
+    },
+  });
+
   // --- Buttons editor functionalaty ---
 
   const playIcon =
@@ -299,7 +493,7 @@
     btn.on("hover:enter", openEditDialog);
 
     // Перевіряємо налаштування та приховуємо кнопку, якщо редактор вимкнено
-    if (Lampa.Storage.get("buttons_editor_enabled") === false) {
+    if (Lampa.Storage.get("buttons_editor") === false) {
       btn.hide();
     }
 
@@ -1766,8 +1960,8 @@
         default: true,
       },
       field: {
-        name: "Редактор кнопок",
-        description: "Перемикання відображення Редактора кнопок",
+        name: Lampa.Lang.translate("buttons_editor_title"),
+        description: Lampa.Lang.translate("buttons_editor_description"),
       },
       onChange: function (value) {
         setTimeout(function () {
@@ -1776,10 +1970,10 @@
           var currentValue = Lampa.Storage.get("buttons_editor_enabled", true);
           if (currentValue) {
             $(".button--edit-order").show();
-            Lampa.Noty.show("Редактор кнопок увімкнено");
+            Lampa.Noty.show(Lampa.Lang.translate("buttons_editor_on"));
           } else {
             $(".button--edit-order").hide();
-            Lampa.Noty.show("Редактор кнопок вимкнено");
+            Lampa.Noty.show(Lampa.Lang.translate("buttons_editor_off"));
           }
         }, 100);
       },
@@ -1951,33 +2145,6 @@
         Lampa.Storage.set("show_original_names", value);
       },
     });
-
-    const style = $(
-      `<style>
-        @keyframes button-fade-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-        .full-start__button { opacity: 0; }
-        .full-start__button.hidden { display: none !important; }
-        .button--folder { cursor: pointer; }
-        .full-start-new__buttons { display: flex !important; flex-direction: row !important; flex-wrap: wrap !important; gap: 0.5em !important; }
-        .full-start-new__buttons.buttons-loading .full-start__button { visibility: hidden !important; }
-        .menu-edit-list__create-folder { background: rgba(100,200,100,0.2); border: 3px solid transparent; }
-        .menu-edit-list__create-folder.focus { background: rgba(100,200,100,0.3); border-color: rgba(255,255,255,0.8); }
-        .menu-edit-list__delete, .menu-edit-list__rename, .menu-edit-list__edit-content { width: 2.4em; height: 2.4em; display: flex; align-items: center; justify-content: center; cursor: pointer; }
-        .menu-edit-list__delete svg, .menu-edit-list__rename svg, .menu-edit-list__edit-content svg { width: 1.2em !important; height: 1.2em !important; }
-        .menu-edit-list__delete.focus, .menu-edit-list__rename.focus, .menu-edit-list__edit-content.focus { border: 2px solid rgba(255,255,255,0.8); border-radius: 0.3em; }
-        .folder-item .menu-edit-list__move { margin-right: 0; }
-        .folder-create-confirm { background: rgba(100,200,100,0.3); margin-top: 1em; border-radius: 0.3em; }
-        .folder-create-confirm.focus { border: 3px solid rgba(255,255,255,0.8); }
-        .bottom-controls { display: flex; gap: 0.5em; margin-top: 1em; }
-        .bottom-controls > .menu-edit-list__item { width: calc(50% - 0.25em); margin-bottom: 0; justify-content: center; }
-        .folder-reset-button { background: rgba(200,100,100,0.3); border: 3px solid transparent; }
-        .folder-reset-button.focus { background: rgba(200,100,100,0.4); border-color: rgba(255,255,255,0.8); }
-        .menu-edit-list__toggle.focus { border: 2px solid rgba(255,255,255,0.8); border-radius: 0.3em; }
-        .button--folder.folder--no-name { min-width: 3.5em; max-width: 3.5em; justify-content: center; }
-        .button--folder.folder--no-name > span { display: none; }
-      </style>`
-    );
-    $("body").append(style);
 
     Lampa.Listener.follow("full", (e) => {
       if (e.type !== "complite") return;
