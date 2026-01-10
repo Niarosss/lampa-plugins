@@ -2868,6 +2868,10 @@
           settingsSettingsCreated = true;
         }
       };
+
+      this.render = function () {
+        return this.container || $("<div></div>");
+      };
     });
 
     Lampa.Listener.follow("full", (e) => {
