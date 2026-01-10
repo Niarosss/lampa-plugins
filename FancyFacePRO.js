@@ -2848,10 +2848,10 @@
       };
 
       this.render = function () {
-        return this.container || $("<div></div>");
+        return this.container;
       };
       this.start = function () {
-        Lampa.Settings.render(this.container, "menu_filter");
+        Lampa.SettingsApi.render(this.container, "menu_filter");
       };
     });
 
