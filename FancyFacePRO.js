@@ -3158,7 +3158,7 @@
       window.title_plugin_inited = true;
     }
 
-    initGlobalObserver();
+    // initGlobalObserver();
   }
 
   if (window.appready) {
