@@ -875,9 +875,9 @@
 
     const waitForMenu = setInterval(() => {
       if (
-        $(".menu__list").length &&
-        $(".head__actions").length &&
-        $(".settings__body").length
+        $(".menu__item").length &&
+        $(".head__action").length &&
+        $(".settings-folder").length
       ) {
         clearInterval(waitForMenu);
 
@@ -896,7 +896,7 @@
           }
         });
       }
-    }, 500);
+    }, 100);
   }
 
   /**
