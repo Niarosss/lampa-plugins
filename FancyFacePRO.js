@@ -887,6 +887,16 @@
             }
           }, 100);
         },
+        onRender: function (element) {
+          setTimeout(function () {
+            var lastElement = $(
+              'div[data-component="interface"] .settings-param'
+            ).last();
+            if (lastElement.length) {
+              element.insertAfter(lastElement);
+            }
+          }, 0);
+        },
       });
     }
 
