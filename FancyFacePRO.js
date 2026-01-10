@@ -2873,7 +2873,7 @@
         return this.container || $("<div></div>");
       };
       this.start = function () {
-        // пусто, нічого не робимо
+        Lampa.Settings.render(this.container, "menu_filter");
       };
     });
 
