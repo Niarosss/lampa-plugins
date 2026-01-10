@@ -337,13 +337,13 @@
     };
 
     Lampa.SettingsApi.addComponent({
-      component: "season_info",
+      component: "fancy_mod",
       name: "Налаштування FancyFace PRO",
       icon: `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M4 5C4 4.44772 4.44772 4 5 4H19C19.5523 4 20 4.44772 20 5V7C20 7.55228 19.5523 8 19 8H5C4.44772 8 4 7.55228 4 7V5Z" stroke="white" stroke-width="2"/><path d="M4 11C4 10.4477 4.44772 10 5 10H19C19.5523 10 20 10.4477 20 11V13C20 13.5523 19.5523 14 19 14H5C4.44772 14 4 13.5523 4 13V11Z" stroke="white" stroke-width="2"/><path d="M4 17C4 16.4477 4.44772 16 5 16H19C19.5523 16 20 16.4477 20 17V19C20 19.5523 19.5523 20 19 20H5C4.44772 20 4 19.5523 4 19V17Z" stroke="white" stroke-width="2"/></svg>`,
     });
 
     Lampa.SettingsApi.addParam({
-      component: "season_info",
+      component: "fancy_mod",
       param: {
         name: "seasons_info_mode",
         type: "select",
@@ -365,7 +365,31 @@
     });
 
     Lampa.SettingsApi.addParam({
-      component: "season_info",
+      component: "fancy_mod",
+      param: {
+        name: "buttons_editor_enabled",
+        type: "trigger",
+        default: true,
+      },
+      field: {
+        name: "Редактор кнопок",
+      },
+      onChange: (value) => {
+        Lampa.Storage.set("buttons_editor_enabled", value);
+        setTimeout(() => {
+          if (value) {
+            $(".button--edit-order").show();
+            Lampa.Noty.show("Редактор кнопок увімкнено");
+          } else {
+            $(".button--edit-order").hide();
+            Lampa.Noty.show("Редактор кнопок вимкнено");
+          }
+        }, 100);
+      },
+    });
+
+    Lampa.SettingsApi.addParam({
+      component: "fancy_mod",
       param: {
         name: "label_position",
         type: "select",
@@ -388,9 +412,9 @@
     });
 
     Lampa.SettingsApi.addParam({
-      component: "season_info",
+      component: "fancy_mod",
       param: {
-        name: "season_info_show_movie_type",
+        name: "fancy_mod_show_movie_type",
         type: "trigger",
         default: true,
       },
@@ -400,7 +424,7 @@
       },
       onChange: (value) => {
         FancyFace.settings.show_movie_type = value;
-        Lampa.Storage.set("season_info_show_movie_type", value);
+        Lampa.Storage.set("fancy_mod_show_movie_type", value);
         $("body").attr("data-movie-labels", value ? "on" : "off");
         if (!value) {
           $(".content-label").remove();
@@ -409,7 +433,7 @@
     });
 
     Lampa.SettingsApi.addParam({
-      component: "season_info",
+      component: "fancy_mod",
       param: {
         name: "theme_select",
         type: "select",
@@ -437,7 +461,7 @@
     });
 
     Lampa.SettingsApi.addParam({
-      component: "season_info",
+      component: "fancy_mod",
       param: {
         name: "colored_ratings",
         type: "trigger",
@@ -460,7 +484,7 @@
     });
 
     Lampa.SettingsApi.addParam({
-      component: "season_info",
+      component: "fancy_mod",
       param: {
         name: "colored_elements",
         type: "trigger",
@@ -493,7 +517,7 @@
     });
 
     Lampa.SettingsApi.addParam({
-      component: "season_info",
+      component: "fancy_mod",
       param: {
         name: "show_original_names",
         type: "trigger",
@@ -510,7 +534,7 @@
     });
 
     FancyFace.settings.show_movie_type = Lampa.Storage.get(
-      "season_info_show_movie_type",
+      "fancy_mod_show_movie_type",
       true
     );
     FancyFace.settings.theme = Lampa.Storage.get("theme_select", "default");
@@ -560,7 +584,7 @@
 
   function initHideFeature() {
     Lampa.SettingsApi.addParam({
-      component: "season_info",
+      component: "fancy_mod",
       param: {
         name: "hide_menu_button",
         type: "button",
@@ -572,7 +596,7 @@
       onChange: () => {
         Lampa.Settings.create("menu_filter", {
           onBack: () => {
-            Lampa.Settings.create("season_info");
+            Lampa.Settings.create("fancy_mod");
           },
         });
       },
@@ -618,7 +642,7 @@
         if (
           component &&
           component !== "menu_filter" &&
-          component !== "season_info"
+          component !== "fancy_mod"
         ) {
           $item.toggleClass("hidden", hiddenItems.includes(component));
         }
@@ -864,42 +888,6 @@
    * Инициализирует функциональность редактора кнопок.
    */
   function initButtonsFeature() {
-    if (Lampa.SettingsApi) {
-      Lampa.SettingsApi.addParam({
-        component: "season_info",
-        param: {
-          name: "buttons_editor_enabled",
-          type: "trigger",
-          default: true,
-        },
-        field: {
-          name: "Редактор кнопок",
-        },
-        onChange: (value) => {
-          Lampa.Storage.set("buttons_editor_enabled", value);
-          setTimeout(() => {
-            if (value) {
-              $(".button--edit-order").show();
-              Lampa.Noty.show("Редактор кнопок увімкнено");
-            } else {
-              $(".button--edit-order").hide();
-              Lampa.Noty.show("Редактор кнопок вимкнено");
-            }
-          }, 100);
-        },
-        onRender: function (element) {
-          setTimeout(function () {
-            var lastElement = $(
-              'div[data-component="interface"] .settings-param'
-            ).last();
-            if (lastElement.length) {
-              element.insertAfter(lastElement);
-            }
-          }, 0);
-        },
-      });
-    }
-
     Lampa.Listener.follow("full", (e) => {
       if (e.type !== "complite") return;
       const container = e.object.activity.render();
