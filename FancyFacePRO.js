@@ -2530,7 +2530,7 @@
     Lampa.SettingsApi.addParam({
       component: "fancy_mod",
       param: {
-        type: "toggle",
+        type: "button",
       },
       field: {
         name: Lampa.Lang.translate("menu_items_hide"),
@@ -2596,6 +2596,9 @@
         $name.find("svg").after($text);
       },
     });
+    let leftSettingsCreated = false;
+    let headSettingsCreated = false;
+    let settingsSettingsCreated = false;
 
     // Змінні для відстеження створення налаштувань
     if (!leftSettingsCreated) {
