@@ -864,43 +864,31 @@
    * Инициализирует функциональность редактора кнопок.
    */
   function initButtonsFeature() {
-    Lampa.SettingsApi.addParam({
-      component: "season_info",
-      param: {
-        name: "buttons_editor_open",
-        type: "button",
-      },
-      field: {
-        name: "Відкрити редактор кнопок",
-        description:
-          "Відкрити вікно для сортування, приховання та групування кнопок у папки.",
-      },
-      onChange: openEditDialog,
-    });
-
-    Lampa.SettingsApi.addParam({
-      component: "season_info",
-      param: {
-        name: "buttons_editor_enabled",
-        type: "trigger",
-        default: true,
-      },
-      field: {
-        name: "Редактор кнопок",
-      },
-      onChange: (value) => {
-        Lampa.Storage.set("buttons_editor_enabled", value);
-        setTimeout(() => {
-          if (value) {
-            $(".button--edit-order").show();
-            Lampa.Noty.show("Редактор кнопок увімкнено");
-          } else {
-            $(".button--edit-order").hide();
-            Lampa.Noty.show("Редактор кнопок вимкнено");
-          }
-        }, 100);
-      },
-    });
+    if (Lampa.SettingsApi) {
+      Lampa.SettingsApi.addParam({
+        component: "season_info",
+        param: {
+          name: "buttons_editor_enabled",
+          type: "trigger",
+          default: true,
+        },
+        field: {
+          name: "Редактор кнопок",
+        },
+        onChange: (value) => {
+          Lampa.Storage.set("buttons_editor_enabled", value);
+          setTimeout(() => {
+            if (value) {
+              $(".button--edit-order").show();
+              Lampa.Noty.show("Редактор кнопок увімкнено");
+            } else {
+              $(".button--edit-order").hide();
+              Lampa.Noty.show("Редактор кнопок вимкнено");
+            }
+          }, 100);
+        },
+      });
+    }
 
     Lampa.Listener.follow("full", (e) => {
       if (e.type !== "complite") return;
