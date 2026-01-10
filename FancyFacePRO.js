@@ -345,6 +345,25 @@
     Lampa.SettingsApi.addParam({
       component: "fancy_mod",
       param: {
+        name: "hide_menu_button",
+        type: "button",
+      },
+      field: {
+        name: Lampa.Lang.translate("menu_items_hide"),
+        description: Lampa.Lang.translate("plugin_description"),
+      },
+      onChange: () => {
+        Lampa.Settings.create("menu_filter", {
+          onBack: () => {
+            Lampa.Settings.create("fancy_mod");
+          },
+        });
+      },
+    });
+
+    Lampa.SettingsApi.addParam({
+      component: "fancy_mod",
+      param: {
         name: "seasons_info_mode",
         type: "select",
         values: {
@@ -583,25 +602,6 @@
   }
 
   function initHideFeature() {
-    Lampa.SettingsApi.addParam({
-      component: "fancy_mod",
-      param: {
-        name: "hide_menu_button",
-        type: "button",
-      },
-      field: {
-        name: Lampa.Lang.translate("menu_items_hide"),
-        description: Lampa.Lang.translate("plugin_description"),
-      },
-      onChange: () => {
-        Lampa.Settings.create("menu_filter", {
-          onBack: () => {
-            Lampa.Settings.create("fancy_mod");
-          },
-        });
-      },
-    });
-
     function updateMenuVisibility() {
       const hiddenItems = Lampa.Storage.get("menu_hide", []);
       $(".menu__item").each(function () {
