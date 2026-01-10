@@ -193,8 +193,8 @@
       uk: "Редактор кнопок",
     },
     buttons_editor_description: {
-      en: "Buttons editor",
-      uk: "Редактор кнопок",
+      en: "Toggle the display of the Button Editor",
+      uk: "Перемикання відображення Редактора кнопок",
     },
     buttons_editor_on: {
       en: "The button editor is enabled",
@@ -211,6 +211,14 @@
     folder_ranemad: {
       en: "Folder renamed",
       uk: "Папку перейменовано",
+    },
+    new_button_name: {
+      en: "Enter new button name",
+      uk: "Введіть нову назву кнопки",
+    },
+    button_ranemad: {
+      en: "Button renamed",
+      uk: "Кнопку перейменовано",
     },
   });
 
@@ -1139,7 +1147,7 @@
         setTimeout(() => {
           Lampa.Input.edit(
             {
-              title: "Перейменувати папку",
+              title: Lampa.Lang.translate("new_folder_name"),
               value: folder.name,
               free: true,
               nosave: true,
@@ -1152,7 +1160,7 @@
                 if (targetFolder) {
                   targetFolder.name = newName.trim();
                   setFolders(folders);
-                  Lampa.Noty.show("Папку перейменовано");
+                  Lampa.Noty.show(Lampa.Lang.translate("folder_renamed"));
                 }
               }
               openEditDialog();
@@ -1258,7 +1266,7 @@
           Lampa.Input.edit(
             {
               free: true,
-              title: "Нова назва кнопки",
+              title: Lampa.Lang.translate("new_button_name"),
               nosave: true,
               value: currentName,
               nomic: true,
@@ -1268,7 +1276,7 @@
                 const renamedButtons = getRenamedButtons();
                 renamedButtons[btnId] = newName.trim();
                 setRenamedButtons(renamedButtons);
-                Lampa.Noty.show("Кнопку перейменовано");
+                Lampa.Noty.show(Lampa.Lang.translate("button_renamed"));
               }
               openEditDialog();
             }
@@ -1818,9 +1826,9 @@
       production: { bg: "rgba(52, 152, 219, 0.8)", text: "white" },
     };
     const STATUS_MAP = {
-      completed: ["Завершено", "Ended"],
+      completed: ["Випущено", "Завершено", "Ended"],
       canceled: ["Скасовано", "Canceled"],
-      ongoing: ["Виходить", "Returning Series"],
+      ongoing: ["Виходить", "Онгоїнг", "Returning Series", "Ongoing"],
       production: ["У виробництві", "In Production"],
     };
     for (const key in STATUS_MAP) {
@@ -1967,7 +1975,7 @@
         setTimeout(function () {
           FancyFace.settings.buttons_editor = value;
           Lampa.Settings.update();
-          var currentValue = Lampa.Storage.get("buttons_editor_enabled", true);
+          var currentValue = Lampa.Storage.get("buttons_editor", true);
           if (currentValue) {
             $(".button--edit-order").show();
             Lampa.Noty.show(Lampa.Lang.translate("buttons_editor_on"));
@@ -2175,7 +2183,7 @@
       }, 400);
     });
 
-    FancyFace.settings.show_movie_type = Lampa.Storage.get(
+    FancyFace.settings.buttons_editor = Lampa.Storage.get(
       "buttons_editor",
       true
     );
