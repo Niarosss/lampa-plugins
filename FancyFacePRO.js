@@ -107,8 +107,8 @@
   // Мультимовна підтримка
   Lampa.Lang.add({
     menu_items_hide: {
-      en: "Setting the visibility of elements",
-      uk: "Перемикання видимості елементів",
+      en: "Management of interface elements",
+      uk: "Керування елементами інтерфейсу",
     },
     left_menu_title: {
       en: "Left menu",
@@ -2553,28 +2553,6 @@
           onChange: resetAllHiddenItems,
           onRender: function (item) {
             item.addClass("menu-hide-item");
-            item.find(".settings-param__descr").remove();
-
-            const $name = item.find(".settings-param__name");
-            $name.css({
-              margin: 0,
-              display: "flex",
-              "align-items": "center",
-              "justify-content": "space-between",
-              "font-size": "16px",
-              width: "100%",
-            });
-
-            $name
-              .find("svg")
-              .css({ width: 30, height: 30 })
-              .addClass("menu-hide-icon");
-
-            const $text = $('<span class="menu-hide-text"></span>').text(
-              Lampa.Lang.translate("reset_all_hidden")
-            );
-
-            $name.find("svg").after($text);
           },
         });
 
