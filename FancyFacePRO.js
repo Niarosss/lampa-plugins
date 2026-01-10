@@ -101,7 +101,7 @@
         opacity: 0.6 !important; \
         pointer-events: none !important; \
     }\
-    .settings-folder[data-component='menu_filter']:display:none;\
+    .settings-folder[data-component='menu_filter']{display:none;}\
 </style>"
   ).appendTo("head");
 
