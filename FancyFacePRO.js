@@ -2277,7 +2277,7 @@
       if (!component) return;
 
       // Не приховуємо налаштування нашого плагіна
-      if (component === "menu_filter") return;
+      if (component === "fancy_mod") return;
 
       if (hiddenItems.includes(component)) {
         $item.addClass("hidden");
@@ -2330,12 +2330,12 @@
       icon: mainIcon,
     });
 
-    // Lampa.SettingsApi.addComponent({
-    //   component: "menu_filter",
-    //   name: Lampa.Lang.translate("menu_items_hide"),
-    //   description: Lampa.Lang.translate("hide_description"),
-    //   icon: eyeIcon,
-    // });
+    Lampa.SettingsApi.addComponent({
+      component: "menu_filter",
+      name: Lampa.Lang.translate("menu_items_hide"),
+      description: Lampa.Lang.translate("hide_description"),
+      icon: eyeIcon,
+    });
 
     Lampa.SettingsApi.addParam({
       component: "fancy_mod",
@@ -3000,8 +3000,7 @@
                 "justify-content": "space-between",
               });
 
-              // Деактивуємо кнопку "Приховати елементи інтерфейсу"
-              if (component === "menu_filter") {
+              if (component === "fancy_mod") {
                 item.find(".settings-param").addClass("disable-hide");
               }
 
@@ -3047,7 +3046,7 @@
               // Функція перемикання стану
               function toggleItem() {
                 // Ми не дозволяємо приховувати налаштування плагіна
-                if (component === "menu_filter") return;
+                if (component === "fancy_mod") return;
 
                 const hiddenItems = Lampa.Storage.get(
                   "settings_hidden_items",
