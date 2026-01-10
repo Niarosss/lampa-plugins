@@ -35,7 +35,7 @@
         .menu-edit-list__delete svg, .menu-edit-list__rename svg, .menu-edit-list__edit-content svg { width: 1.2em !important; height: 1.2em !important; }\
         .menu-edit-list__delete.focus, .menu-edit-list__rename.focus, .menu-edit-list__edit-content.focus { border: 2px solid rgba(255,255,255,0.8); border-radius: 0.3em; }\
         .folder-item .menu-edit-list__move { margin-right: 0; }\
-        .folder-create-confirm { background: rgba(100,200,100,0.3); margin-top: 1em; border-radius: 0.3em; }\
+        .folder-create-confirm { background: rgba(100,200,100,0.3); margin-top: 1em; border-radius: 0.3em; border: 3px solid transparent; }\
         .folder-create-confirm.focus { border: 3px solid rgba(255,255,255,0.8); }\
         .bottom-controls { display: flex; gap: 0.5em; margin-top: 1em; }\
         .bottom-controls > .menu-edit-list__item { width: calc(50% - 0.25em); margin-bottom: 0; justify-content: center; }\
@@ -259,6 +259,78 @@
     reset_settings: {
       en: "Reset",
       uk: "Скинути",
+    },
+    season_one: {
+      en: "season",
+      uk: "сезон",
+    },
+    season_two: {
+      en: "seasons",
+      uk: "сезони",
+    },
+    season_five: {
+      en: "seasons",
+      uk: "сезонів",
+    },
+    episode_one: {
+      en: "episode",
+      uk: "серія",
+    },
+    episode_two: {
+      en: "episodes",
+      uk: "серії",
+    },
+    episode_five: {
+      en: "episodes",
+      uk: "серій",
+    },
+    season_episode_text_completed: {
+      en: "{seasons_count} {seasons_word} {episodes_count} {episodes_word}",
+      uk: "{seasons_count} {seasons_word} {episodes_count} {episodes_word}",
+    },
+    season_episode_text_ongoing: {
+      en: "{seasons_count} {seasons_word} {episodes_count} {episodes_word} from {total_episodes_count}",
+      uk: "{seasons_count} {seasons_word} {episodes_count} {episodes_word} з {total_episodes_count}",
+    },
+    status_ended: {
+      en: "Ended",
+      uk: "Завершено",
+    },
+    status_canceled: {
+      en: "Canceled",
+      uk: "Скасовано",
+    },
+    status_returning_series: {
+      en: "Returning Series",
+      uk: "Виходить",
+    },
+    status_in_production: {
+      en: "In Production",
+      uk: "У виробництві",
+    },
+    status_planned: {
+      en: "Planned",
+      uk: "Заплановано",
+    },
+    status_pilot: {
+      en: "Pilot",
+      uk: "Пілотний",
+    },
+    status_released: {
+      en: "Released",
+      uk: "Випущено",
+    },
+    status_rumored: {
+      en: "Rumored",
+      uk: "За чутками",
+    },
+    status_post_production: {
+      en: "Post Production",
+      uk: "Пост-продакшн",
+    },
+    status_unknown: {
+      en: "Unknown",
+      uk: "Невідомо",
     },
     button_settings_title: {
       en: "Button settings",
@@ -1681,17 +1753,17 @@
 
   function getStatusText(status) {
     const statusMap = {
-      Ended: "Завершено",
-      Canceled: "Скасовано",
-      "Returning Series": "Виходить",
-      "In Production": "У виробництві",
-      Planned: "Заплановано",
-      Pilot: "Пілотний",
-      Released: "Випущено",
-      Rumored: "За чутками",
-      "Post Production": "Пост-продакшн",
+      Ended: Lampa.Lang.translate("status_ended"),
+      Canceled: Lampa.Lang.translate("status_canceled"),
+      "Returning Series": Lampa.Lang.translate("status_returning_series"),
+      "In Production": Lampa.Lang.translate("status_in_production"),
+      Planned: Lampa.Lang.translate("status_planned"),
+      Pilot: Lampa.Lang.translate("status_pilot"),
+      Released: Lampa.Lang.translate("status_released"),
+      Rumored: Lampa.Lang.translate("status_rumored"),
+      "Post Production": Lampa.Lang.translate("status_post_production"),
     };
-    return statusMap[status] || status || "Невідомо";
+    return statusMap[status] || Lampa.Lang.translate("status_unknown");
   }
 
   // --- Інформація про сезони ---
@@ -1771,26 +1843,55 @@
         displaySeasons = totalSeasons;
         displayEpisodes = totalEpisodes;
       }
-      seasonsText = plural(displaySeasons, "сезон", "сезони", "сезонів");
-      episodesText = plural(displayEpisodes, "серія", "серії", "серій");
+      seasonsText = plural(
+        displaySeasons,
+        Lampa.Lang.translate("season_one"),
+        Lampa.Lang.translate("season_two"),
+        Lampa.Lang.translate("season_five")
+      );
+      episodesText = plural(
+        displayEpisodes,
+        Lampa.Lang.translate("episode_one"),
+        Lampa.Lang.translate("episode_two"),
+        Lampa.Lang.translate("episode_five")
+      );
 
       const infoElement = $('<div class="season-info-label"></div>');
       const isCompleted =
         movie.status === "Ended" || movie.status === "Canceled";
 
       if (isCompleted) {
-        const seasonEpisodeText = `${displaySeasons} ${seasonsText} ${displayEpisodes} ${episodesText}`;
+        const seasonEpisodeText = Lampa.Lang.translate(
+          "season_episode_text_completed",
+          {
+            seasons_count: displaySeasons,
+            seasons_word: seasonsText,
+            episodes_count: displayEpisodes,
+            episodes_word: episodesText,
+          }
+        );
         infoElement
           .append($("<div></div>").text(seasonEpisodeText))
           .append($("<div></div>").text(getStatusText(movie.status)));
       } else {
-        let text = `${displaySeasons} ${seasonsText} ${displayEpisodes} ${episodesText}`;
+        let text = Lampa.Lang.translate("season_episode_text_completed", {
+          seasons_count: displaySeasons,
+          seasons_word: seasonsText,
+          episodes_count: displayEpisodes,
+          episodes_word: episodesText,
+        });
         if (
           seasons_info_mode === "aired" &&
           totalEpisodes > 0 &&
           airedEpisodes < totalEpisodes
         ) {
-          text += ` з ${totalEpisodes}`;
+          text = Lampa.Lang.translate("season_episode_text_ongoing", {
+            seasons_count: displaySeasons,
+            seasons_word: seasonsText,
+            episodes_count: airedEpisodes,
+            episodes_word: episodesText,
+            total_episodes_count: totalEpisodes,
+          });
         }
         infoElement.append($("<div></div>").text(text));
       }
@@ -1897,15 +1998,7 @@
         }
         .card.focus .card__view::after, .card.hover .card__view::after { border: 2px solid #ff00ff; box-shadow: 0 0 20px #00ffff; }
       `,
-      dark_night: `
-        body { background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 50%, #0f0f0f 100%); color: #ffffff; }
-        .menu__item.focus, .menu__item.traverse, .menu__item.hover, .settings-folder.focus, .settings-param.focus, .selectbox-item.focus, .full-start__button.focus, .full-descr__tag.focus, .player-panel .button.focus {
-            background: linear-gradient(to right, #8a2387, #e94057, #f27121); color: #fff; box-shadow: 0 0 30px rgba(233, 64, 87, 0.3); animation: night-pulse 2s infinite;
-        }
-        @keyframes night-pulse { 0% { box-shadow: 0 0 20px rgba(233, 64, 87, 0.3); } 50% { box-shadow: 0 0 30px rgba(242, 113, 33, 0.3); } 100% { box-shadow: 0 0 20px rgba(138, 35, 135, 0.3); } }
-        .card.focus .card__view::after, .card.hover .card__view::after { border: 2px solid #e94057; box-shadow: 0 0 30px rgba(242, 113, 33, 0.5); }
-      `,
-      blue_cosmos: `
+      blue: `
         body { background: linear-gradient(135deg, #0b365c 0%, #144d80 50%, #0c2a4d 100%); color: #ffffff; }
         .menu__item.focus, .menu__item.traverse, .menu__item.hover, .settings-folder.focus, .settings-param.focus, .selectbox-item.focus, .full-start__button.focus, .full-descr__tag.focus, .player-panel .button.focus {
             background: linear-gradient(to right, #12c2e9, #c471ed, #f64f59); color: #fff; box-shadow: 0 0 30px rgba(18, 194, 233, 0.3); animation: cosmos-pulse 2s infinite;
@@ -1913,7 +2006,7 @@
         @keyframes cosmos-pulse { 0% { box-shadow: 0 0 20px rgba(18, 194, 233, 0.3); } 50% { box-shadow: 0 0 30px rgba(196, 113, 237, 0.3); } 100% { box-shadow: 0 0 20px rgba(246, 79, 89, 0.3); } }
         .card.focus .card__view::after, .card.hover .card__view::after { border: 2px solid #12c2e9; box-shadow: 0 0 30px rgba(196, 113, 237, 0.5); }
       `,
-      sunset: `
+      dark: `
         body { background: linear-gradient(135deg, #2d1f3d 0%, #614385 50%, #516395 100%); color: #ffffff; }
         .menu__item.focus, .menu__item.traverse, .menu__item.hover, .settings-folder.focus, .settings-param.focus, .selectbox-item.focus, .full-start__button.focus, .full-descr__tag.focus, .player-panel .button.focus {
             background: linear-gradient(to right, #ff6e7f, #bfe9ff); color: #2d1f3d; box-shadow: 0 0 15px rgba(255, 110, 127, 0.3); font-weight: bold;
@@ -1933,14 +2026,6 @@
             background: linear-gradient(to right, #aa4b6b, #6b6b83, #3b8d99); color: #fff; box-shadow: 0 0 20px rgba(170, 75, 107, 0.3); transform: scale(1.02); transition: all 0.3s ease;
         }
         .card.focus .card__view::after, .card.hover .card__view::after { border: 2px solid #aa4b6b; box-shadow: 0 0 25px rgba(170, 75, 107, 0.5); }
-      `,
-      bywolf_mod: `
-        body { background: linear-gradient(135deg, #090227 0%, #170b34 50%, #261447 100%); color: #ffffff; }
-        .menu__item.focus, .menu__item.traverse, .menu__item.hover, .settings-folder.focus, .settings-param.focus, .selectbox-item.focus, .full-start__button.focus, .full-descr__tag.focus, .player-panel .button.focus {
-            background: linear-gradient(to right, #fc00ff, #00dbde); color: #fff; box-shadow: 0 0 30px rgba(252, 0, 255, 0.3); animation: cosmic-pulse 2s infinite;
-        }
-        @keyframes cosmic-pulse { 0% { box-shadow: 0 0 20px rgba(252, 0, 255, 0.3); } 50% { box-shadow: 0 0 30px rgba(0, 219, 222, 0.3); } 100% { box-shadow: 0 0 20px rgba(252, 0, 255, 0.3); } }
-        .card.focus .card__view::after, .card.hover .card__view::after { border: 2px solid #fc00ff; box-shadow: 0 0 30px rgba(0, 219, 222, 0.5); }
       `,
     };
     $('<style id="fancyface_mod_theme"></style>')
@@ -2111,6 +2196,32 @@
     Lampa.SettingsApi.addParam({
       component: "fancy_mod",
       param: {
+        name: "theme_select",
+        type: "select",
+        values: {
+          default: "Немає",
+          blue: "Blue",
+          neon: "Neon",
+          dark: "Dark",
+          emerald: "Emerald",
+          aurora: "Aurora",
+        },
+        default: "default",
+      },
+      field: {
+        name: Lampa.Lang.translate("interface_theme_title"),
+        description: Lampa.Lang.translate("interface_theme_description"),
+      },
+      onChange: function (value) {
+        FancyFace.settings.theme = value;
+        Lampa.Storage.set("theme_select", value);
+        applyTheme(value);
+      },
+    });
+
+    Lampa.SettingsApi.addParam({
+      component: "fancy_mod",
+      param: {
         name: "buttons_editor",
         type: "trigger",
         default: true,
@@ -2198,34 +2309,6 @@
         if (!value) {
           $(".content-label").remove();
         }
-      },
-    });
-
-    Lampa.SettingsApi.addParam({
-      component: "fancy_mod",
-      param: {
-        name: "theme_select",
-        type: "select",
-        values: {
-          default: "Немає",
-          bywolf_mod: "Bywolf_mod",
-          dark_night: "Dark Night bywolf",
-          blue_cosmos: "Blue Cosmos",
-          neon: "Neon",
-          sunset: "Dark MOD",
-          emerald: "Emerald V1",
-          aurora: "Aurora",
-        },
-        default: "default",
-      },
-      field: {
-        name: Lampa.Lang.translate("interface_theme_title"),
-        description: Lampa.Lang.translate("interface_theme_description"),
-      },
-      onChange: function (value) {
-        FancyFace.settings.theme = value;
-        Lampa.Storage.set("theme_select", value);
-        applyTheme(value);
       },
     });
 
