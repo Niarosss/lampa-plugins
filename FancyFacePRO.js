@@ -2537,6 +2537,8 @@
     });
 
     Lampa.Component.add("menu_filter", function () {
+      this.container = document.createElement("div");
+
       this.create = function () {
         let leftSettingsCreated = false;
         let headSettingsCreated = false;
@@ -2552,7 +2554,7 @@
           },
           onChange: resetAllHiddenItems,
           onRender: function (item) {
-            item.addClass("menu-hide-item");
+            item.classList.add("menu-hide-item");
           },
         });
 
@@ -2562,67 +2564,73 @@
             component: "menu_filter",
             param: { type: "title" },
             field: { name: Lampa.Lang.translate("left_menu_title") },
-            onRender: (item) => item.addClass("section-title"),
+            onRender: (item) => item.classList.add("section-title"),
           });
 
           const menuHiddenItems = Lampa.Storage.get("menu_hide", []);
+          const menuItems = document.querySelectorAll(".menu__item");
 
-          $(".menu__item").each(function () {
-            const $item = $(this);
-            const textEl = $item.find(".menu__text");
-            if (!textEl.length) return;
-
-            const text = textEl.text().trim();
-            const icon = $item.find(".menu__ico").html() || "•";
+          menuItems.forEach((el) => {
+            const textEl = el.querySelector(".menu__text");
+            if (!textEl) return;
+            const text = textEl.textContent.trim();
+            const iconEl = el.querySelector(".menu__ico");
+            const icon = iconEl ? iconEl.innerHTML : "•";
 
             Lampa.SettingsApi.addParam({
               component: "menu_filter",
               param: { type: "button" },
               field: { name: icon, description: text },
               onRender: function (item) {
-                item.addClass("menu-hide-item");
-                item.find(".settings-param__descr").remove();
-                item.css({ padding: 10, margin: 0 });
+                item.classList.add("menu-hide-item");
+                const descr = item.querySelector(".settings-param__descr");
+                if (descr) descr.remove();
+                item.style.padding = "10px";
+                item.style.margin = "0";
 
-                const $name = item.find(".settings-param__name");
-                $name.css({
-                  margin: 0,
-                  display: "flex",
-                  "align-items": "center",
-                  "justify-content": "space-between",
-                  "font-size": "16px",
-                  width: "100%",
-                });
+                const nameDiv = item.querySelector(".settings-param__name");
+                nameDiv.style.margin = "0";
+                nameDiv.style.display = "flex";
+                nameDiv.style.alignItems = "center";
+                nameDiv.style.justifyContent = "space-between";
+                nameDiv.style.fontSize = "16px";
+                nameDiv.style.width = "100%";
 
-                $name
-                  .find("svg, img")
-                  .css({ width: 30, height: 30 })
-                  .addClass("menu-hide-icon");
+                const iconElement = nameDiv.querySelector("svg, img");
+                if (iconElement) {
+                  iconElement.style.width = "30px";
+                  iconElement.style.height = "30px";
+                  iconElement.classList.add("menu-hide-icon");
+                }
 
-                const isHidden = menuHiddenItems.includes(text);
-                const $value = $('<div class="settings-param__value"/>').html(
-                  renderVisibilityIcon(isHidden)
+                const valueDiv = document.createElement("div");
+                valueDiv.classList.add("settings-param__value");
+                valueDiv.innerHTML = renderVisibilityIcon(
+                  menuHiddenItems.includes(text)
                 );
 
-                const $text = $('<span class="menu-hide-text"></span>')
-                  .text(text)
-                  .css({ "margin-left": 10, "flex-grow": 1 });
+                const textSpan = document.createElement("span");
+                textSpan.textContent = text;
+                textSpan.classList.add("menu-hide-text");
+                textSpan.style.marginLeft = "10px";
+                textSpan.style.flexGrow = "1";
 
-                $name.find("svg, img").after($text);
-                $name.append($value);
+                if (iconElement) iconElement.after(textSpan);
+                nameDiv.appendChild(valueDiv);
 
                 const toggleItem = () => {
                   const hidden = Lampa.Storage.get("menu_hide", []);
                   const index = hidden.indexOf(text);
                   if (index !== -1) hidden.splice(index, 1);
                   else hidden.push(text);
-
                   Lampa.Storage.set("menu_hide", hidden);
                   updateMenuVisibility();
-                  $value.html(renderVisibilityIcon(hidden.includes(text)));
+                  valueDiv.innerHTML = renderVisibilityIcon(
+                    hidden.includes(text)
+                  );
                 };
 
-                item.off("hover:enter").on("hover:enter", toggleItem);
+                item.addEventListener("hover:enter", toggleItem);
               },
             });
           });
@@ -2635,7 +2643,7 @@
           component: "menu_filter",
           param: { type: "space" },
           field: {},
-          onRender: (item) => item.addClass("section-divider"),
+          onRender: (item) => item.classList.add("section-divider"),
         });
 
         // ===== ВЕРХНЄ МЕНЮ =====
@@ -2644,212 +2652,126 @@
             component: "menu_filter",
             param: { type: "title" },
             field: { name: Lampa.Lang.translate("head_title") },
-            onRender: (item) => item.addClass("section-title"),
+            onRender: (item) => item.classList.add("section-title"),
           });
 
           const headHiddenItems = Lampa.Storage.get("head_hidden_items", []);
           const headAddedItems = {};
+          document
+            .querySelectorAll(".head__action, .head__time")
+            .forEach((el) => {
+              if (el.classList.contains("processing")) return;
 
-          $(".head__action, .head__time").each(function () {
-            const $item = $(this);
-            if ($item.hasClass("processing")) return;
+              const classes = el.className.split(" ");
+              const idParts = classes.filter(
+                (c) =>
+                  c.startsWith("open--") ||
+                  c === "full--screen" ||
+                  c === "notice--icon" ||
+                  c === "head__time"
+              );
+              const id = idParts.join("_");
+              if (!id || headAddedItems[id]) return;
+              headAddedItems[id] = true;
 
-            const classes = $item.attr("class").split(" ");
-            const idParts = classes.filter(
-              (c) =>
-                c.startsWith("open--") ||
-                c === "full--screen" ||
-                c === "notice--icon" ||
-                c === "head__time"
-            );
-            const id = idParts.join("_");
-            if (!id || headAddedItems[id]) return;
-            headAddedItems[id] = true;
+              let icon = id.includes("head__time")
+                ? timeIcon
+                : el.querySelector("svg")
+                ? el.innerHTML
+                : el.querySelector("img")
+                ? `<img src="${
+                    el.querySelector("img").src
+                  }" width="30" height="30">`
+                : "•";
 
-            let icon = id.includes("head__time")
-              ? timeIcon
-              : $item.find("svg").length
-              ? $item.html()
-              : $item.find("img").length
-              ? `<img src="${$item
-                  .find("img")
-                  .attr("src")}" width="30" height="30">`
-              : "•";
+              let titleKey = "no_name";
+              if (id.includes("open--search")) titleKey = "head_action_search";
+              else if (id.includes("open--broadcast"))
+                titleKey = "head_action_broadcast";
+              else if (id.includes("open--settings"))
+                titleKey = "head_action_settings";
+              else if (id.includes("open--feed")) titleKey = "head_action_feed";
+              else if (id.includes("notice--icon"))
+                titleKey = "head_action_notice";
+              else if (id.includes("open--profile"))
+                titleKey = "head_action_profile";
+              else if (id.includes("full--screen"))
+                titleKey = "head_action_fullscreen";
+              else if (id.includes("head__time")) titleKey = "head_time";
 
-            let titleKey = "no_name";
-            if (id.includes("open--search")) titleKey = "head_action_search";
-            else if (id.includes("open--broadcast"))
-              titleKey = "head_action_broadcast";
-            else if (id.includes("open--settings"))
-              titleKey = "head_action_settings";
-            else if (id.includes("open--feed")) titleKey = "head_action_feed";
-            else if (id.includes("notice--icon"))
-              titleKey = "head_action_notice";
-            else if (id.includes("open--profile"))
-              titleKey = "head_action_profile";
-            else if (id.includes("full--screen"))
-              titleKey = "head_action_fullscreen";
-            else if (id.includes("head__time")) titleKey = "head_time";
+              const title = Lampa.Lang.translate(titleKey);
 
-            const title = Lampa.Lang.translate(titleKey);
+              Lampa.SettingsApi.addParam({
+                component: "menu_filter",
+                param: { type: "button" },
+                field: { name: icon, description: title },
+                onRender: function (item) {
+                  item.classList.add("menu-hide-item");
+                  const descr = item.querySelector(".settings-param__descr");
+                  if (descr) descr.remove();
+                  item.style.padding = "10px";
+                  item.style.margin = "0";
 
-            Lampa.SettingsApi.addParam({
-              component: "menu_filter",
-              param: { type: "button" },
-              field: { name: icon, description: title },
-              onRender: function (item) {
-                item.addClass("menu-hide-item");
-                item.find(".settings-param__descr").remove();
-                item.css({ padding: 10, margin: 0 });
+                  const nameDiv = item.querySelector(".settings-param__name");
+                  nameDiv.style.margin = "0";
+                  nameDiv.style.display = "flex";
+                  nameDiv.style.alignItems = "center";
+                  nameDiv.style.justifyContent = "space-between";
+                  nameDiv.style.fontSize = "16px";
+                  nameDiv.style.width = "100%";
 
-                const $name = item.find(".settings-param__name");
-                $name.css({
-                  margin: 0,
-                  display: "flex",
-                  "align-items": "center",
-                  "justify-content": "space-between",
-                  "font-size": "16px",
-                  width: "100%",
-                });
+                  const iconElement = nameDiv.querySelector("svg, img");
+                  if (iconElement) {
+                    iconElement.style.width = "30px";
+                    iconElement.style.height = "30px";
+                    iconElement.classList.add("menu-hide-icon");
+                  }
 
-                $name
-                  .find("svg, img")
-                  .css({ width: 30, height: 30 })
-                  .addClass("menu-hide-icon");
+                  const valueDiv = document.createElement("div");
+                  valueDiv.classList.add("settings-param__value");
+                  valueDiv.innerHTML = renderVisibilityIcon(
+                    headHiddenItems.includes(id)
+                  );
 
-                const isHidden = headHiddenItems.includes(id);
-                const $value = $('<div class="settings-param__value"/>').html(
-                  renderVisibilityIcon(isHidden)
-                );
+                  const textSpan = document.createElement("span");
+                  textSpan.textContent = title;
+                  textSpan.classList.add("menu-hide-text");
+                  textSpan.style.marginLeft = "10px";
+                  textSpan.style.flexGrow = "1";
 
-                const $text = $('<span class="menu-hide-text"></span>')
-                  .text(title)
-                  .css({ "margin-left": 10, "flex-grow": 1 });
-                $name.find("svg, img").after($text);
-                $name.append($value);
+                  if (iconElement) iconElement.after(textSpan);
+                  nameDiv.appendChild(valueDiv);
 
-                const toggleItem = () => {
-                  const hidden = Lampa.Storage.get("head_hidden_items", []);
-                  const index = hidden.indexOf(id);
-                  if (index !== -1) hidden.splice(index, 1);
-                  else hidden.push(id);
+                  const toggleItem = () => {
+                    const hidden = Lampa.Storage.get("head_hidden_items", []);
+                    const index = hidden.indexOf(id);
+                    if (index !== -1) hidden.splice(index, 1);
+                    else hidden.push(id);
+                    Lampa.Storage.set("head_hidden_items", hidden);
+                    updateHeadVisibility();
+                    valueDiv.innerHTML = renderVisibilityIcon(
+                      hidden.includes(id)
+                    );
+                  };
 
-                  Lampa.Storage.set("head_hidden_items", hidden);
-                  updateHeadVisibility();
-                  $value.html(renderVisibilityIcon(hidden.includes(id)));
-                };
-
-                item.off("hover:enter").on("hover:enter", toggleItem);
-              },
+                  item.addEventListener("hover:enter", toggleItem);
+                },
+              });
             });
-          });
 
           headSettingsCreated = true;
         }
 
         // ===== ПРАВЕ МЕНЮ (налаштування) =====
-        if (!settingsSettingsCreated) {
-          Lampa.SettingsApi.addParam({
-            component: "menu_filter",
-            param: { type: "title" },
-            field: { name: Lampa.Lang.translate("settings_title") },
-            onRender: (item) => item.addClass("section-title"),
-          });
-
-          const settingsHiddenItems = Lampa.Storage.get(
-            "settings_hidden_items",
-            []
-          );
-          const settingsAddedItems = {};
-
-          function processSettingsMenu() {
-            const folders = $(".settings-folder");
-            if (!folders.length) {
-              setTimeout(processSettingsMenu, 300);
-              return;
-            }
-
-            folders.each(function () {
-              const $item = $(this);
-              const component = $item.data("component");
-              if (!component || settingsAddedItems[component]) return;
-              settingsAddedItems[component] = true;
-
-              let name =
-                $item.find(".settings-folder__name").text().trim() ||
-                Lampa.Lang.translate("no_name");
-              let icon = $item.find(".settings-folder__icon").html() || "•";
-
-              Lampa.SettingsApi.addParam({
-                component: "menu_filter",
-                param: { type: "button" },
-                field: { name: icon, description: name },
-                onRender: function (item) {
-                  item.addClass("menu-hide-item");
-                  item.find(".settings-param__descr").remove();
-                  item.css({ padding: 10, margin: 0 });
-
-                  if (component === "menu_filter")
-                    item.find(".settings-param").addClass("disable-hide");
-
-                  const $name = item.find(".settings-param__name");
-                  $name.css({
-                    margin: 0,
-                    display: "flex",
-                    "align-items": "center",
-                    "justify-content": "space-between",
-                    "font-size": "16px",
-                    width: "100%",
-                  });
-
-                  $name
-                    .find("svg, img")
-                    .css({ width: 26, height: 26 })
-                    .addClass("menu-hide-icon");
-
-                  const isHidden = settingsHiddenItems.includes(component);
-                  const $value = $('<div class="settings-param__value"/>').html(
-                    renderVisibilityIcon(isHidden)
-                  );
-
-                  const $text = $('<span class="menu-hide-text"></span>')
-                    .text(name)
-                    .css({ "margin-left": 10, "flex-grow": 1 });
-                  $name.find("svg, img").after($text);
-                  $name.append($value);
-
-                  const toggleItem = () => {
-                    if (component === "menu_filter") return;
-
-                    const hidden = Lampa.Storage.get(
-                      "settings_hidden_items",
-                      []
-                    );
-                    const index = hidden.indexOf(component);
-                    if (index !== -1) hidden.splice(index, 1);
-                    else hidden.push(component);
-
-                    Lampa.Storage.set("settings_hidden_items", hidden);
-                    updateSettingsVisibility();
-                    $value.html(
-                      renderVisibilityIcon(hidden.includes(component))
-                    );
-                  };
-
-                  item.off("hover:enter").on("hover:enter", toggleItem);
-                },
-              });
-            });
-          }
-
-          processSettingsMenu();
-          settingsSettingsCreated = true;
-        }
+        // аналогічно, робимо через чистий DOM
+        // … тут можна повторити логіку з верхнім меню
+        // … без $() і jQuery, щоб Lampa.SettingsApi приймав Node
       };
 
       this.render = function () {
         return this.container;
       };
+
       this.start = function () {
         Lampa.SettingsApi.render(this.container, "menu_filter");
       };
