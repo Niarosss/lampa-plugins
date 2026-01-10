@@ -2538,43 +2538,35 @@
 
     Lampa.Component.add("menu_filter", function () {
       this.create = function () {
-        const settings = new Lampa.Settings();
+        const resetIcon = '<svg viewBox="0 0 24 24">...</svg>'; // твій ікон
+        const timeIcon = '<svg viewBox="0 0 24 24">...</svg>'; // іконка часу
 
-        // Кнопка скидання всіх прихованих елементів
-        settings.add({
-          type: "button",
-          name: resetIcon,
-          description: Lampa.Lang.translate("reset_all_hidden"),
-          onClick: resetAllHiddenItems,
+        // ===== КНОПКА "Скинути всі приховані" =====
+        Lampa.SettingsApi.addParam({
+          component: "menu_filter",
+          param: { type: "button" },
+          field: {
+            name: resetIcon,
+            description: Lampa.Lang.translate("reset_all_hidden"),
+          },
+          onChange: resetAllHiddenItems,
           onRender: function (item) {
             item.addClass("menu-hide-item");
             item.find(".settings-param__descr").remove();
 
-            item.find(".settings-param").css({
-              padding: "0 15px",
-              display: "flex",
-              "align-items": "center",
-              "justify-content": "space-between",
-            });
-
             const $name = item.find(".settings-param__name");
             $name.css({
               margin: 0,
-              "font-size": "16px",
               display: "flex",
               "align-items": "center",
               "justify-content": "space-between",
+              "font-size": "16px",
               width: "100%",
             });
 
             $name
               .find("svg")
-              .css({
-                width: "30px",
-                height: "30px",
-                "min-width": "30px",
-                "min-height": "30px",
-              })
+              .css({ width: 30, height: 30 })
               .addClass("menu-hide-icon");
 
             const $text = $('<span class="menu-hide-text"></span>').text(
@@ -2585,15 +2577,17 @@
           },
         });
 
-        // Ліве меню
+        // ===== ЛІВЕ МЕНЮ =====
         if (!leftSettingsCreated) {
-          settings.add({
-            type: "title",
-            name: Lampa.Lang.translate("left_menu_title"),
+          Lampa.SettingsApi.addParam({
+            component: "menu_filter",
+            param: { type: "title" },
+            field: { name: Lampa.Lang.translate("left_menu_title") },
             onRender: (item) => item.addClass("section-title"),
           });
 
           const menuHiddenItems = Lampa.Storage.get("menu_hide", []);
+
           $(".menu__item").each(function () {
             const $item = $(this);
             const textEl = $item.find(".menu__text");
@@ -2602,40 +2596,28 @@
             const text = textEl.text().trim();
             const icon = $item.find(".menu__ico").html() || "•";
 
-            settings.add({
-              type: "button",
-              name: icon,
-              description: text,
+            Lampa.SettingsApi.addParam({
+              component: "menu_filter",
+              param: { type: "button" },
+              field: { name: icon, description: text },
               onRender: function (item) {
                 item.addClass("menu-hide-item");
                 item.find(".settings-param__descr").remove();
-                item.css({ padding: "10px", margin: 0 });
-
-                item.find(".settings-param").css({
-                  padding: "0 15px",
-                  display: "flex",
-                  "align-items": "center",
-                  "justify-content": "space-between",
-                });
+                item.css({ padding: 10, margin: 0 });
 
                 const $name = item.find(".settings-param__name");
                 $name.css({
                   margin: 0,
-                  "font-size": "16px",
                   display: "flex",
                   "align-items": "center",
                   "justify-content": "space-between",
+                  "font-size": "16px",
                   width: "100%",
                 });
 
                 $name
                   .find("svg, img")
-                  .css({
-                    width: "30px",
-                    height: "30px",
-                    "min-width": "30px",
-                    "min-height": "30px",
-                  })
+                  .css({ width: 30, height: 30 })
                   .addClass("menu-hide-icon");
 
                 const isHidden = menuHiddenItems.includes(text);
@@ -2645,7 +2627,7 @@
 
                 const $text = $('<span class="menu-hide-text"></span>')
                   .text(text)
-                  .css({ "margin-left": "10px", "flex-grow": 1 });
+                  .css({ "margin-left": 10, "flex-grow": 1 });
 
                 $name.find("svg, img").after($text);
                 $name.append($value);
@@ -2669,17 +2651,20 @@
           leftSettingsCreated = true;
         }
 
-        // Роздільник
-        settings.add({
-          type: "space",
+        // ===== РОЗДІЛЬНИК =====
+        Lampa.SettingsApi.addParam({
+          component: "menu_filter",
+          param: { type: "space" },
+          field: {},
           onRender: (item) => item.addClass("section-divider"),
         });
 
-        // Верхнє меню
+        // ===== ВЕРХНЄ МЕНЮ =====
         if (!headSettingsCreated) {
-          settings.add({
-            type: "title",
-            name: Lampa.Lang.translate("head_title"),
+          Lampa.SettingsApi.addParam({
+            component: "menu_filter",
+            param: { type: "title" },
+            field: { name: Lampa.Lang.translate("head_title") },
             onRender: (item) => item.addClass("section-title"),
           });
 
@@ -2691,29 +2676,26 @@
             if ($item.hasClass("processing")) return;
 
             const classes = $item.attr("class").split(" ");
-            let idParts = [];
-            for (let cls of classes) {
-              if (
-                cls.startsWith("open--") ||
-                cls === "full--screen" ||
-                cls === "notice--icon" ||
-                cls === "head__time"
-              ) {
-                idParts.push(cls);
-              }
-            }
+            const idParts = classes.filter(
+              (c) =>
+                c.startsWith("open--") ||
+                c === "full--screen" ||
+                c === "notice--icon" ||
+                c === "head__time"
+            );
             const id = idParts.join("_");
             if (!id || headAddedItems[id]) return;
             headAddedItems[id] = true;
 
-            let icon = "";
-            if (id.includes("head__time")) icon = timeIcon;
-            else if ($item.find("svg").length) icon = $item.html();
-            else if ($item.find("img").length)
-              icon = `<img src="${$item
-                .find("img")
-                .attr("src")}" width="30" height="30" style="display:block;">`;
-            else icon = "•";
+            let icon = id.includes("head__time")
+              ? timeIcon
+              : $item.find("svg").length
+              ? $item.html()
+              : $item.find("img").length
+              ? `<img src="${$item
+                  .find("img")
+                  .attr("src")}" width="30" height="30">`
+              : "•";
 
             let titleKey = "no_name";
             if (id.includes("open--search")) titleKey = "head_action_search";
@@ -2732,40 +2714,28 @@
 
             const title = Lampa.Lang.translate(titleKey);
 
-            settings.add({
-              type: "button",
-              name: icon,
-              description: title,
+            Lampa.SettingsApi.addParam({
+              component: "menu_filter",
+              param: { type: "button" },
+              field: { name: icon, description: title },
               onRender: function (item) {
                 item.addClass("menu-hide-item");
                 item.find(".settings-param__descr").remove();
-                item.css({ padding: "10px", margin: 0 });
-
-                item.find(".settings-param").css({
-                  padding: "0 15px",
-                  display: "flex",
-                  "align-items": "center",
-                  "justify-content": "space-between",
-                });
+                item.css({ padding: 10, margin: 0 });
 
                 const $name = item.find(".settings-param__name");
                 $name.css({
                   margin: 0,
-                  "font-size": "16px",
                   display: "flex",
                   "align-items": "center",
                   "justify-content": "space-between",
+                  "font-size": "16px",
                   width: "100%",
                 });
 
                 $name
                   .find("svg, img")
-                  .css({
-                    width: "30px",
-                    height: "30px",
-                    "min-width": "30px",
-                    "min-height": "30px",
-                  })
+                  .css({ width: 30, height: 30 })
                   .addClass("menu-hide-icon");
 
                 const isHidden = headHiddenItems.includes(id);
@@ -2775,7 +2745,7 @@
 
                 const $text = $('<span class="menu-hide-text"></span>')
                   .text(title)
-                  .css({ "margin-left": "10px", "flex-grow": 1 });
+                  .css({ "margin-left": 10, "flex-grow": 1 });
                 $name.find("svg, img").after($text);
                 $name.append($value);
 
@@ -2798,8 +2768,104 @@
           headSettingsCreated = true;
         }
 
-        // Вставляємо UI в Activity
-        this.activity.render().append(settings.render());
+        // ===== ПРАВЕ МЕНЮ (налаштування) =====
+        if (!settingsSettingsCreated) {
+          Lampa.SettingsApi.addParam({
+            component: "menu_filter",
+            param: { type: "title" },
+            field: { name: Lampa.Lang.translate("settings_title") },
+            onRender: (item) => item.addClass("section-title"),
+          });
+
+          const settingsHiddenItems = Lampa.Storage.get(
+            "settings_hidden_items",
+            []
+          );
+          const settingsAddedItems = {};
+
+          function processSettingsMenu() {
+            const folders = $(".settings-folder");
+            if (!folders.length) {
+              setTimeout(processSettingsMenu, 300);
+              return;
+            }
+
+            folders.each(function () {
+              const $item = $(this);
+              const component = $item.data("component");
+              if (!component || settingsAddedItems[component]) return;
+              settingsAddedItems[component] = true;
+
+              let name =
+                $item.find(".settings-folder__name").text().trim() ||
+                Lampa.Lang.translate("no_name");
+              let icon = $item.find(".settings-folder__icon").html() || "•";
+
+              Lampa.SettingsApi.addParam({
+                component: "menu_filter",
+                param: { type: "button" },
+                field: { name: icon, description: name },
+                onRender: function (item) {
+                  item.addClass("menu-hide-item");
+                  item.find(".settings-param__descr").remove();
+                  item.css({ padding: 10, margin: 0 });
+
+                  if (component === "menu_filter")
+                    item.find(".settings-param").addClass("disable-hide");
+
+                  const $name = item.find(".settings-param__name");
+                  $name.css({
+                    margin: 0,
+                    display: "flex",
+                    "align-items": "center",
+                    "justify-content": "space-between",
+                    "font-size": "16px",
+                    width: "100%",
+                  });
+
+                  $name
+                    .find("svg, img")
+                    .css({ width: 26, height: 26 })
+                    .addClass("menu-hide-icon");
+
+                  const isHidden = settingsHiddenItems.includes(component);
+                  const $value = $('<div class="settings-param__value"/>').html(
+                    renderVisibilityIcon(isHidden)
+                  );
+
+                  const $text = $('<span class="menu-hide-text"></span>')
+                    .text(name)
+                    .css({ "margin-left": 10, "flex-grow": 1 });
+                  $name.find("svg, img").after($text);
+                  $name.append($value);
+
+                  const toggleItem = () => {
+                    if (component === "menu_filter") return;
+
+                    const hidden = Lampa.Storage.get(
+                      "settings_hidden_items",
+                      []
+                    );
+                    const index = hidden.indexOf(component);
+                    if (index !== -1) hidden.splice(index, 1);
+                    else hidden.push(component);
+
+                    Lampa.Storage.set("settings_hidden_items", hidden);
+                    updateSettingsVisibility();
+                    $value.html(
+                      renderVisibilityIcon(hidden.includes(component))
+                    );
+                  };
+
+                  item.off("hover:enter").on("hover:enter", toggleItem);
+                },
+              });
+            });
+          }
+
+          processSettingsMenu();
+          settingsSettingsCreated = true;
+        }
       };
     });
 
