@@ -2299,7 +2299,7 @@
       if (!component) return;
 
       // Не приховуємо налаштування нашого плагіна
-      if (component === "menu_filter") return;
+      if (component === "fancy_mod") return;
 
       if (hiddenItems.includes(component)) {
         $item.addClass("hidden");
@@ -3068,7 +3068,7 @@
               // Функція перемикання стану
               function toggleItem() {
                 // Ми не дозволяємо приховувати налаштування плагіна
-                if (component === "menu_filter") return;
+                if (component === "fancy_mod") return;
 
                 const hiddenItems = Lampa.Storage.get(
                   "settings_hidden_items",
@@ -3184,6 +3184,18 @@
     }
 
     initGlobalObserver();
+
+    Lampa.Settings.listener.follow("open", () => {
+      setTimeout(() => {
+        const ourSettings = $('.settings-folder[data-component="season_info"]');
+        const interfaceSettings = $(
+          '.settings-folder[data-component="interface"]'
+        );
+        if (ourSettings.length && interfaceSettings.length) {
+          ourSettings.insertAfter(interfaceSettings);
+        }
+      }, 100);
+    });
   }
 
   if (window.appready) {
