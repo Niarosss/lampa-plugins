@@ -2296,20 +2296,12 @@
     $(".settings-folder").each(function () {
       const $item = $(this);
       const component = $item.data("component");
-      const nameElement = $item.find(".settings-folder__name");
-      const name = nameElement.length ? nameElement.text().trim() : null;
-
-      // Якщо немає ідентифікатора компонента — використовуємо назву як резервну
-      const identifier = component || name;
-      if (!identifier) return;
+      if (!component) return;
 
       // Не приховуємо налаштування нашого плагіна
-      if (identifier === "fancy_mod") return;
+      if (component === "menu_filter") return;
 
-      if (
-        hiddenItems.includes(identifier) ||
-        (name && hiddenItems.includes(name))
-      ) {
+      if (hiddenItems.includes(component)) {
         $item.addClass("hidden");
       } else {
         $item.removeClass("hidden");
@@ -3056,13 +3048,7 @@
                 })
                 .addClass("menu-hide-icon");
 
-              // Визначаємо ідентифікатор для збереження: компонент або назва як fallback
-              const idToSave = component || name;
-              const isHidden = idToSave
-                ? settingsHiddenItems.includes(idToSave) ||
-                  settingsHiddenItems.includes(name)
-                : false;
-
+              const isHidden = settingsHiddenItems.includes(component);
               var $value = $('<div class="settings-param__value"/>').html(
                 renderVisibilityIcon(isHidden)
               );
@@ -3082,27 +3068,24 @@
               // Функція перемикання стану
               function toggleItem() {
                 // Ми не дозволяємо приховувати налаштування плагіна
-                // Забороняємо приховувати наш плагін
-                if (idToSave === "fancy_mod") return;
+                if (component === "menu_filter") return;
 
                 const hiddenItems = Lampa.Storage.get(
                   "settings_hidden_items",
                   []
                 );
-                const index = idToSave ? hiddenItems.indexOf(idToSave) : -1;
+                const index = hiddenItems.indexOf(component);
 
                 if (index !== -1) {
                   hiddenItems.splice(index, 1);
-                } else if (idToSave) {
-                  hiddenItems.push(idToSave);
+                } else {
+                  hiddenItems.push(component);
                 }
 
                 Lampa.Storage.set("settings_hidden_items", hiddenItems);
                 updateSettingsVisibility();
 
-                const isNowHidden = idToSave
-                  ? hiddenItems.includes(idToSave)
-                  : false;
+                const isNowHidden = hiddenItems.includes(component);
                 $value.html(renderVisibilityIcon(isNowHidden));
               }
 
