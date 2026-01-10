@@ -2522,19 +2522,16 @@
     });
 
     Lampa.SettingsApi.addParam({
-      component: "fancy_mod",
-      param: { type: "button" },
-      field: {
-        name: Lampa.Lang.translate("menu_items_hide"),
-        description: Lampa.Lang.translate("plugin_description"),
-      },
+      key: "menu_filter_button", // Використовуйте key замість component
+      name: Lampa.Lang.translate("menu_items_hide"),
+      description: Lampa.Lang.translate("plugin_description"),
+      type: "button", // Правильний тип для кнопки
       onChange: function () {
         Lampa.Activity.push({
           component: "menu_filter",
           title: Lampa.Lang.translate("menu_items_hide"),
           render: function () {
-            // Генеруємо HTML для меню
-            let html = "";
+            let html = '<div class="settings-container">';
 
             // ===== Ліве меню =====
             const menuHiddenItems = Lampa.Storage.get("menu_hide", []);
@@ -2547,13 +2544,13 @@
               const icon = $item.find(".menu__ico").html() || "•";
               const isHidden = menuHiddenItems.includes(text);
 
-              html += `
-                        <div class="settings-item menu-hide-item" data-text="${text}">
-                            <div class="settings-item__title">${icon} ${text}</div>
+              html += `  
+                        <div class="settings-item menu-hide-item" data-text="${text}">  
+                            <div class="settings-item__title">${icon} ${text}</div>  
                             <div class="settings-param__value">${renderVisibilityIcon(
                               isHidden
-                            )}</div>
-                        </div>
+                            )}</div>  
+                        </div>  
                     `;
             });
 
@@ -2604,13 +2601,13 @@
               const title = Lampa.Lang.translate(titleKey);
               const isHidden = headHiddenItems.includes(id);
 
-              html += `
-                        <div class="settings-item menu-hide-item" data-id="${id}">
-                            <div class="settings-item__title">${icon} ${title}</div>
+              html += `  
+                        <div class="settings-item menu-hide-item" data-id="${id}">  
+                            <div class="settings-item__title">${icon} ${title}</div>  
                             <div class="settings-param__value">${renderVisibilityIcon(
                               isHidden
-                            )}</div>
-                        </div>
+                            )}</div>  
+                        </div>  
                     `;
             });
 
@@ -2632,17 +2629,18 @@
               const icon = $item.find(".settings-folder__icon").html() || "•";
               const isHidden = settingsHiddenItems.includes(component);
 
-              html += `
-                        <div class="settings-item menu-hide-item" data-component="${component}">
-                            <div class="settings-item__title">${icon} ${name}</div>
+              html += `  
+                        <div class="settings-item menu-hide-item" data-component="${component}">  
+                            <div class="settings-item__title">${icon} ${name}</div>  
                             <div class="settings-param__value">${renderVisibilityIcon(
                               isHidden
-                            )}</div>
-                        </div>
+                            )}</div>  
+                        </div>  
                     `;
             });
 
-            return { html };
+            html += "</div>";
+            return { html: html };
           },
           start: function (container) {
             // Ліве меню toggle
