@@ -2330,12 +2330,12 @@
       icon: mainIcon,
     });
 
-    Lampa.SettingsApi.addComponent({
-      component: "menu_filter",
-      name: Lampa.Lang.translate("menu_items_hide"),
-      description: Lampa.Lang.translate("hide_description"),
-      icon: eyeIcon,
-    });
+    // Lampa.SettingsApi.addComponent({
+    //   component: "menu_filter",
+    //   name: Lampa.Lang.translate("menu_items_hide"),
+    //   description: Lampa.Lang.translate("hide_description"),
+    //   icon: eyeIcon,
+    // });
 
     Lampa.SettingsApi.addParam({
       component: "fancy_mod",
