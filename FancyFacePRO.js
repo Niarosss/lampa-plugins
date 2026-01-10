@@ -2296,12 +2296,20 @@
     $(".settings-folder").each(function () {
       const $item = $(this);
       const component = $item.data("component");
-      if (!component) return;
+      const nameElement = $item.find(".settings-folder__name");
+      const name = nameElement.length ? nameElement.text().trim() : null;
+
+      // Якщо немає ідентифікатора компонента — використовуємо назву як резервну
+      const identifier = component || name;
+      if (!identifier) return;
 
       // Не приховуємо налаштування нашого плагіна
-      if (component === "fancy_mod") return;
+      if (identifier === "fancy_mod") return;
 
-      if (hiddenItems.includes(component)) {
+      if (
+        hiddenItems.includes(identifier) ||
+        (name && hiddenItems.includes(name))
+      ) {
         $item.addClass("hidden");
       } else {
         $item.removeClass("hidden");
@@ -3048,7 +3056,13 @@
                 })
                 .addClass("menu-hide-icon");
 
-              const isHidden = settingsHiddenItems.includes(component);
+              // Визначаємо ідентифікатор для збереження: компонент або назва як fallback
+              const idToSave = component || name;
+              const isHidden = idToSave
+                ? settingsHiddenItems.includes(idToSave) ||
+                  settingsHiddenItems.includes(name)
+                : false;
+
               var $value = $('<div class="settings-param__value"/>').html(
                 renderVisibilityIcon(isHidden)
               );
@@ -3068,24 +3082,27 @@
               // Функція перемикання стану
               function toggleItem() {
                 // Ми не дозволяємо приховувати налаштування плагіна
-                if (component === "fancy_mod") return;
+                // Забороняємо приховувати наш плагін
+                if (idToSave === "fancy_mod") return;
 
                 const hiddenItems = Lampa.Storage.get(
                   "settings_hidden_items",
                   []
                 );
-                const index = hiddenItems.indexOf(component);
+                const index = idToSave ? hiddenItems.indexOf(idToSave) : -1;
 
                 if (index !== -1) {
                   hiddenItems.splice(index, 1);
-                } else {
-                  hiddenItems.push(component);
+                } else if (idToSave) {
+                  hiddenItems.push(idToSave);
                 }
 
                 Lampa.Storage.set("settings_hidden_items", hiddenItems);
                 updateSettingsVisibility();
 
-                const isNowHidden = hiddenItems.includes(component);
+                const isNowHidden = idToSave
+                  ? hiddenItems.includes(idToSave)
+                  : false;
                 $value.html(renderVisibilityIcon(isNowHidden));
               }
 
@@ -3184,18 +3201,6 @@
     }
 
     initGlobalObserver();
-
-    Lampa.Settings.listener.follow("open", () => {
-      setTimeout(() => {
-        const ourSettings = $('.settings-folder[data-component="season_info"]');
-        const interfaceSettings = $(
-          '.settings-folder[data-component="interface"]'
-        );
-        if (ourSettings.length && interfaceSettings.length) {
-          ourSettings.insertAfter(interfaceSettings);
-        }
-      }, 100);
-    });
   }
 
   if (window.appready) {
