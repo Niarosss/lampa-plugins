@@ -3188,13 +3188,14 @@
 
     Lampa.Settings.listener.follow("open", () => {
       setTimeout(() => {
-        const ourSettings = $('.settings-folder[data-component="season_info"]');
+        const ourSettings = $('.settings-folder[data-component="fancy_mod"]');
         const interfaceSettings = $(
           '.settings-folder[data-component="interface"]'
         );
         if (ourSettings.length && interfaceSettings.length) {
           ourSettings.insertAfter(interfaceSettings);
         }
+        updateAllVisibility();
       }, 100);
     });
   }
