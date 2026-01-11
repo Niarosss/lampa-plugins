@@ -16,6 +16,7 @@
       show_original_names: true,
       buttons_editor: true,
     },
+    observer: null,
   };
 
   // -- Стилі для приховування елементів та оформлення ---
