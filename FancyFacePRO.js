@@ -2220,7 +2220,7 @@
 
       // меню апдейти
       if (menuTouched) {
-        createMenuSettings();
+        // createMenuSettings();
         updateAllVisibility();
       }
 
