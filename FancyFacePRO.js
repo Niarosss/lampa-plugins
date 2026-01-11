@@ -2218,11 +2218,11 @@
         }
       });
 
-      // меню апдейти
-      if (menuTouched) {
-        // createMenuSettings();
-        updateAllVisibility();
-      }
+      // // меню апдейти
+      // if (menuTouched) {
+      //   createMenuSettings();
+      //   updateAllVisibility();
+      // }
 
       // апдейт карток
       if (cardsToUpdate.size) {
