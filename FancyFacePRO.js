@@ -2,8 +2,8 @@
   ("use strict");
 
   const FancyFace = {
-    name: "FancyFacePro",
-    version: "1.0.1",
+    name: "FancyFace",
+    version: "1.1.2",
     settings: {
       enabled: true,
       show_movie_type: true,
@@ -21,89 +21,171 @@
 
   // -- Стилі для приховування елементів та оформлення ---
   $(
-    "<style>\
-      @keyframes button-fade-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }\
-        .full-start__button { opacity: 0; }\
-        .full-start__button.hidden { display: none !important; }\
-        .button--folder { cursor: pointer; }\
-        .full-start-new__buttons { display: flex !important; flex-direction: row !important; flex-wrap: wrap !important; gap: 0.5em !important; }\
-        .full-start-new__buttons.buttons-loading .full-start__button { visibility: hidden !important; }\
-        .menu-edit-list__create-folder { background: rgba(100,200,100,0.2); border: 3px solid transparent; }\
-        .menu-edit-list__create-folder.focus { background: rgba(100,200,100,0.3); border-color: rgba(255,255,255,0.8); }\
-        .menu-edit-list__delete, .menu-edit-list__rename, .menu-edit-list__edit-content { width: 2.4em; height: 2.4em; display: flex; align-items: center; justify-content: center; cursor: pointer; }\
-        .menu-edit-list__delete svg, .menu-edit-list__rename svg, .menu-edit-list__edit-content svg { width: 1.2em !important; height: 1.2em !important; }\
-        .menu-edit-list__delete.focus, .menu-edit-list__rename.focus, .menu-edit-list__edit-content.focus { border: 2px solid rgba(255,255,255,0.8); border-radius: 0.3em; }\
-        .folder-item .menu-edit-list__move { margin-right: 0; }\
-        .folder-create-confirm { background: rgba(100,200,100,0.3); margin-top: 1em; border-radius: 0.3em; border: 3px solid transparent; }\
-        .folder-create-confirm.focus { border: 3px solid rgba(255,255,255,0.8); }\
-        .bottom-controls { display: flex; gap: 0.5em; margin-top: 1em; }\
-        .bottom-controls > .menu-edit-list__item { width: calc(50% - 0.25em); margin-bottom: 0; justify-content: center; }\
-        .folder-reset-button { background: rgba(200,100,100,0.3); border: 3px solid transparent; }\
-        .folder-reset-button.focus { background: rgba(200,100,100,0.4); border-color: rgba(255,255,255,0.8); }\
-        .menu-edit-list__toggle.focus { border: 2px solid rgba(255,255,255,0.8); border-radius: 0.3em; }\
-        .button--folder.folder--no-name { min-width: 3.5em; max-width: 3.5em; justify-content: center; }\
-        .button--folder.folder--no-name > span { display: none; }\
-    .hidden { display: none !important; }\
-    .menu-hide-item .settings-param { \
-        padding: 16px 40px !important; /* Збільшений відступ */ \
-        min-height: 54px !important; \
-        display: flex !important; \
-        align-items: center !important; \
-        border-radius: 12px !important; \
-        margin-bottom: 12px !important; \
-        background: rgba(255,255,255,0.05) !important; \
-        transition: all 0.2s ease !important; \
-    }\
-    .menu-hide-item .settings-param:hover { \
-        background: rgba(255,255,255,0.1) !important; \
-        transform: translateY(-2px) !important; \
-    }\
-    .menu-hide-icon { \
-        width: 30px !important; \
-        height: 30px !important; \
-        min-width: 30px !important; \
-        min-height: 30px !important; \
-        display: flex !important; \
-        align-items: center !important; \
-        justify-content: center !important; \
-        margin-right: 16px !important; \
-        margin-left: 10px !important; /* Додано відступ зліва */ \
-    }\
-    .menu-hide-text { \
-        font-size: 18px !important; \
-        flex-grow: 1 !important; \
-        font-weight: 500 !important; \
-        letter-spacing: 0.3px !important; \
-    }\
-    .menu-hide-hidden { \
-        color: #ff4e45 !important; \
-    }\
-    .menu-hide-shown { \
-        color: #4CAF50 !important; \
-    }\
-    .section-title .settings-param__name { \
-        font-size: 20px !important; \
-        font-weight: 600 !important; \
-        margin: 25px 0 15px 0 !important; \
-        padding-bottom: 8px !important; \
-        border-bottom: 2px solid rgba(255,255,255,0.1) !important; \
-        color: #fff !important; \
-    }\
-    .section-divider .settings-param { \
-        height: 1px !important; \
-        min-height: 1px !important; \
-        padding: 0 !important; \
-        background: rgba(255,255,255,0.1) !important; \
-        margin: 25px 0 !important; \
-    }\
-    .settings-param.disable-hide { \
-        opacity: 0.6 !important; \
-        pointer-events: none !important; \
-    }\
-</style>"
+    `<style>
+      @keyframes button-fade-in {
+        from {
+          opacity: 0;
+          transform: translateY(8px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      .full-start__button {
+        opacity: 0;
+      }
+      .full-start__button.hidden {
+        display: none !important;
+      }
+      .button--folder {
+        cursor: pointer;
+      }
+      .full-start-new__buttons {
+        display: flex !important;
+        flex-direction: row !important;
+        flex-wrap: wrap !important;
+        gap: 0.5em !important;
+      }
+      .full-start-new__buttons.buttons-loading .full-start__button {
+        visibility: hidden !important;
+      }
+      .menu-edit-list__create-folder {
+        background: rgba(100, 200, 100, 0.2);
+        border: 3px solid transparent;
+      }
+      .menu-edit-list__create-folder.focus {
+        background: rgba(100, 200, 100, 0.3);
+        border-color: rgba(255, 255, 255, 0.8);
+      }
+      .menu-edit-list__delete,
+      .menu-edit-list__rename,
+      .menu-edit-list__edit-content {
+        width: 2.4em;
+        height: 2.4em;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+      }
+      .menu-edit-list__delete svg,
+      .menu-edit-list__rename svg,
+      .menu-edit-list__edit-content svg {
+        width: 1.2em !important;
+        height: 1.2em !important;
+      }
+      .menu-edit-list__delete.focus,
+      .menu-edit-list__rename.focus,
+      .menu-edit-list__edit-content.focus {
+        border: 2px solid rgba(255, 255, 255, 0.8);
+        border-radius: 0.3em;
+      }
+      .folder-item .menu-edit-list__move {
+        margin-right: 0;
+      }
+      .folder-create-confirm {
+        background: rgba(100, 200, 100, 0.3);
+        margin-top: 1em;
+        border-radius: 0.3em;
+        border: 3px solid transparent;
+      }
+      .folder-create-confirm.focus {
+        border: 3px solid rgba(255, 255, 255, 0.8);
+      }
+      .bottom-controls {
+        display: flex;
+        gap: 0.5em;
+        margin-top: 1em;
+      }
+      .bottom-controls > .menu-edit-list__item {
+        width: calc(50% - 0.25em);
+        margin-bottom: 0;
+        justify-content: center;
+      }
+      .folder-reset-button {
+        background: rgba(200, 100, 100, 0.3);
+        border: 3px solid transparent;
+      }
+      .folder-reset-button.focus {
+        background: rgba(200, 100, 100, 0.4);
+        border-color: rgba(255, 255, 255, 0.8);
+      }
+      .menu-edit-list__toggle.focus {
+        border: 2px solid rgba(255, 255, 255, 0.8);
+        border-radius: 0.3em;
+      }
+      .button--folder.folder--no-name {
+        min-width: 3.5em;
+        max-width: 3.5em;
+        justify-content: center;
+      }
+      .button--folder.folder--no-name > span {
+        display: none;
+      }
+      .hidden {
+        display: none !important;
+      }
+      .menu-hide-item .settings-param {
+        padding: 16px 40px !important;
+        min-height: 54px !important;
+        display: flex !important;
+        align-items: center !important;
+        border-radius: 12px !important;
+        margin-bottom: 12px !important;
+        background: rgba(255, 255, 255, 0.05) !important;
+        transition: all 0.2s ease !important;
+      }
+      .menu-hide-item .settings-param:hover {
+        background: rgba(255, 255, 255, 0.1) !important;
+        transform: translateY(-2px) !important;
+      }
+      .menu-hide-icon {
+        width: 30px !important;
+        height: 30px !important;
+        min-width: 30px !important;
+        min-height: 30px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        margin-right: 16px !important;
+        margin-left: 10px !important;
+      }
+      .menu-hide-text {
+        font-size: 18px !important;
+        flex-grow: 1 !important;
+        font-weight: 500 !important;
+        letter-spacing: 0.3px !important;
+      }
+      .menu-hide-hidden {
+        color: #ff4e45 !important;
+      }
+      .menu-hide-shown {
+        color: #4caf50 !important;
+      }
+      .section-title .settings-param__name {
+        font-size: 20px !important;
+        font-weight: 600 !important;
+        margin: 25px 0 15px 0 !important;
+        padding-bottom: 8px !important;
+        border-bottom: 2px solid rgba(255, 255, 255, 0.1) !important;
+        color: #fff !important;
+      }
+      .section-divider .settings-param {
+        height: 1px !important;
+        min-height: 1px !important;
+        padding: 0 !important;
+        background: rgba(255, 255, 255, 0.1) !important;
+        margin: 25px 0 !important;
+      }
+      .settings-param.disable-hide {
+        opacity: 0.6 !important;
+        pointer-events: none !important;
+      }
+    </style>`
   ).appendTo("head");
 
-  // Мультимовна підтримка
+  // --- Мультимовна підтримка ---
+
   Lampa.Lang.add({
     menu_items_hide: {
       en: "Management of interface elements",
@@ -165,10 +247,6 @@
       en: "Broadcast",
       uk: "Трансляція",
     },
-    reset_all_hidden: {
-      en: "Show all",
-      uk: "Показати все",
-    },
     head_time: {
       en: "Time",
       uk: "Час і дата",
@@ -178,8 +256,8 @@
       uk: "Редактор кнопок",
     },
     buttons_editor_description: {
-      en: "Toggle the display of the Button Editor",
-      uk: "Перемикання відображення Редактора кнопок",
+      en: "Toggle the display of the Button Editor in the card",
+      uk: "Перемикання відображення Редактора кнопок в картці",
     },
     buttons_editor_on: {
       en: "The button editor is enabled",
@@ -427,6 +505,9 @@
 
   const timeIcon = `<svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>`;
 
+  const playIcon =
+    '<svg viewBox="0 0 12 12" xmlns="http://www.w3.org/2000/svg"><path d="M 10.234 7.733 L 4.468 11.631 C 3.063 12.581 1.16 11.583 1.16 9.898 L 1.16 2.101 C 1.16 0.415 3.063 -0.582 4.468 0.368 L 10.234 4.266 C 11.511 5.125 11.511 6.874 10.234 7.733 Z" fill="currentColor"></path></svg>';
+
   const renderVisibilityIcon = (isHidden) => {
     return `<svg width="26" height="26" viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg">
 <rect x="1.89111" y="1.78369" width="21.793" height="21.793" rx="3.5" stroke="currentColor" stroke-width="3"/>
@@ -435,9 +516,6 @@
     }"/>
 </svg>`;
   };
-
-  const playIcon =
-    '<svg viewBox="0 0 12 12" xmlns="http://www.w3.org/2000/svg"><path d="M 10.234 7.733 L 4.468 11.631 C 3.063 12.581 1.16 11.583 1.16 9.898 L 1.16 2.101 C 1.16 0.415 3.063 -0.582 4.468 0.368 L 10.234 4.266 C 11.511 5.125 11.511 6.874 10.234 7.733 Z" fill="currentColor"></path></svg>';
 
   const EXCLUDED_CLASSES = [
     "button--play",
@@ -462,7 +540,6 @@
   let allButtonsOriginal = [];
   let currentContainer = null;
 
-  // Допоміжна функція для пошуку кнопки
   function findButton(btnId) {
     let btn = allButtonsOriginal.find((b) => getButtonId(b) === btnId);
     if (!btn) {
@@ -471,7 +548,6 @@
     return btn;
   }
 
-  // Допоміжна функція для отримання всіх ID кнопок у папках
   function getButtonsInFolders() {
     const folders = getFolders();
     return folders.flatMap((folder) => folder.buttons);
@@ -1777,17 +1853,6 @@
     return translatedText;
   }
 
-  function translateWithPlaceholders(key, placeholders = {}) {
-    let translatedText = Lampa.Lang.translate(key);
-    for (const placeholder in placeholders) {
-      translatedText = translatedText.replace(
-        `{${placeholder}}`,
-        placeholders[placeholder]
-      );
-    }
-    return translatedText;
-  }
-
   // --- Інформація про сезони ---
 
   function calculateAiredInfo(movie) {
@@ -2147,7 +2212,6 @@
   // MutationObserver
 
   function initGlobalObserver() {
-    // первинний апдейт
     updateAllVisibility();
 
     // listener на Storage
@@ -2166,13 +2230,12 @@
       let menuTouched = false;
 
       mutations.forEach((mutation) => {
-        // === DOM changes ===
+        // === DOM  ===
         if (mutation.type === "childList" && mutation.addedNodes.length) {
           mutation.addedNodes.forEach((node) => {
             if (node.nodeType !== 1) return;
             const $node = $(node);
 
-            // меню / хедер / налаштування
             if (
               $node.is(".menu__list, .head__actions, .settings__body") ||
               $node.find(".menu__list, .head__actions, .settings__body").length
@@ -2180,20 +2243,17 @@
               menuTouched = true;
             }
 
-            // картки
             if (FancyFace.settings.show_movie_type) {
               if ($node.hasClass("card")) cardsToUpdate.add(node);
               $node.find(".card").each((_, card) => cardsToUpdate.add(card));
             }
 
-            // рейтинги
             if (FancyFace.settings.colored_ratings) {
               $node
                 .find(".card__vote, .full-start__rate, .full-start-new__rate")
                 .each((_, el) => applyColorByRating(el));
             }
 
-            // кольорові елементи
             if (FancyFace.settings.colored_elements) {
               if ($node.hasClass("full-start__status")) applyStatusColor(node);
               $node
@@ -2208,7 +2268,6 @@
           });
         }
 
-        // === attribute changes ===
         if (
           FancyFace.settings.show_movie_type &&
           mutation.type === "attributes" &&
@@ -2218,13 +2277,6 @@
         }
       });
 
-      // // меню апдейти
-      // if (menuTouched) {
-      //   createMenuSettings();
-      //   updateAllVisibility();
-      // }
-
-      // апдейт карток
       if (cardsToUpdate.size) {
         requestAnimationFrame(() =>
           cardsToUpdate.forEach((card) => updateCardLabel(card))
@@ -2263,10 +2315,8 @@
 
     $(".head__action, .head__time").each(function () {
       const $item = $(this);
-      // Пропускаємо системні елементи
       if ($item.hasClass("processing")) return;
 
-      // Генеруємо ID на основі класів
       const classes = $item.attr("class").split(" ");
       let idParts = [];
       for (let i = 0; i < classes.length; i++) {
@@ -2576,48 +2626,23 @@
       },
       field: {
         name: resetIcon,
-        description: Lampa.Lang.translate("reset_all_hidden"),
+        description: Lampa.Lang.translate("reset_settings"),
       },
       onChange: function () {
         resetAllHiddenItems();
       },
       onRender: function (item) {
         item.addClass("menu-hide-item");
-        item.find(".settings-param__descr").remove();
-
-        item.find(".settings-param").css({
-          padding: "0 15px",
-          display: "flex",
-          "align-items": "center",
-          "justify-content": "space-between",
-        });
 
         var $name = item.find(".settings-param__name");
-        $name.css({
-          margin: "0",
-          "font-size": "16px",
-          display: "flex",
-          "align-items": "center",
-          "justify-content": "space-between",
-          width: "100%",
-        });
-
-        $name
-          .find("svg")
-          .css({
-            width: "30px",
-            height: "30px",
-            "min-width": "30px",
-            "min-height": "30px",
-          })
-          .addClass("menu-hide-icon");
-
         var $text = $(
-          '<span class="menu-hide-text">' +
-            Lampa.Lang.translate("reset_all_hidden") +
-            "</span>"
+          `<span class="menu-hide-text">${Lampa.Lang.translate(
+            "reset_settings"
+          )}</span>`
         );
-        $name.find("svg").after($text);
+        $name.empty().append(resetIcon).append($text);
+
+        item.find(".settings-param__descr").remove();
       },
     });
     let leftSettingsCreated = false;
