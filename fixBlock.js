@@ -53,6 +53,42 @@
     return originalFetch(input, init);
   };
 
+  const OriginalWebSocket = window.WebSocket;
+
+  window.WebSocket = function (url, protocols) {
+    if (url.includes("z01.online")) {
+      const proxied =
+        "wss://p.suharevich-vadim.workers.dev/?url=" + encodeURIComponent(url);
+
+      // Створюємо сокет
+      const ws = protocols
+        ? new OriginalWebSocket(proxied, protocols)
+        : new OriginalWebSocket(proxied);
+
+      // Маскуємо URL, щоб NativeWsClient не панікував
+      Object.defineProperty(ws, "url", { value: url, writable: false });
+
+      // Додаємо дебаг, щоб бачити чи шле скрипт щось
+      const originalSend = ws.send;
+      ws.send = function (data) {
+        console.log("📤 [WS Outbound]:", data);
+        return originalSend.apply(this, arguments);
+      };
+
+      return ws;
+    }
+    return protocols
+      ? new OriginalWebSocket(url, protocols)
+      : new OriginalWebSocket(url);
+  };
+
+  // ВАЖЛИВО: копіюємо прототип і константи, щоб скрипти не "падали"
+  window.WebSocket.prototype = OriginalWebSocket.prototype;
+  window.WebSocket.CONNECTING = OriginalWebSocket.CONNECTING;
+  window.WebSocket.OPEN = OriginalWebSocket.OPEN;
+  window.WebSocket.CLOSING = OriginalWebSocket.CLOSING;
+  window.WebSocket.CLOSED = OriginalWebSocket.CLOSED;
+
   /* ajax */
   if (window.$ && $.ajax) {
     const originalAjax = $.ajax;
